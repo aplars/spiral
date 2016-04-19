@@ -1,0 +1,2 @@
+#include "animationchannelmodel.h"
+
