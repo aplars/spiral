@@ -68,14 +68,14 @@ void GLWidget::initializeGL() {
   {0.5,0.5, 0.5, 1},
   {1.0,1.0, 1.0, 1}));
 
-    scene->addMeshEntity("desert_city", "desert_city.xml");
-//  scene->addMeshEntity("groundplane100x100", "groundplane100x100.xml");
-//  scene->addMeshEntity("bob0", "bob.xml");
-//  scene->getMeshEntity("bob0")->playSkeletalAnimation("");
+//    scene->addMeshEntity("desert_city", "desert_city.xml");
+  scene->addMeshEntity("groundplane100x100", "groundplane100x100.xml");
+  scene->addMeshEntity("bob0", "bob.xml");
+  scene->getMeshEntity("bob0")->playSkeletalAnimation("");
 
-//  scene->addMeshEntity("motioncapture0", "motioncapture.xml");
-//  scene->getMeshEntity("motioncapture0")->playNodeAnimation("");
-//  scene->getMeshEntity("motioncapture0")->setPosition(20,0,40);
+  scene->addMeshEntity("motioncapture0", "motioncapture.xml");
+  scene->getMeshEntity("motioncapture0")->playNodeAnimation("");
+  scene->getMeshEntity("motioncapture0")->setPosition(120,0,40);
   float LO = -200.0f;
   float HI = 200.0f;
 

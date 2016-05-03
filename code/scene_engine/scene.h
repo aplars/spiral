@@ -10,6 +10,7 @@
 #include "backgroundworker.h"
 #include "adt/lru.h"
 #include "imagecache.h"
+#include "shadercache.h"
 #include <config/config.h>
 #include <boost/flyweight.hpp>
 
@@ -80,7 +81,8 @@ private:
 
 
   ImageCache m_imageCache;
-  lru<std::string, TexturePtr> m_textureCache;
+  TextureCache m_textureCache;
+  ShaderCache m_shaderCache;
 
 };
 }

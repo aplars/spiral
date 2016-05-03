@@ -15,8 +15,10 @@ public:
   ShaderProgram(const char* vertexProgram, const char* fragmentProgram, const char* geometryProgram, const std::set<std::string>& defines);
   void bind();
   void release();
+  void link();
 
   int attributeLocation(const char* name) const;
+  void bindAttributeLocation(const char* name, int location);
   int uniformLocation(const char* name) const;
 
   void setUniformValue(int location, float value);
@@ -31,7 +33,7 @@ public:
   void setUniformValueArray(int location, const std::vector<Matrix44T<float>>& values);
 private:
   void cacheUniforms();
-  QOpenGLShaderProgram m_glObject;
+  mutable QOpenGLShaderProgram m_glObject;
   std::map<std::string, int> m_uniformsCache;
 };
 

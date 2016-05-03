@@ -9,6 +9,8 @@
 #include "adt/lru.h"
 #include <config/config.h>
 #include "imagecache.h"
+#include "texturecache.h"
+#include "shadercache.h"
 
 namespace sa {
 class RenderDevice;
@@ -33,7 +35,7 @@ public:
   void setPendingStorage();
   void setDiskStorage();
   void toCPU(ImageCache& imageCache);
-  void toGPU(const ConfigurationManager& config, unsigned int numberOfShadowCascades, lru<std::string, TexturePtr>& textureCache, RenderDevice* device, RenderContext* context);
+  void toGPU(const ConfigurationManager& config, unsigned int numberOfShadowCascades, TextureCache& textureCache, ShaderCache& shaderCache, RenderDevice* device, RenderContext* context);
   void applyAnimations(float dt);
   void applyTransformations();
   //Returns a list of all skeletal animations

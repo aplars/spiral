@@ -38,7 +38,9 @@ HEADERS += meshrenderable.h \
     datastorage.h \
     backgroundworker.h \
     streamedmeshentity.h \
-    imagecache.h
+    imagecache.h \
+    shadercache.h \
+    texturecache.h
 
 CONFIG( debug, debug|release ) {
     DESTDIR = $$(SPAR_ROOT)/libs/lib-debug
@@ -56,4 +58,6 @@ DISTFILES += \
     ../../data/shaders/ubershader.vsh \
     ../../data/shaders/ubershader.fsh \
     ../../data/shaders/debugshader.fsh \
-    ../../data/shaders/debugshader.vsh
+    ../../data/shaders/debugshader.vsh \
+    ../../data/shaders/ubershadowshader.fsh \
+    ../../data/shaders/ubershadowshader.vsh

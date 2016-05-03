@@ -9,13 +9,15 @@ QT       += core
 TARGET = adt
 TEMPLATE = lib
 CONFIG += staticlib
+CONFIG += c++11
 
 QMAKE_CXXFLAGS += -isystem $$(SPAR_ROOT)/thirdparty/boost/
 INCLUDEPATH += "$$(SPAR_ROOT)/thirdparty/boost/"
 
 
 HEADERS += lru.h \ 
-    stringid.h
+    stringid.h \
+    subject.h
 
 
 CONFIG( debug, debug|release ) {

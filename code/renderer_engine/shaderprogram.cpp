@@ -29,7 +29,6 @@ sa::ShaderProgram::ShaderProgram(const char* vertexProgram, const char* fragment
   initializeOpenGLFunctions();
   cacheUniforms();
   m_glObject.release();
-
 }
 
 sa::ShaderProgram::ShaderProgram(const char* vertexProgram, const char* fragmentProgram, const char* geometryProgram, const std::set<std::string>& defines)
@@ -73,8 +72,16 @@ void sa::ShaderProgram::release()
   m_glObject.release();
 }
 
+void sa::ShaderProgram::link() {
+  m_glObject.link();
+}
+
 int sa::ShaderProgram::attributeLocation(const char* name) const {
   return m_glObject.attributeLocation(name);
+}
+
+void sa::ShaderProgram::bindAttributeLocation(const char* name, int location) {
+  m_glObject.bindAttributeLocation(name, location);
 }
 
 int sa::ShaderProgram::uniformLocation(const char* name) const {
@@ -149,3 +156,4 @@ void sa::ShaderProgram::cacheUniforms() {
   uniformName = NULL;
 
 }
+

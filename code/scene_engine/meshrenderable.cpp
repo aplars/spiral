@@ -81,24 +81,12 @@ void MeshRenderable::toCPU(ImageCache& imageCache) {
   }
   //m_currentDataStorage = DataStorage::CPU;
 }
-/*
-enum ShaderSwitches {
-  AMBIENT_TEXTURE = 1,
-  DIFFUSE_TEXTURE = 2,
-  SPECULAR_TEXTURE = 4,
-  BONE_ANIMATION = 8,
-};
 
-class ShaderKey {
-  int m_shaderSwitches;
-  std::string m_name;
-};
-*/
-void MeshRenderable::toGPU(const ConfigurationManager& config, unsigned int numberOfShadowCascades, lru<std::string, TexturePtr>& textureCache, RenderDevice* device, RenderContext* context) {
-  std::string dataDir = config.getParam("DATA_DIR");
-
+void MeshRenderable::toGPU(const ConfigurationManager& config, unsigned int numberOfShadowCascades, TextureCache& textureCache, ShaderCache& shaderCache, RenderDevice* device, RenderContext* context) {
   //Setup the shader paths.
   std::set<std::string> defines;
+
+
 
   defines.insert("NUMBER_OF_CASCADES " + std::to_string(numberOfShadowCascades));
   for(MeshModel::Data::Materials::value_type material : m_meshModel.m_data.m_materials) {
@@ -118,10 +106,17 @@ void MeshRenderable::toGPU(const ConfigurationManager& config, unsigned int numb
     defines.insert("BONE_ANIMATION");
   }
 
-  ShaderProgramPtr sp = device->createShaderProgramFromFile(
-        (config.getParam("DATA_DIR") + "/shaders/" + "ubershader.vsh").c_str(),
-        (config.getParam("DATA_DIR") + "/shaders/" + "ubershader.fsh").c_str(),
-        defines);
+  ShaderProgramPtr sp;
+  std::string vshDir = (config.getParam("DATA_DIR") + "/shaders/" + "ubershader.vsh");
+  std::string fshDir = (config.getParam("DATA_DIR") + "/shaders/" + "ubershader.fsh");
+
+  if(!shaderCache.try_get(std::make_tuple(defines, vshDir, fshDir), sp)) {
+    sp = device->createShaderProgramFromFile(
+          vshDir.c_str(),
+          fshDir.c_str(),
+          defines);
+  }
+
   int posAttr = sp->attributeLocation("posAttr");
   int texAttr = sp->attributeLocation("texAttr");
   int norAttr = sp->attributeLocation("norAttr");
@@ -130,41 +125,10 @@ void MeshRenderable::toGPU(const ConfigurationManager& config, unsigned int numb
 
   m_modelMatrixUniform = sp->uniformLocation("u_modelMatrix");
 
-  static const char *vertexShadowShaderSource =
-      "attribute highp highp vec3 posAttr;\n"
-      "attribute highp highp vec4 bAttr;\n"
-      "attribute highp highp vec4 wAttr;\n"
-      "uniform highp mat4 u_modelMatrix;\n"
-      "uniform highp mat4 u_viewMatrix;\n"
-      "uniform highp mat4 u_projectionMatrix;\n"
-      "uniform highp mat4 u_bones[100];\n"
-      "#ifdef BONE_ANIMATION\n"
-      "#endif\n"
-
-      "void main() {\n"
-      "  mat4 boneTransform = mat4(0.0);\n"
-      "#ifdef BONE_ANIMATION\n"
-      "  boneTransform  = u_bones[int(bAttr[0])] * wAttr[0];\n"
-      "  boneTransform += u_bones[int(bAttr[1])] * wAttr[1];\n"
-      "  boneTransform += u_bones[int(bAttr[2])] * wAttr[2];\n"
-      "  boneTransform += u_bones[int(bAttr[3])] * wAttr[3];\n"
-      "#else\n"
-      "  boneTransform = mat4(1.0);\n"
-      "#endif\n"
-      "  mat4 viewmodel = u_viewMatrix * u_modelMatrix;\n"
-      "  mat4 viewmodelbone = viewmodel * boneTransform;\n"
-      "  vec4 posAttr4 = vec4(viewmodelbone * vec4(posAttr, 1));\n"
-      "  gl_Position = u_projectionMatrix * viewmodelbone * vec4(posAttr, 1.0);\n"
-      "}\n";
-
-
-  static const char *fragmentShadowShaderSource =
-      "void main() {\n"
-      "   gl_FragColor =  vec4(1,1,1,1);\n"
-      "}\n";
-
-  ShaderProgramPtr ssp = device->createShaderProgram(vertexShadowShaderSource, fragmentShadowShaderSource, defines);
-
+  ShaderProgramPtr ssp = device->createShaderProgramFromFile(
+        (config.getParam("DATA_DIR") + "/shaders/" + "ubershadowshader.vsh").c_str(),
+        (config.getParam("DATA_DIR") + "/shaders/" + "ubershadowshader.fsh").c_str(),
+        defines);
 
 
   sa::VertexDescription vertexDesc =

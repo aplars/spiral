@@ -68,8 +68,8 @@ void StreamedMeshEntity::toCPU(ImageCache& imageCache) {
   m_mutex.unlock();
 }
 
-void StreamedMeshEntity::toGPU(const ConfigurationManager& config, unsigned int numberOfShadowCascades, lru<std::string, TexturePtr>& textureCache, RenderDevice* device, RenderContext* context) {
-  m_mesh->toGPU(config, numberOfShadowCascades, textureCache, device, context);
+void StreamedMeshEntity::toGPU(const ConfigurationManager& config, unsigned int numberOfShadowCascades, TextureCache& textureCache, ShaderCache& shaderCache, RenderDevice* device, RenderContext* context) {
+  m_mesh->toGPU(config, numberOfShadowCascades, textureCache, shaderCache, device, context);
   m_mutex.lock();
   m_currentStorage = DataStorage::GPU;
   m_mutex.unlock();

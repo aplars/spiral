@@ -18,6 +18,7 @@ Scene::Scene(unsigned int width, unsigned int height)
   : m_sun({1,0,1}, {0.5,0.5, 0.5, 1}, {1.0,1.0, 1.0, 1})
   , m_imageCache(1000)
   , m_textureCache(1000)
+  , m_shaderCache(1000)
 {
 
   m_shadowMapCascadeDistance.push_back(100);
@@ -80,7 +81,6 @@ void Scene::toCPU() {
       }
       if(e.second->currentDataStorage() == DataStorage::Disk)
       {
-        //e.second->toCPU(m_imageCache);
         //We don not want to load this sucker again therefore we set it as pending.
         e.second->setPendingStorage();
         BackgroundWorkPtr work;
@@ -107,11 +107,6 @@ void Scene::toCPU() {
   Vector3T<float> centerpoint = m_camera.getFrusumCenterPoint(m_projection);
 
   m_sunCamera.setLookAt(centerpoint + m_sun.direction(), centerpoint, Vector3T<float>(0, 1, 0));
-
-  //m_sunCamera.setLookAt(m_sun.direction(), Vector3T<float>(), Vector3T<float>(0, 1, 0));
-
-
-
 }
 
 void Scene::toGPUOnce(RenderDevice* device, RenderContext* context) {
@@ -139,14 +134,10 @@ void Scene::toGPU(RenderDevice* device, RenderContext* context) {
     }
   }
 
-  int numToCPU=0;
   for(Entities::value_type e : m_meshes) {
     if(e.second->currentDataStorage() == DataStorage::CPU)
     {
-      e.second->toGPU(m_config, m_shadowMapCascadeDistance.size(), m_textureCache, device, context);
-      if(numToCPU > 0)
-        break;
-      numToCPU++;
+      e.second->toGPU(m_config, m_shadowMapCascadeDistance.size(), m_textureCache, m_shaderCache, device, context);
     }
   }
 

@@ -6,6 +6,9 @@
 #include <string>
 #include "adt/lru.h"
 #include "imagecache.h"
+#include "texturecache.h"
+#include "shadercache.h"
+
 namespace sa {
 class RenderDevice;
 class RenderContext;
@@ -35,7 +38,7 @@ public:
    * @param context
    * @return
    */
-  void toGPU(const ConfigurationManager& config, unsigned int numberOfShadowCascades, lru<std::string, TexturePtr>& textureCache, RenderDevice* device, RenderContext* context);
+  void toGPU(const ConfigurationManager& config, unsigned int numberOfShadowCascades, TextureCache& textureCache, ShaderCache& shaderCache, RenderDevice* device, RenderContext* context);
 
   void unloadGPU();
   void unloadCPU();

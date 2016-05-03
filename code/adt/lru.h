@@ -1,7 +1,7 @@
 #pragma once
 #include <map>
 #include <list>
-
+#include <unordered_map>
 namespace sa
 {
 ///An lru cache storing key value pairs.
@@ -12,7 +12,7 @@ public:
 
   typedef std::pair<K, V> key_value_type;
   typedef std::list<std::pair<K, V>> history_type;
-  typedef std::map<K, typename history_type::iterator> key_value_map_type;
+  typedef std::unordered_map<K, typename history_type::iterator> key_value_map_type;
 
   typedef typename history_type::iterator iterator;
   typedef typename history_type::const_iterator const_iterator;
