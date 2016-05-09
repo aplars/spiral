@@ -19,6 +19,7 @@
 #include <scene_models/meshnodemodel.h>
 #include <scene_models/transformationnodemodel.h>
 #include <config/config.h>
+#include "converters.h"
 
 BOOST_CLASS_EXPORT(sa::MeshNodeModel)
 BOOST_CLASS_EXPORT(sa::TransformationNodeModel);
@@ -110,11 +111,13 @@ void MeshRenderable::toGPU(const ConfigurationManager& config, unsigned int numb
   std::string vshDir = (config.getParam("DATA_DIR") + "/shaders/" + "ubershader.vsh");
   std::string fshDir = (config.getParam("DATA_DIR") + "/shaders/" + "ubershader.fsh");
 
-  if(!shaderCache.try_get(std::make_tuple(defines, vshDir, fshDir), sp)) {
+  auto shaderkey = std::make_tuple(defines, vshDir, fshDir);
+  if(!shaderCache.try_get(shaderkey, sp)) {
     sp = device->createShaderProgramFromFile(
           vshDir.c_str(),
           fshDir.c_str(),
           defines);
+    shaderCache.insert(shaderkey, sp);
   }
 
   int posAttr = sp->attributeLocation("posAttr");
@@ -140,21 +143,6 @@ void MeshRenderable::toGPU(const ConfigurationManager& config, unsigned int numb
     {wAttr, sa::VertexDescriptionElement::Type::FLOAT, 4}
   };
 
-  std::function<Texture::WrapMode (MaterialModel::TextureMappingMode)> convertWrapMode = [](MaterialModel::TextureMappingMode mode) {
-    switch(mode) {
-    case sa::MaterialModel::Repeat:
-      return Texture::WrapMode::Repeat;
-    case sa::MaterialModel::MirroredRepeat:
-      return Texture::WrapMode::MirroredRepeat;
-    case sa::MaterialModel::ClampToEdge:
-      return Texture::WrapMode::ClampToEdge;
-    case sa::MaterialModel::ClampToBorder:
-      return Texture::WrapMode::ClampToBorder;
-    default:
-      return Texture::WrapMode::Repeat;
-    }
-  };
-
   unsigned int meshIndex = 0;
   for(sa::MeshModel::Data::SubMeshes::value_type sm : m_meshModel.m_data.m_subMeshes) {
     DrawData subMeshDrawData;
@@ -169,17 +157,17 @@ void MeshRenderable::toGPU(const ConfigurationManager& config, unsigned int numb
 
     if(!ambientTex)
     {
-      ambientTex =  device->createTextureFromImage(m_ambientImage[sm->getMaterialKey()], convertWrapMode(material->mappingModeAmbient()));
+      ambientTex =  device->createTextureFromImage(m_ambientImage[sm->getMaterialKey()], Converters::convertWrapMode(material->mappingModeAmbient()));
       textureCache.insert(material->texDirAmbient(), ambientTex);
     }
     if(!diffuseTex)
     {
-      diffuseTex =  device->createTextureFromImage(m_diffuseImage[sm->getMaterialKey()], convertWrapMode(material->mappingModeDiffuse()));
+      diffuseTex =  device->createTextureFromImage(m_diffuseImage[sm->getMaterialKey()], Converters::convertWrapMode(material->mappingModeDiffuse()));
       textureCache.insert(material->texDirDiffuse(), diffuseTex);
     }
     if(!speculaTex)
     {
-      speculaTex =  device->createTextureFromImage(m_specularImage[sm->getMaterialKey()], convertWrapMode(material->mappingModeSpecular()));
+      speculaTex =  device->createTextureFromImage(m_specularImage[sm->getMaterialKey()], Converters::convertWrapMode(material->mappingModeSpecular()));
       textureCache.insert(material->texDirDiffuse(), speculaTex);
     }
 

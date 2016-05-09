@@ -26,7 +26,8 @@ SOURCES += meshrenderable.cpp \
     cuberenderable.cpp \
     debugentity.cpp \
     backgroundworker.cpp \
-    streamedmeshentity.cpp
+    streamedmeshentity.cpp \
+    converters.cpp
 
 HEADERS += meshrenderable.h \
     scene.h \
@@ -40,7 +41,8 @@ HEADERS += meshrenderable.h \
     streamedmeshentity.h \
     imagecache.h \
     shadercache.h \
-    texturecache.h
+    texturecache.h \
+    converters.h
 
 CONFIG( debug, debug|release ) {
     DESTDIR = $$(SPAR_ROOT)/libs/lib-debug
