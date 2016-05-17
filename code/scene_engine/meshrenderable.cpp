@@ -88,7 +88,6 @@ void MeshRenderable::toGPU(const ConfigurationManager& config, unsigned int numb
   std::set<std::string> defines;
 
 
-
   defines.insert("NUMBER_OF_CASCADES " + std::to_string(numberOfShadowCascades));
   for(MeshModel::Data::Materials::value_type material : m_meshModel.m_data.m_materials) {
     if(!material->texDirAmbient().empty()) {
@@ -128,11 +127,19 @@ void MeshRenderable::toGPU(const ConfigurationManager& config, unsigned int numb
 
   m_modelMatrixUniform = sp->uniformLocation("u_modelMatrix");
 
-  ShaderProgramPtr ssp = device->createShaderProgramFromFile(
-        (config.getParam("DATA_DIR") + "/shaders/" + "ubershadowshader.vsh").c_str(),
-        (config.getParam("DATA_DIR") + "/shaders/" + "ubershadowshader.fsh").c_str(),
-        defines);
+  ShaderProgramPtr ssp;
+  std::string svshDir = (config.getParam("DATA_DIR") + "/shaders/" + "ubershadowshader.vsh");
+  std::string sfshDir = (config.getParam("DATA_DIR") + "/shaders/" + "ubershadowshader.fsh");
 
+  shaderkey = std::make_tuple(defines, svshDir, sfshDir);
+  if(!shaderCache.try_get(shaderkey, ssp))
+  {
+    ssp = device->createShaderProgramFromFile(
+          svshDir.c_str(),
+          sfshDir.c_str(),
+          defines);
+    shaderCache.insert(shaderkey, ssp);
+  }
 
   sa::VertexDescription vertexDesc =
   {
