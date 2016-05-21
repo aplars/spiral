@@ -16,6 +16,8 @@ QMAKE_CXXFLAGS += -isystem $$(SPAR_ROOT)/thirdparty/boost/
 INCLUDEPATH += "$$(SPAR_ROOT)/code"
 INCLUDEPATH += "$$(SPAR_ROOT)/thirdparty/boost"
 
+warning ($$(SPAR_ROOT))
+
 SOURCES += \
     materialmodel.cpp \
     transformationnodemodel.cpp \

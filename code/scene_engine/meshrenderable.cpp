@@ -110,7 +110,11 @@ void MeshRenderable::toGPU(const ConfigurationManager& config, unsigned int numb
   std::string vshDir = (config.getParam("DATA_DIR") + "/shaders/" + "ubershader.vsh");
   std::string fshDir = (config.getParam("DATA_DIR") + "/shaders/" + "ubershader.fsh");
 
-  auto shaderkey = std::make_tuple(defines, vshDir, fshDir);
+  std::string definesAsString;
+  for(auto define : defines) {
+    definesAsString+=define;
+  }
+  auto shaderkey = definesAsString + vshDir + fshDir;
   if(!shaderCache.try_get(shaderkey, sp)) {
     sp = device->createShaderProgramFromFile(
           vshDir.c_str(),
@@ -131,7 +135,11 @@ void MeshRenderable::toGPU(const ConfigurationManager& config, unsigned int numb
   std::string svshDir = (config.getParam("DATA_DIR") + "/shaders/" + "ubershadowshader.vsh");
   std::string sfshDir = (config.getParam("DATA_DIR") + "/shaders/" + "ubershadowshader.fsh");
 
-  shaderkey = std::make_tuple(defines, svshDir, sfshDir);
+  definesAsString.clear();
+  for(auto define : defines) {
+    definesAsString+=define;
+  }
+  shaderkey = definesAsString + vshDir + fshDir;
   if(!shaderCache.try_get(shaderkey, ssp))
   {
     ssp = device->createShaderProgramFromFile(
@@ -258,7 +266,7 @@ void MeshRenderable::applyAnimations(float dt) {
 
 
   for(sa::MeshModel::Data::SubMeshes::value_type subMesh : m_meshModel.m_data.m_subMeshes) {
-    if(subMesh->skeleton() && subMesh->skeleton()->Animations.end() != subMesh->skeleton()->Animations.find(m_currentSkeletalAnimation)) {
+    if(subMesh && subMesh->skeleton() && subMesh->skeleton()->Animations.end() != subMesh->skeleton()->Animations.find(m_currentSkeletalAnimation)) {
       subMesh->skeleton()->animate(m_currentSkeletalAnimationTime, m_currentSkeletalAnimation);
     }
   }
