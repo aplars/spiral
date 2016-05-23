@@ -72,29 +72,6 @@ uniform float u_shininessStrength;
 uniform vec3 u_eyePosition;
 uniform DirectionalLight u_directionalLight;
 
-vec4 ambientMaterialProperty() {
-#ifdef AMBIENT_TEXTURE
-  return texture2D(u_ambientTexture, v_texAttr);
-#else
-  return u_ambientMaterial;
-#endif
-}
-
-vec4 diffuseMaterialProperty() {
-#ifdef DIFFUSE_TEXTURE
-  return texture2D(u_diffuseTexture, v_texAttr);
-#else
-  return u_diffuseMaterial;
-#endif
-}
-
-vec4 specularMaterialProperty() {
-#ifdef SPECULAR_TEXTURE
-  return texture2D(u_specularTexture, v_texAttr);
-#else
-  return u_specularMaterial;
-#endif
-}
 
 void main()
 {
@@ -105,9 +82,21 @@ void main()
    cascadeColors[3] = vec4(1,1,0.5,0.5);
    cascadeColors[4] = vec4(0.5,1,1,0.5);
 
-   vec4 ambient = ambientMaterialProperty();
-   vec4 diffuse = diffuseMaterialProperty();
-   vec4 specular = specularMaterialProperty();
+#ifdef AMBIENT_TEXTURE
+  vec4 ambient = texture2D(u_ambientTexture, v_texAttr);
+#else
+  vec4 ambient = u_ambientMaterial;
+#endif
+#ifdef DIFFUSE_TEXTURE
+  vec4 diffuse = texture2D(u_diffuseTexture, v_texAttr);
+#else
+  vec4 diffuse = u_diffuseMaterial;
+#endif
+#ifdef SPECULAR_TEXTURE
+  vec4 specular = texture2D(u_specularTexture, v_texAttr);
+#else
+  vec4 specular = u_specularMaterial;
+#endif
 
    vec4 o = blinnPhong(
       u_directionalLight.ambient,

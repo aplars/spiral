@@ -34,7 +34,7 @@ IndexBufferPtr RenderDevice::createIndexBuffer(const std::vector<unsigned int> &
         indices.size());
 }
 
-ShaderProgramPtr RenderDevice::createShaderProgram(const char* vertexProgram, const char* fragmantProgram, std::set<std::string>& defines) const {
+ShaderProgramPtr RenderDevice::createShaderProgram(const char* vertexProgram, const char* fragmantProgram, const std::set<std::string>& defines) const {
   ShaderProgramPtr sp = ShaderProgramPtr(new ShaderProgram(vertexProgram, fragmantProgram, defines));
   return sp;
 }
@@ -57,7 +57,7 @@ static std::string readFromFile(const char* filePath) {
 
 }
 
-ShaderProgramPtr RenderDevice::createShaderProgramFromFile(const char* vertexProgram, const char* fragmantProgram, std::set<std::string>& defines) const {
+ShaderProgramPtr RenderDevice::createShaderProgramFromFile(const char* vertexProgram, const char* fragmantProgram, const std::set<std::string>& defines) const {
 
   return createShaderProgram(
         readFromFile(vertexProgram).c_str(),
@@ -65,12 +65,12 @@ ShaderProgramPtr RenderDevice::createShaderProgramFromFile(const char* vertexPro
         defines);
 }
 
-ShaderProgramPtr RenderDevice::createShaderProgram(const char* vertexProgram, const char* fragmantProgram, const char* geometryProgram, std::set<std::string>& defines) const {
+ShaderProgramPtr RenderDevice::createShaderProgram(const char* vertexProgram, const char* fragmantProgram, const char* geometryProgram, const std::set<std::string>& defines) const {
   ShaderProgramPtr sp = ShaderProgramPtr(new ShaderProgram(vertexProgram, fragmantProgram, geometryProgram, defines));
   return sp;
 }
 
-ShaderProgramPtr RenderDevice::createShaderProgramFromFile(const char* vertexProgram, const char* fragmantProgram, const char* geometryProgram, std::set<std::string>& defines) const {
+ShaderProgramPtr RenderDevice::createShaderProgramFromFile(const char* vertexProgram, const char* fragmantProgram, const char* geometryProgram, const std::set<std::string>& defines) const {
   std::function<std::string (const char*)> readFromFile = [](const char* filePath) {
     std::string fileString;
     std::string line;

@@ -268,11 +268,11 @@ void Scene::drawShadowPass(RenderContext* context) {
       dd.Matrix4Uniforms[dd.SP->uniformLocation("u_viewMatrix")] = m_sunCamera.viewMatrix();
       dd.Matrix4Uniforms[dd.SP->uniformLocation("u_projectionMatrix")] = ortho;
 
-      dd.Vec3Uniforms[dd.SP->uniformLocation("u_directionalLight.direction")] = m_sun.direction();
-      dd.Vec4Uniforms[dd.SP->uniformLocation("u_directionalLight.ambient")] = m_sun.ambient();
-      dd.Vec4Uniforms[dd.SP->uniformLocation("u_directionalLight.diffuse")] = m_sun.diffuse();
+//      dd.Vec3Uniforms[dd.SP->uniformLocation("u_directionalLight.direction")] = m_sun.direction();
+//      dd.Vec4Uniforms[dd.SP->uniformLocation("u_directionalLight.ambient")] = m_sun.ambient();
+//      dd.Vec4Uniforms[dd.SP->uniformLocation("u_directionalLight.diffuse")] = m_sun.diffuse();
 
-      dd.Vec3Uniforms[dd.SP->uniformLocation("u_eyePosition")] = m_sunCamera.eye();
+//      dd.Vec3Uniforms[dd.SP->uniformLocation("u_eyePosition")] = m_sunCamera.eye();
 
     }
     for(std::deque<DrawData>::value_type& dd : allToDraw) {

@@ -76,11 +76,51 @@ void MeshRenderable::toCPU(ImageCache& imageCache) {
       m_specularImage[materialKey] = img;
     }
     ++materialKey;
-    //m_ambientImage[materialE.first] = Image(m_resourcePath + material->texDirAmbient());
-    //m_diffuseImage[materialE.first] = Image(m_resourcePath + material->texDirDiffuse());
-    //m_specularImage[materialE.first] = Image(m_resourcePath + material->texDirSpecular());
   }
-  //m_currentDataStorage = DataStorage::CPU;
+}
+
+std::set<std::string> getShaderDefinesFromMesh(const MeshModel& mesh) {
+  std::set<std::string> defines;
+  if(mesh.m_data.m_haveBones) {
+    defines.insert("BONE_ANIMATION");
+  }
+  return defines;
+}
+
+std::set<std::string> getShaderDefinesFromSubMesh(const SubMeshModel& subMesh, const MeshModel::Data::Materials& materials) {
+  std::set<std::string> defines;
+  auto material = materials[subMesh.getMaterialKey()];
+  if(!material->texDirAmbient().empty()) {
+    defines.insert("AMBIENT_TEXTURE");
+  }
+  if(!material->texDirDiffuse().empty()) {
+    defines.insert("DIFFUSE_TEXTURE");
+  }
+  if(!material->texDirSpecular().empty()) {
+    defines.insert("SPECULAR_TEXTURE");
+  }
+  return defines;
+}
+
+ShaderProgramPtr createShaderProgramFromFile(const std::set<std::string>& defines, const std::string& vshDir, const std::string& fshDir, ShaderCache& cache, RenderDevice* device) {
+  ShaderProgramPtr sp;
+  std::string definesAsString;
+  for(auto define : defines) {
+    definesAsString+=define;
+  }
+  auto shaderkey = definesAsString + vshDir + fshDir;
+  if(!cache.try_get(shaderkey, sp)) {
+    sp = device->createShaderProgramFromFile(
+          vshDir.c_str(),
+          fshDir.c_str(),
+          defines);
+    cache.insert(shaderkey, sp);
+  }
+  return sp;
+}
+
+void set_insert_range(const std::set<std::string>& in, std::set<std::string>& out) {
+  out.insert(in.begin(), in.end());
 }
 
 void MeshRenderable::toGPU(const ConfigurationManager& config, unsigned int numberOfShadowCascades, TextureCache& textureCache, ShaderCache& shaderCache, RenderDevice* device, RenderContext* context) {
@@ -106,22 +146,12 @@ void MeshRenderable::toGPU(const ConfigurationManager& config, unsigned int numb
     defines.insert("BONE_ANIMATION");
   }
 
+  /*
   ShaderProgramPtr sp;
   std::string vshDir = (config.getParam("DATA_DIR") + "/shaders/" + "ubershader.vsh");
   std::string fshDir = (config.getParam("DATA_DIR") + "/shaders/" + "ubershader.fsh");
 
-  std::string definesAsString;
-  for(auto define : defines) {
-    definesAsString+=define;
-  }
-  auto shaderkey = definesAsString + vshDir + fshDir;
-  if(!shaderCache.try_get(shaderkey, sp)) {
-    sp = device->createShaderProgramFromFile(
-          vshDir.c_str(),
-          fshDir.c_str(),
-          defines);
-    shaderCache.insert(shaderkey, sp);
-  }
+  sp = createShaderProgramFromFile(defines, vshDir, fshDir, shaderCache, device);
 
   int posAttr = sp->attributeLocation("posAttr");
   int texAttr = sp->attributeLocation("texAttr");
@@ -135,20 +165,7 @@ void MeshRenderable::toGPU(const ConfigurationManager& config, unsigned int numb
   std::string svshDir = (config.getParam("DATA_DIR") + "/shaders/" + "ubershadowshader.vsh");
   std::string sfshDir = (config.getParam("DATA_DIR") + "/shaders/" + "ubershadowshader.fsh");
 
-  definesAsString.clear();
-  for(auto define : defines) {
-    definesAsString+=define;
-  }
-  shaderkey = definesAsString + vshDir + fshDir;
-  if(!shaderCache.try_get(shaderkey, ssp))
-  {
-    ssp = device->createShaderProgramFromFile(
-          svshDir.c_str(),
-          sfshDir.c_str(),
-          defines);
-    shaderCache.insert(shaderkey, ssp);
-  }
-
+  ssp = createShaderProgramFromFile(defines, svshDir, sfshDir, shaderCache, device);
   sa::VertexDescription vertexDesc =
   {
     {posAttr, sa::VertexDescriptionElement::Type::FLOAT, 3},
@@ -157,9 +174,55 @@ void MeshRenderable::toGPU(const ConfigurationManager& config, unsigned int numb
     {bAttr, sa::VertexDescriptionElement::Type::FLOAT, 4},
     {wAttr, sa::VertexDescriptionElement::Type::FLOAT, 4}
   };
+*/
+  std::set<std::string> globalDefines;
+
+
+  globalDefines.insert("NUMBER_OF_CASCADES " + std::to_string(numberOfShadowCascades));
+  set_insert_range(getShaderDefinesFromMesh(m_meshModel), globalDefines);
 
   unsigned int meshIndex = 0;
   for(sa::MeshModel::Data::SubMeshes::value_type sm : m_meshModel.m_data.m_subMeshes) {
+    std::set<std::string> defines;
+    std::set<std::string> subMeshDefines = getShaderDefinesFromSubMesh(*sm, m_meshModel.m_data.m_materials);
+    set_insert_range(globalDefines, defines);
+    set_insert_range(subMeshDefines, defines);
+
+    ShaderProgramPtr sp = createShaderProgramFromFile(
+          defines,
+          (config.getParam("DATA_DIR") + "/shaders/" + "ubershader.vsh"),
+          (config.getParam("DATA_DIR") + "/shaders/" + "ubershader.fsh"),
+          shaderCache,
+          device);
+    ShaderProgramPtr ssp = createShaderProgramFromFile(
+          defines,
+          (config.getParam("DATA_DIR") + "/shaders/" + "ubershadowshader.vsh"),
+          (config.getParam("DATA_DIR") + "/shaders/" + "ubershadowshader.fsh"),
+          shaderCache,
+          device);
+
+    int posAttr = sp->attributeLocation("posAttr");
+    int texAttr = sp->attributeLocation("texAttr");
+    int norAttr = sp->attributeLocation("norAttr");
+    int bAttr = sp->attributeLocation("bAttr");
+    int wAttr = sp->attributeLocation("wAttr");
+    sa::VertexDescription vertexDesc =
+    {
+      {posAttr, sa::VertexDescriptionElement::Type::FLOAT, 3},
+      {texAttr, sa::VertexDescriptionElement::Type::FLOAT, 2},
+      {norAttr, sa::VertexDescriptionElement::Type::FLOAT, 3},
+      {bAttr, sa::VertexDescriptionElement::Type::FLOAT, 4},
+      {wAttr, sa::VertexDescriptionElement::Type::FLOAT, 4}
+    };
+
+    int sposAttr = ssp->attributeLocation("posAttr");
+    if(sposAttr != posAttr)
+    {
+      throw "sdsdsd";
+    }
+
+    m_modelMatrixUniform = sp->uniformLocation("u_modelMatrix");
+
     DrawData subMeshDrawData;
     const MaterialModel* material = m_meshModel.m_data.m_materials[sm->getMaterialKey()];
 
@@ -284,8 +347,8 @@ void MeshRenderable::applyTransformations() {
       Skeleton* skeleton = subMesh->skeleton();
       skeleton->applyTransformations();
       unsigned int i = 0;
+      int uniLoc = m_drawData[subMeshIndex].SP->uniformLocation("u_bones");
       for(Skeleton::JointMap::value_type j : skeleton->Joints) {
-        int uniLoc = m_drawData[subMeshIndex].SP->uniformLocation("u_bones");
         m_drawData[subMeshIndex].Matrix4Uniforms[uniLoc+i] = j.second.Transformation;
         i++;
       }
@@ -303,8 +366,8 @@ void MeshRenderable::applyTransformations() {
   {
     const std::set<MeshNodeModel*>& meshNodes = m_meshModel.getMeshNodes();
     for(MeshNodeModel* mesh : meshNodes) {
-      //m_drawData[mesh->mesh()].Matrix4Uniforms[m_drawData[mesh->mesh()].SP->uniformLocation("u_modelMatrix")] =  mesh->transformation();
-      m_drawData[mesh->mesh()].Matrix4Uniforms[m_modelMatrixUniform] =  mesh->transformation();
+      m_drawData[mesh->mesh()].Matrix4Uniforms[m_drawData[mesh->mesh()].SP->uniformLocation("u_modelMatrix")] =  mesh->transformation();
+      //m_drawData[mesh->mesh()].Matrix4Uniforms[m_modelMatrixUniform] =  mesh->transformation();
       m_drawDataDeque.push_back(m_drawData[mesh->mesh()]);
     }
   }

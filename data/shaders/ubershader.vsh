@@ -3,13 +3,16 @@
 attribute highp highp vec3 posAttr;
 attribute highp highp vec2 texAttr;
 attribute highp highp vec3 norAttr;
+#ifdef BONE_ANIMATION
 attribute highp highp vec4 bAttr;
 attribute highp highp vec4 wAttr;
+#endif
 varying vec3 v_posAttr;
 varying vec2 v_texAttr;
 varying vec4 v_norAttr;
 varying vec4 v_shadowCoord[NUMBER_OF_CASCADES];
 varying float v_posViewZ;
+
 uniform highp mat4 u_modelMatrix;
 uniform highp mat4 u_viewMatrix;
 uniform highp mat4 u_projectionMatrix;
@@ -41,11 +44,7 @@ void main()
   for(int i = 0; i < NUMBER_OF_CASCADES; i++) {
      v_shadowCoord[i] = u_depthBiasMVPMatrix[i] * u_modelMatrix * boneTransform * vec4(posAttr, 1.0);
   }
-  //v_shadowCoord[0] = u_depthBiasMVPMatrix[0] * u_modelMatrix * boneTransform * vec4(posAttr, 1.0);
-  //v_shadowCoord[1] = u_depthBiasMVPMatrix[1] * u_modelMatrix * boneTransform * vec4(posAttr, 1.0);
-  //v_shadowCoord[2] = u_depthBiasMVPMatrix[2] * u_modelMatrix * boneTransform * vec4(posAttr, 1.0);
   vec4 thePos = u_projectionMatrix * viewmodelbone * vec4(posAttr, 1.0);
-  //v_posViewZ = thePos.z/thePos.w;
   gl_Position = u_projectionMatrix * viewmodelbone * vec4(posAttr, 1.0);
   v_posViewZ = gl_Position.z;
 }
