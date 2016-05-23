@@ -131,13 +131,10 @@ void RenderContext::draw(DrawData drawData) {
   {
     m_currentSP->setUniformValueArray(uniform.first, uniform.second);
   }
-
   for(Matrix4ArrayUniformsMap::value_type uniform : drawData.Matrix4ArrayUniforms)
   {
     m_currentSP->setUniformValueArray(uniform.first, uniform.second);
   }
-
-
   for(Sampler2DArrayUniformsMap::value_type uniform : drawData.Sampler2DArrayUniforms)
   {
     m_currentSP->setUniformValueArray(uniform.first, uniform.second);

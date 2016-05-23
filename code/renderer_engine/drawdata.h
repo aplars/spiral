@@ -7,14 +7,14 @@
 
 namespace sa {
 
-typedef std::map<int, float> FloatUniformsMap;
-typedef std::map<int, Vector3T<float> > Vec3UniformsMap;
-typedef std::map<int, Vector4T<float> > Vec4UniformsMap;
-typedef std::map<int, Matrix44T<float> > Matrix4UniformsMap;
-typedef std::map<int, unsigned int> Sampler2DUniformsMap;
-typedef std::map<int, std::vector<float>> FloatArrayUniformsMap;
-typedef std::map<int, std::vector<Matrix44T<float>>> Matrix4ArrayUniformsMap;
-typedef std::map<int, std::vector<unsigned int>> Sampler2DArrayUniformsMap;
+typedef std::map<std::string, float> FloatUniformsMap;
+typedef std::map<std::string, Vector3T<float> > Vec3UniformsMap;
+typedef std::map<std::string, Vector4T<float> > Vec4UniformsMap;
+typedef std::map<std::string, Matrix44T<float> > Matrix4UniformsMap;
+typedef std::map<std::string, unsigned int> Sampler2DUniformsMap;
+typedef std::map<std::string, std::vector<float>> FloatArrayUniformsMap;
+typedef std::map<std::string, std::vector<Matrix44T<float>>> Matrix4ArrayUniformsMap;
+typedef std::map<std::string, std::vector<unsigned int>> Sampler2DArrayUniformsMap;
 
 struct DrawData {
   bool IsVisible = true;

@@ -21,16 +21,16 @@ public:
   void bindAttributeLocation(const char* name, int location);
   int uniformLocation(const char* name) const;
 
-  void setUniformValue(int location, float value);
-  void setUniformValue(int location, const Vector3T<float> &value);
-  void setUniformValue(int location, const Vector4T<float> &value);
-  void setUniformValue(int location, const Matrix44T<float>& value);
-  void setUniformValue(int location, const float value[4][4]);
-  void setUniformValue(int location, unsigned int value);
+  void setUniformValue(const std::string& location, float value);
+  void setUniformValue(const std::string& location, const Vector3T<float> &value);
+  void setUniformValue(const std::string& location, const Vector4T<float> &value);
+  void setUniformValue(const std::string& location, const Matrix44T<float>& value);
+  void setUniformValue(const std::string& location, const float value[4][4]);
+  void setUniformValue(const std::string& location, unsigned int value);
 
-  void setUniformValueArray(int location, const std::vector<float>& values);
-  void setUniformValueArray(int location, const std::vector<unsigned int>& values);
-  void setUniformValueArray(int location, const std::vector<Matrix44T<float>>& values);
+  void setUniformValueArray(const std::string& location, const std::vector<float>& values);
+  void setUniformValueArray(const std::string& location, const std::vector<unsigned int>& values);
+  void setUniformValueArray(const std::string& location, const std::vector<Matrix44T<float>>& values);
 private:
   void cacheUniforms();
   mutable QOpenGLShaderProgram m_glObject;

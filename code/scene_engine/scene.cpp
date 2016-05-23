@@ -211,7 +211,6 @@ void Scene::drawShadowPass(RenderContext* context) {
 
 
 
-
     std::array<Vector3T<float>, 8> frustumpoints = m_camera.getFrusumPoints(m_shadowProjections[shadowPass]);
 
     Matrix44T<float> shadowCamView = m_sunCamera.viewMatrix();
@@ -262,17 +261,14 @@ void Scene::drawShadowPass(RenderContext* context) {
 
 
     m_depthBiasMVPMatrix.push_back(biasMatrix * ortho * m_sunCamera.viewMatrix());
+
+
     for(std::deque<DrawData>::value_type& dd : allToDraw) {
       dd.SP = dd.SSP;
 
-      dd.Matrix4Uniforms[dd.SP->uniformLocation("u_viewMatrix")] = m_sunCamera.viewMatrix();
-      dd.Matrix4Uniforms[dd.SP->uniformLocation("u_projectionMatrix")] = ortho;
+      dd.Matrix4Uniforms["u_viewMatrix"] = m_sunCamera.viewMatrix();
+      dd.Matrix4Uniforms["u_projectionMatrix"] = ortho;
 
-//      dd.Vec3Uniforms[dd.SP->uniformLocation("u_directionalLight.direction")] = m_sun.direction();
-//      dd.Vec4Uniforms[dd.SP->uniformLocation("u_directionalLight.ambient")] = m_sun.ambient();
-//      dd.Vec4Uniforms[dd.SP->uniformLocation("u_directionalLight.diffuse")] = m_sun.diffuse();
-
-//      dd.Vec3Uniforms[dd.SP->uniformLocation("u_eyePosition")] = m_sunCamera.eye();
 
     }
     for(std::deque<DrawData>::value_type& dd : allToDraw) {
@@ -301,18 +297,18 @@ void Scene::draw(RenderContext* context) {
 
 
   for(std::deque<DrawData>::value_type& dd : allToDraw) {
-    dd.Matrix4Uniforms[dd.SP->uniformLocation("u_viewMatrix")] = m_camera.viewMatrix();
-    dd.Matrix4Uniforms[dd.SP->uniformLocation("u_projectionMatrix")] = m_projection;
-    dd.Matrix4ArrayUniforms[dd.SP->uniformLocation("u_depthBiasMVPMatrix")] = m_depthBiasMVPMatrix;
+    dd.Matrix4Uniforms["u_viewMatrix"] = m_camera.viewMatrix();
+    dd.Matrix4Uniforms["u_projectionMatrix"] = m_projection;
+    dd.Matrix4ArrayUniforms["u_depthBiasMVPMatrix"] = m_depthBiasMVPMatrix;
 
-    dd.Vec3Uniforms[dd.SP->uniformLocation("u_directionalLight.direction")] = m_sun.direction();
-    dd.Vec4Uniforms[dd.SP->uniformLocation("u_directionalLight.ambient")] = m_sun.ambient();
-    dd.Vec4Uniforms[dd.SP->uniformLocation("u_directionalLight.diffuse")] = m_sun.diffuse();
+    dd.Vec3Uniforms["u_directionalLight.direction"] = m_sun.direction();
+    dd.Vec4Uniforms["u_directionalLight.ambient"] = m_sun.ambient();
+    dd.Vec4Uniforms["u_directionalLight.diffuse"] = m_sun.diffuse();
 
-    dd.Vec3Uniforms[dd.SP->uniformLocation("u_eyePosition")] = m_camera.eye();
+    dd.Vec3Uniforms["u_eyePosition"] = m_camera.eye();
 
 
-    dd.FloatArrayUniforms[dd.SP->uniformLocation("u_shadowMapCascadeDistance")] = m_shadowMapCascadeDistance;
+    dd.FloatArrayUniforms["u_shadowMapCascadeDistance"] = m_shadowMapCascadeDistance;
 
     for(int i = 0; i < m_shadowMapCascadeDistance.size(); ++i) {
       dd.TEX[3+i] = m_shadowBufferTarget[i]->getDepthTexture();
@@ -321,7 +317,7 @@ void Scene::draw(RenderContext* context) {
     for(int i = 0; i < m_shadowMapCascadeDistance.size(); ++i) {
       shadowMap.push_back(3+i);
     }
-    dd.Sampler2DArrayUniforms[dd.SP->uniformLocation("u_shadowMap")] = shadowMap;
+    dd.Sampler2DArrayUniforms["u_shadowMap"] = shadowMap;
   }
   for(std::deque<DrawData>::value_type& dd : allToDraw) {
     context->draw(dd);
@@ -331,7 +327,7 @@ void Scene::draw(RenderContext* context) {
   if(m_shadowBufferRectangle)
   {
     m_shadowBufferRectangle->TEX[0] = m_shadowBufferTarget[0]->getDepthTexture();
-    m_shadowBufferRectangle->Sampler2DUniforms[m_shadowBufferRectangle->SP->uniformLocation("u_texture")] = 0;
+    m_shadowBufferRectangle->Sampler2DUniforms["u_texture"] = 0;
     context->draw(*m_shadowBufferRectangle);
   }
 }
@@ -397,9 +393,9 @@ void Scene::createShadowBufferRectangle(RenderDevice* device, RenderContext* con
   m_shadowBufferRectangle->SP = sp;
   m_shadowBufferRectangle->VAO = vao;
   m_shadowBufferRectangle->IB = ib;
-  m_shadowBufferRectangle->Matrix4Uniforms[sp->uniformLocation("u_modelMatrix")] = Matrix44T<float>::GetIdentity();
-  m_shadowBufferRectangle->Matrix4Uniforms[sp->uniformLocation("u_viewMatrix")] = Matrix44T<float>::GetIdentity();
-  m_shadowBufferRectangle->Matrix4Uniforms[sp->uniformLocation("u_projectionMatrix")] = Matrix44T<float>::GetOrthographicProjection(
+  m_shadowBufferRectangle->Matrix4Uniforms["u_modelMatrix"] = Matrix44T<float>::GetIdentity();
+  m_shadowBufferRectangle->Matrix4Uniforms["u_viewMatrix"] = Matrix44T<float>::GetIdentity();
+  m_shadowBufferRectangle->Matrix4Uniforms["u_projectionMatrix"] = Matrix44T<float>::GetOrthographicProjection(
         RectangleT<float>(0,0, context->width(), context->height()),
         0,
         5

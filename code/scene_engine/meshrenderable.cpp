@@ -124,57 +124,7 @@ void set_insert_range(const std::set<std::string>& in, std::set<std::string>& ou
 }
 
 void MeshRenderable::toGPU(const ConfigurationManager& config, unsigned int numberOfShadowCascades, TextureCache& textureCache, ShaderCache& shaderCache, RenderDevice* device, RenderContext* context) {
-  //Setup the shader paths.
-  std::set<std::string> defines;
 
-
-  defines.insert("NUMBER_OF_CASCADES " + std::to_string(numberOfShadowCascades));
-  for(MeshModel::Data::Materials::value_type material : m_meshModel.m_data.m_materials) {
-    if(!material->texDirAmbient().empty()) {
-      defines.insert("AMBIENT_TEXTURE");
-    }
-    if(!material->texDirDiffuse().empty()) {
-      defines.insert("DIFFUSE_TEXTURE");
-    }
-    if(!material->texDirSpecular().empty()) {
-      defines.insert("SPECULAR_TEXTURE");
-    }
-  }
-
-  //Tell the shader that the model is bone animated if thats the case.
-  if(m_meshModel.m_data.m_haveBones) {
-    defines.insert("BONE_ANIMATION");
-  }
-
-  /*
-  ShaderProgramPtr sp;
-  std::string vshDir = (config.getParam("DATA_DIR") + "/shaders/" + "ubershader.vsh");
-  std::string fshDir = (config.getParam("DATA_DIR") + "/shaders/" + "ubershader.fsh");
-
-  sp = createShaderProgramFromFile(defines, vshDir, fshDir, shaderCache, device);
-
-  int posAttr = sp->attributeLocation("posAttr");
-  int texAttr = sp->attributeLocation("texAttr");
-  int norAttr = sp->attributeLocation("norAttr");
-  int bAttr = sp->attributeLocation("bAttr");
-  int wAttr = sp->attributeLocation("wAttr");
-
-  m_modelMatrixUniform = sp->uniformLocation("u_modelMatrix");
-
-  ShaderProgramPtr ssp;
-  std::string svshDir = (config.getParam("DATA_DIR") + "/shaders/" + "ubershadowshader.vsh");
-  std::string sfshDir = (config.getParam("DATA_DIR") + "/shaders/" + "ubershadowshader.fsh");
-
-  ssp = createShaderProgramFromFile(defines, svshDir, sfshDir, shaderCache, device);
-  sa::VertexDescription vertexDesc =
-  {
-    {posAttr, sa::VertexDescriptionElement::Type::FLOAT, 3},
-    {texAttr, sa::VertexDescriptionElement::Type::FLOAT, 2},
-    {norAttr, sa::VertexDescriptionElement::Type::FLOAT, 3},
-    {bAttr, sa::VertexDescriptionElement::Type::FLOAT, 4},
-    {wAttr, sa::VertexDescriptionElement::Type::FLOAT, 4}
-  };
-*/
   std::set<std::string> globalDefines;
 
 
@@ -206,6 +156,12 @@ void MeshRenderable::toGPU(const ConfigurationManager& config, unsigned int numb
     int norAttr = sp->attributeLocation("norAttr");
     int bAttr = sp->attributeLocation("bAttr");
     int wAttr = sp->attributeLocation("wAttr");
+
+    ssp->bindAttributeLocation("posAttr", posAttr);
+    ssp->bindAttributeLocation("bAttr", bAttr);
+    ssp->bindAttributeLocation("wAttr", wAttr);
+    ssp->link();
+
     sa::VertexDescription vertexDesc =
     {
       {posAttr, sa::VertexDescriptionElement::Type::FLOAT, 3},
@@ -215,13 +171,6 @@ void MeshRenderable::toGPU(const ConfigurationManager& config, unsigned int numb
       {wAttr, sa::VertexDescriptionElement::Type::FLOAT, 4}
     };
 
-    int sposAttr = ssp->attributeLocation("posAttr");
-    if(sposAttr != posAttr)
-    {
-      throw "sdsdsd";
-    }
-
-    m_modelMatrixUniform = sp->uniformLocation("u_modelMatrix");
 
     DrawData subMeshDrawData;
     const MaterialModel* material = m_meshModel.m_data.m_materials[sm->getMaterialKey()];
@@ -263,27 +212,27 @@ void MeshRenderable::toGPU(const ConfigurationManager& config, unsigned int numb
     subMeshDrawData.TEX[2] = speculaTex;
 
     if(ambientTex) {
-      subMeshDrawData.Sampler2DUniforms[sp->uniformLocation("u_ambientTexture")] = 0;
+      subMeshDrawData.Sampler2DUniforms["u_ambientTexture"] = 0;
     }
     else {
-      subMeshDrawData.Vec4Uniforms[sp->uniformLocation("u_ambientMaterial")] = material->ambient();
+      subMeshDrawData.Vec4Uniforms["u_ambientMaterial"] = material->ambient();
     }
     if(diffuseTex) {
-      subMeshDrawData.Sampler2DUniforms[sp->uniformLocation("u_diffuseTexture")] = 1;
+      subMeshDrawData.Sampler2DUniforms["u_diffuseTexture"] = 1;
     }
     else {
-      subMeshDrawData.Vec4Uniforms[sp->uniformLocation("u_diffuseMaterial")] = material->diffuse();
+      subMeshDrawData.Vec4Uniforms["u_diffuseMaterial"] = material->diffuse();
     }
     if(speculaTex) {
-      subMeshDrawData.Sampler2DUniforms[sp->uniformLocation("u_specularTexture")] = 2;
+      subMeshDrawData.Sampler2DUniforms["u_specularTexture"] = 2;
     }
     else {
-      subMeshDrawData.Vec4Uniforms[sp->uniformLocation("u_specularMaterial")] = material->specular();
+      subMeshDrawData.Vec4Uniforms["u_specularMaterial"] = material->specular();
     }
-    subMeshDrawData.FloatUniforms[sp->uniformLocation("u_shininess")] = material->shininess();
-    subMeshDrawData.FloatUniforms[sp->uniformLocation("u_shininessStrength")] = material->shininessStrength();
+    subMeshDrawData.FloatUniforms["u_shininess"] = material->shininess();
+    subMeshDrawData.FloatUniforms["u_shininessStrength"] = material->shininessStrength();
 
-    subMeshDrawData.Matrix4Uniforms[sp->uniformLocation("u_modelMatrix")] = sa::Matrix44T<float>::GetIdentity();
+    subMeshDrawData.Matrix4Uniforms["u_modelMatrix"] = sa::Matrix44T<float>::GetIdentity();
     m_drawData[meshIndex] = subMeshDrawData;
     ++meshIndex;
   }
@@ -347,9 +296,9 @@ void MeshRenderable::applyTransformations() {
       Skeleton* skeleton = subMesh->skeleton();
       skeleton->applyTransformations();
       unsigned int i = 0;
-      int uniLoc = m_drawData[subMeshIndex].SP->uniformLocation("u_bones");
       for(Skeleton::JointMap::value_type j : skeleton->Joints) {
-        m_drawData[subMeshIndex].Matrix4Uniforms[uniLoc+i] = j.second.Transformation;
+        std::string uniformName = std::string("u_bones") + std::string("[") + std::to_string(i) + std::string("]");
+        m_drawData[subMeshIndex].Matrix4Uniforms[uniformName] = j.second.Transformation;
         i++;
       }
       ++subMeshIndex;
@@ -366,7 +315,7 @@ void MeshRenderable::applyTransformations() {
   {
     const std::set<MeshNodeModel*>& meshNodes = m_meshModel.getMeshNodes();
     for(MeshNodeModel* mesh : meshNodes) {
-      m_drawData[mesh->mesh()].Matrix4Uniforms[m_drawData[mesh->mesh()].SP->uniformLocation("u_modelMatrix")] =  mesh->transformation();
+      m_drawData[mesh->mesh()].Matrix4Uniforms["u_modelMatrix"] =  mesh->transformation();
       //m_drawData[mesh->mesh()].Matrix4Uniforms[m_modelMatrixUniform] =  mesh->transformation();
       m_drawDataDeque.push_back(m_drawData[mesh->mesh()]);
     }

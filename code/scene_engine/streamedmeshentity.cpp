@@ -85,8 +85,7 @@ void StreamedMeshEntity::applyTransformations() {
   //Apply the position
   Matrix44T<float> movementTransformation = Matrix44T<float>::GetTranslate(m_position) * Matrix44T<float>::GetRotateY(m_heading);
   for(DrawData& dd : m_mesh->getDrawData()) {
-    int location = dd.SP->uniformLocation("u_modelMatrix");
-    dd.Matrix4Uniforms[location] = movementTransformation * dd.Matrix4Uniforms[location];
+    dd.Matrix4Uniforms["u_modelMatrix"] = movementTransformation * dd.Matrix4Uniforms["u_modelMatrix"];
   }
 }
 

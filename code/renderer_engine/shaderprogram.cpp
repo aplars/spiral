@@ -91,43 +91,43 @@ int sa::ShaderProgram::uniformLocation(const char* name) const {
   return -1;
 }
 
-void sa::ShaderProgram::setUniformValue(int location, float value) {
-  m_glObject.setUniformValue(location, value);
+void sa::ShaderProgram::setUniformValue(const std::__cxx11::string &location, float value) {
+  m_glObject.setUniformValue(location.c_str(), value);
 }
 
-void sa::ShaderProgram::setUniformValue(int location, const Vector3T<float> &value) {
-  m_glObject.setUniformValue(location, value[0], value[1], value[2]);
+void sa::ShaderProgram::setUniformValue(const std::__cxx11::string &location, const Vector3T<float> &value) {
+  m_glObject.setUniformValue(location.c_str(), value[0], value[1], value[2]);
 }
 
-void sa::ShaderProgram::setUniformValue(int location, const Vector4T<float> &value) {
-  m_glObject.setUniformValue(location, value[0], value[1], value[2], value[3]);
+void sa::ShaderProgram::setUniformValue(const std::__cxx11::string &location, const Vector4T<float> &value) {
+  m_glObject.setUniformValue(location.c_str(), value[0], value[1], value[2], value[3]);
 }
 
-void sa::ShaderProgram::setUniformValue(int location, const Matrix44T<float> &value)
+void sa::ShaderProgram::setUniformValue(const std::__cxx11::string &location, const Matrix44T<float> &value)
 {
   m_glObject.bind();
-  glUniformMatrix4fv(location, 1, false, value.GetConstPtr());
+  glUniformMatrix4fv(m_glObject.uniformLocation(location.c_str()), 1, false, value.GetConstPtr());
 }
 
-void sa::ShaderProgram::setUniformValue(int location, const float value[4][4]) {
-  m_glObject.setUniformValue(location, value);
+void sa::ShaderProgram::setUniformValue(const std::__cxx11::string &location, const float value[4][4]) {
+  m_glObject.setUniformValue(location.c_str(), value);
 }
 
-void sa::ShaderProgram::setUniformValue(int location, unsigned int value) {
-  m_glObject.setUniformValue(location, value);
+void sa::ShaderProgram::setUniformValue(const std::__cxx11::string &location, unsigned int value) {
+  m_glObject.setUniformValue(location.c_str(), value);
 }
 
-void sa::ShaderProgram::setUniformValueArray(int location, const std::vector<float>& values) {
-  m_glObject.setUniformValueArray(location, values.data(), values.size(), 1);
+void sa::ShaderProgram::setUniformValueArray(const std::__cxx11::string &location, const std::vector<float>& values) {
+  m_glObject.setUniformValueArray(location.c_str(), values.data(), values.size(), 1);
 }
 
-void sa::ShaderProgram::setUniformValueArray(int location, const std::vector<Matrix44T<float>>& values) {
+void sa::ShaderProgram::setUniformValueArray(const std::__cxx11::string &location, const std::vector<Matrix44T<float>>& values) {
   m_glObject.bind();
-  glUniformMatrix4fv(location, values.size(), false, values.data()->GetConstPtr());
+  glUniformMatrix4fv(m_glObject.uniformLocation(location.c_str()), values.size(), false, values.data()->GetConstPtr());
 }
 
-void sa::ShaderProgram::setUniformValueArray(int location, const std::vector<unsigned int>& values) {
-  m_glObject.setUniformValueArray(location, values.data(), values.size());
+void sa::ShaderProgram::setUniformValueArray(const std::__cxx11::string &location, const std::vector<unsigned int>& values) {
+  m_glObject.setUniformValueArray(location.c_str(), values.data(), values.size());
 }
 
 void sa::ShaderProgram::cacheUniforms() {

@@ -79,7 +79,7 @@ private:
   std::map<unsigned int, Image> m_diffuseImage;
   std::map<unsigned int, Image> m_specularImage;
 
-  int m_modelMatrixUniform = 0;
+  //int m_modelMatrixUniform = 0;
 
   float m_currentSkeletalAnimationTime = 0.0f;
   std::string m_currentSkeletalAnimation = "__NO_FUCKING_ANIMATION_AT_ALL__";

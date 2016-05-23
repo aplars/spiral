@@ -72,7 +72,6 @@ void GLWidget::initializeGL() {
   scene->addMeshEntity("groundplane100x100", "groundplane100x100.xml");
   scene->addMeshEntity("bob0", "bob.xml");
   scene->getMeshEntity("bob0")->playSkeletalAnimation("");
-
   scene->addMeshEntity("motioncapture0", "motioncapture.xml");
   scene->getMeshEntity("motioncapture0")->playNodeAnimation("");
   scene->getMeshEntity("motioncapture0")->setPosition(120,0,40);
