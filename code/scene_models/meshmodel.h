@@ -111,7 +111,11 @@ public:
   std::deque<std::string> getSkeletalAnimations() const;
   std::deque<std::string> getNodeAnimations() const;
   const std::set<MeshNodeModel*>& getMeshNodes();
-  void unload() { m_data.unload(); }
+  void unload()
+  {
+    m_data.unload();
+    m_meshNodes.clear();
+  }
   Header m_header;
   Data m_data;
 private:

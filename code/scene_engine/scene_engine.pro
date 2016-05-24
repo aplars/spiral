@@ -21,7 +21,6 @@ INCLUDEPATH += "$$(SPAR_ROOT)/thirdparty/boost"
 SOURCES += meshrenderable.cpp \
     scene.cpp \
     fpscamera.cpp \
-    scenestate.cpp \
     directionallight.cpp \
     cuberenderable.cpp \
     debugentity.cpp \
@@ -32,7 +31,6 @@ SOURCES += meshrenderable.cpp \
 HEADERS += meshrenderable.h \
     scene.h \
     fpscamera.h \
-    scenestate.h \
     directionallight.h \
     cuberenderable.h \
     debugentity.h \

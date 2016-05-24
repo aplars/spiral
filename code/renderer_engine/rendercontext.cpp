@@ -107,38 +107,8 @@ void RenderContext::draw(DrawData drawData) {
   }
   //Set shader uniforms. This is usually cheap operation and therefore all uniforms
   //are written. Not just the ones that have changed.
-  for(FloatUniformsMap::value_type uniform : drawData.FloatUniforms)
-  {
-    m_currentSP->setUniformValue(uniform.first, uniform.second);
-  }
-  for(Vec3UniformsMap::value_type uniform : drawData.Vec3Uniforms)
-  {
-    m_currentSP->setUniformValue(uniform.first, uniform.second);
-  }
-  for(Vec4UniformsMap::value_type uniform : drawData.Vec4Uniforms)
-  {
-    m_currentSP->setUniformValue(uniform.first, uniform.second);
-  }
-  for(Matrix4UniformsMap::value_type uniform : drawData.Matrix4Uniforms)
-  {
-    m_currentSP->setUniformValue(uniform.first, uniform.second);
-  }
-  for(Sampler2DUniformsMap::value_type uniform : drawData.Sampler2DUniforms)
-  {
-    m_currentSP->setUniformValue(uniform.first, uniform.second);
-  }
-  for(FloatArrayUniformsMap::value_type uniform : drawData.FloatArrayUniforms)
-  {
-    m_currentSP->setUniformValueArray(uniform.first, uniform.second);
-  }
-  for(Matrix4ArrayUniformsMap::value_type uniform : drawData.Matrix4ArrayUniforms)
-  {
-    m_currentSP->setUniformValueArray(uniform.first, uniform.second);
-  }
-  for(Sampler2DArrayUniformsMap::value_type uniform : drawData.Sampler2DArrayUniforms)
-  {
-    m_currentSP->setUniformValueArray(uniform.first, uniform.second);
-  }
+  setUniforms(m_currentSP, drawData.Uniforms);
+
   //Bind the vertex array if changed.
   if(drawData.VAO != m_currentVAO)
   {
@@ -162,6 +132,55 @@ void RenderContext::draw(DrawData drawData) {
     //No index buffer. Draw using the number of triangles attribute instead.
     if(drawData.IsVisible)
       glDrawArrays(GL_TRIANGLES, 0, drawData.NumberOfTrianglesToDraw);
+  }
+}
+
+void RenderContext::draw(const DrawDataList& drawDataList, ShaderUniforms shaderUniforms) {
+  //Set all global uniforms.
+  for(ShaderProgramPtr shader : drawDataList.shaders()) {
+    //Bind shader program if changed
+    shader->bind();
+    setUniforms(shader, shaderUniforms);
+  }
+  m_currentSP = nullptr;
+  //Draw all objects.
+  for(DrawDataList::value_type dd : drawDataList) {
+    draw(dd);
+  }
+}
+
+void RenderContext::setUniforms(ShaderProgramPtr shader, ShaderUniforms uniforms) {
+  for(FloatUniformsMap::value_type uniform : uniforms.FloatUniforms)
+  {
+    shader->setUniformValue(uniform.first, uniform.second);
+  }
+  for(Vec3UniformsMap::value_type uniform : uniforms.Vec3Uniforms)
+  {
+    shader->setUniformValue(uniform.first, uniform.second);
+  }
+  for(Vec4UniformsMap::value_type uniform : uniforms.Vec4Uniforms)
+  {
+    shader->setUniformValue(uniform.first, uniform.second);
+  }
+  for(Matrix4UniformsMap::value_type uniform : uniforms.Matrix4Uniforms)
+  {
+    shader->setUniformValue(uniform.first, uniform.second);
+  }
+  for(Sampler2DUniformsMap::value_type uniform : uniforms.Sampler2DUniforms)
+  {
+    shader->setUniformValue(uniform.first, uniform.second);
+  }
+  for(FloatArrayUniformsMap::value_type uniform : uniforms.FloatArrayUniforms)
+  {
+    shader->setUniformValueArray(uniform.first, uniform.second);
+  }
+  for(Matrix4ArrayUniformsMap::value_type uniform : uniforms.Matrix4ArrayUniforms)
+  {
+    shader->setUniformValueArray(uniform.first, uniform.second);
+  }
+  for(Sampler2DArrayUniformsMap::value_type uniform : uniforms.Sampler2DArrayUniforms)
+  {
+    shader->setUniformValueArray(uniform.first, uniform.second);
   }
 }
 }

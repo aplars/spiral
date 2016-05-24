@@ -84,6 +84,8 @@ private:
   TextureCache m_textureCache;
   ShaderCache m_shaderCache;
 
+  ShaderUniforms m_sceneSpecificShaderUniforms;
+
 };
 }
 #endif // SCENE_H

@@ -89,7 +89,6 @@ Texture::Texture(TextureFormat textureFormat, int width, int height, PixelFormat
   }
 }
 
-
 void Texture::setMagnificationFilter(Filter filter) {
   m_glObject.setMagnificationFilter(convertFilter(filter));
 }
@@ -113,6 +112,5 @@ void Texture::bind() {
 void Texture::release() {
   m_glObject.release();
 }
-
 }
 

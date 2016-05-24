@@ -78,36 +78,37 @@ void GLWidget::initializeGL() {
   float LO = -200.0f;
   float HI = 200.0f;
 
-//  float LO_H = 0.0f;
-//  float HI_H = 3.1415*2;
+  /*
+  float LO_H = 0.0f;
+  float HI_H = 3.1415*2;
 
-//  for(int i = 0; i < 20; i++) {
-//    std::string meshName = "bob" + std::to_string(i);
-//    scene->addMeshEntity(meshName, "bob.xml");
+  for(int i = 0; i < 20; i++) {
+    std::string meshName = "bob" + std::to_string(i);
+    scene->addMeshEntity(meshName, "bob.xml");
 
-//    float x = LO + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(HI-LO)));
-//    float y = 0;//LO + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(HI-LO)));
-//    float z = LO + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(HI-LO)));
-//    //float h = LO_H + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(HI_H-LO_H)));
+    float x = LO + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(HI-LO)));
+    float y = 0;//LO + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(HI-LO)));
+    float z = LO + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(HI-LO)));
+    //float h = LO_H + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(HI_H-LO_H)));
 
-//    scene->getMeshEntity(meshName)->setPosition(sa::Vector3T<float>(x, y, z));
-//    //scene->getMeshEntity(meshName)->setHeading(h);
-//    scene->getMeshEntity(meshName)->playSkeletalAnimation("");
-//  }
+    scene->getMeshEntity(meshName)->setPosition(sa::Vector3T<float>(x, y, z));
+    //scene->getMeshEntity(meshName)->setHeading(h);
+    scene->getMeshEntity(meshName)->playSkeletalAnimation("");
+  }
 
 
-//  for(int i = 0; i < 20; i++) {
-//    std::string meshName = "motioncapture" + std::to_string(i);
-//    scene->addMeshEntity(meshName, "/home/tobias/source/spiralarchitect/data/meshes/", "motioncapture.xml");
+  for(int i = 0; i < 20; i++) {
+    std::string meshName = "motioncapture" + std::to_string(i);
+    scene->addMeshEntity(meshName, "motioncapture.xml");
 
-//    float x = LO + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(HI-LO)));
-//    float y = 0;//LO + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(HI-LO)));
-//    float z = LO + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(HI-LO)));
+    float x = LO + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(HI-LO)));
+    float y = 0;//LO + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(HI-LO)));
+    float z = LO + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(HI-LO)));
 
-//    scene->getMeshEntity(meshName)->setPosition(sa::Vector3T<float>(x, y, z));
-//    scene->getMeshEntity(meshName)->playNodeAnimation("");
-//  }
-
+    scene->getMeshEntity(meshName)->setPosition(sa::Vector3T<float>(x, y, z));
+    scene->getMeshEntity(meshName)->playNodeAnimation("");
+  }
+  */
 
   QTimer *timer = new QTimer(this);
   connect(timer, SIGNAL(timeout()), this, SLOT(update()));

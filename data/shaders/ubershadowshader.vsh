@@ -7,7 +7,7 @@ attribute highp highp vec4 wAttr;
 #endif
 
 uniform highp mat4 u_modelMatrix;
-uniform highp mat4 u_viewMatrix;
+uniform highp mat4 u_sunViewMatrix;
 uniform highp mat4 u_projectionMatrix;
 #ifdef BONE_ANIMATION
 uniform highp mat4 u_bones[100];
@@ -26,7 +26,7 @@ void main()
 #else
   boneTransform = mat4(1.0);
 #endif
-  mat4 viewmodel = u_viewMatrix * u_modelMatrix;
+  mat4 viewmodel = u_sunViewMatrix * u_modelMatrix;
   mat4 viewmodelbone = viewmodel * boneTransform;
 
   gl_Position = u_projectionMatrix * viewmodelbone * vec4(posAttr, 1.0);

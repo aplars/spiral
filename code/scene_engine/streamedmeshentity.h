@@ -54,9 +54,10 @@ public:
    * @brief getDrawData returns the data needed to draw the mesh.
    * @return the data needed to render the mesh.
    */
-  std::deque<DrawData>& getDrawData();
+  DrawDataList& getDrawData();
 
 private:
+  DrawDataList m_emptyDrawData;
   MeshRenderablePtr m_mesh;
   Vector3T<float> m_position;
   float m_heading = 0.0f;

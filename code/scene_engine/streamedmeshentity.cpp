@@ -85,7 +85,7 @@ void StreamedMeshEntity::applyTransformations() {
   //Apply the position
   Matrix44T<float> movementTransformation = Matrix44T<float>::GetTranslate(m_position) * Matrix44T<float>::GetRotateY(m_heading);
   for(DrawData& dd : m_mesh->getDrawData()) {
-    dd.Matrix4Uniforms["u_modelMatrix"] = movementTransformation * dd.Matrix4Uniforms["u_modelMatrix"];
+    dd.Uniforms.Matrix4Uniforms["u_modelMatrix"] = movementTransformation * dd.Uniforms.Matrix4Uniforms["u_modelMatrix"];
   }
 }
 
@@ -115,7 +115,7 @@ void StreamedMeshEntity::unloadCPU()
   m_mesh->unloadCPU();
 }
 
-std::deque<DrawData>& StreamedMeshEntity::getDrawData() {
+DrawDataList& StreamedMeshEntity::getDrawData() {
   return m_mesh->getDrawData();
 }
 }

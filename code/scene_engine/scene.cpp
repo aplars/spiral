@@ -24,7 +24,7 @@ Scene::Scene(unsigned int width, unsigned int height)
   m_shadowMapCascadeDistance.push_back(100);
   m_shadowMapCascadeDistance.push_back(125);
   m_shadowMapCascadeDistance.push_back(150);
-  m_shadowMapCascadeDistance.push_back(200);
+  m_shadowMapCascadeDistance.push_back(400);
 
 
   float aspect = width/static_cast<float>(height);
@@ -63,22 +63,11 @@ void Scene::addDebugBox(const std::string& name, float posx, float posy, float p
 }
 
 void Scene::toCPU() {
-  bool allVisibleObjectsBboxSet = false;
-  AABBModel allVisibleObjectsBbox;
   std::array<PlaneT<float>, 6> frustum = m_camera.getFrustum(m_projection);
   for(Entities::value_type e : m_meshes) {
     AABBModel bbox = e.second->getBoundingBox();
     IntersectionTests::Side side = IntersectionTests::FrustumAABBIntersect(frustum, bbox.getMin()-Vector3T<float>(10, 10, 10), bbox.getMax()+Vector3T<float>(10, 10, 10));
     if(side == IntersectionTests::Inside || side == IntersectionTests::Intersect) {
-      if(!allVisibleObjectsBboxSet)
-      {
-        allVisibleObjectsBboxSet = true;
-        allVisibleObjectsBbox = bbox;
-      }
-      else
-      {
-        allVisibleObjectsBbox.expand(bbox);
-      }
       if(e.second->currentDataStorage() == DataStorage::Disk)
       {
         //We don not want to load this sucker again therefore we set it as pending.
@@ -202,9 +191,9 @@ void Scene::drawShadowPass(RenderContext* context) {
     m_shadowBufferTarget[shadowPass]->bind();
     context->clear();
 
-    std::deque<DrawData> allToDraw;
+    DrawDataList allToDraw;
     for(Entities::value_type e : m_meshes) {
-      const std::deque<DrawData>& dds = e.second->getDrawData();
+      const DrawDataList& dds = e.second->getDrawData();
       allToDraw.insert(allToDraw.end(), dds.begin(), dds.end());
     }
 
@@ -263,17 +252,20 @@ void Scene::drawShadowPass(RenderContext* context) {
     m_depthBiasMVPMatrix.push_back(biasMatrix * ortho * m_sunCamera.viewMatrix());
 
 
-    for(std::deque<DrawData>::value_type& dd : allToDraw) {
+    for(DrawDataList::value_type& dd : allToDraw) {
       dd.SP = dd.SSP;
 
-      dd.Matrix4Uniforms["u_viewMatrix"] = m_sunCamera.viewMatrix();
-      dd.Matrix4Uniforms["u_projectionMatrix"] = ortho;
+      //dd.Uniforms.Matrix4Uniforms["u_sunViewMatrix"] = m_sunCamera.viewMatrix();
+      dd.Uniforms.Matrix4Uniforms["u_projectionMatrix"] = ortho;
 
 
     }
-    for(std::deque<DrawData>::value_type& dd : allToDraw) {
-      context->draw(dd);
-    }
+
+
+    m_sceneSpecificShaderUniforms.Matrix4Uniforms["u_sunViewMatrix"] = m_sunCamera.viewMatrix();
+
+
+    context->draw(allToDraw, m_sceneSpecificShaderUniforms);
     m_shadowBufferTarget[shadowPass]->release();
   }
 }
@@ -281,13 +273,19 @@ void Scene::drawShadowPass(RenderContext* context) {
 
 
 void Scene::draw(RenderContext* context) {
+
+
+
   drawShadowPass(context);
+
+
+
   context->setCullFace(RenderContext::CullFace::Back);
   context->setViewport(context->width(), context->height());
 
-  std::deque<DrawData> allToDraw;
+  DrawDataList allToDraw;
   for(Entities::value_type e : m_meshes) {
-    const std::deque<DrawData>& dds = e.second->getDrawData();
+    const DrawDataList& dds = e.second->getDrawData();
     allToDraw.insert(allToDraw.end(), dds.begin(), dds.end());
   }
 
@@ -296,19 +294,19 @@ void Scene::draw(RenderContext* context) {
   }
 
 
-  for(std::deque<DrawData>::value_type& dd : allToDraw) {
-    dd.Matrix4Uniforms["u_viewMatrix"] = m_camera.viewMatrix();
-    dd.Matrix4Uniforms["u_projectionMatrix"] = m_projection;
-    dd.Matrix4ArrayUniforms["u_depthBiasMVPMatrix"] = m_depthBiasMVPMatrix;
+  for(DrawDataList::value_type& dd : allToDraw) {
+    //dd.Uniforms.Matrix4Uniforms["u_viewMatrix"] = m_camera.viewMatrix();
+    dd.Uniforms.Matrix4Uniforms["u_projectionMatrix"] = m_projection;
+    dd.Uniforms.Matrix4ArrayUniforms["u_depthBiasMVPMatrix"] = m_depthBiasMVPMatrix;
 
-    dd.Vec3Uniforms["u_directionalLight.direction"] = m_sun.direction();
-    dd.Vec4Uniforms["u_directionalLight.ambient"] = m_sun.ambient();
-    dd.Vec4Uniforms["u_directionalLight.diffuse"] = m_sun.diffuse();
+    dd.Uniforms.Vec3Uniforms["u_directionalLight.direction"] = m_sun.direction();
+    dd.Uniforms.Vec4Uniforms["u_directionalLight.ambient"] = m_sun.ambient();
+    dd.Uniforms.Vec4Uniforms["u_directionalLight.diffuse"] = m_sun.diffuse();
 
-    dd.Vec3Uniforms["u_eyePosition"] = m_camera.eye();
+    dd.Uniforms.Vec3Uniforms["u_eyePosition"] = m_camera.eye();
 
 
-    dd.FloatArrayUniforms["u_shadowMapCascadeDistance"] = m_shadowMapCascadeDistance;
+    dd.Uniforms.FloatArrayUniforms["u_shadowMapCascadeDistance"] = m_shadowMapCascadeDistance;
 
     for(int i = 0; i < m_shadowMapCascadeDistance.size(); ++i) {
       dd.TEX[3+i] = m_shadowBufferTarget[i]->getDepthTexture();
@@ -317,17 +315,17 @@ void Scene::draw(RenderContext* context) {
     for(int i = 0; i < m_shadowMapCascadeDistance.size(); ++i) {
       shadowMap.push_back(3+i);
     }
-    dd.Sampler2DArrayUniforms["u_shadowMap"] = shadowMap;
+    dd.Uniforms.Sampler2DArrayUniforms["u_shadowMap"] = shadowMap;
   }
-  for(std::deque<DrawData>::value_type& dd : allToDraw) {
-    context->draw(dd);
-  }
+
+  m_sceneSpecificShaderUniforms.Matrix4Uniforms["u_viewMatrix"] = m_camera.viewMatrix();
+  context->draw(allToDraw, m_sceneSpecificShaderUniforms);
 
 
   if(m_shadowBufferRectangle)
   {
     m_shadowBufferRectangle->TEX[0] = m_shadowBufferTarget[0]->getDepthTexture();
-    m_shadowBufferRectangle->Sampler2DUniforms["u_texture"] = 0;
+    m_shadowBufferRectangle->Uniforms.Sampler2DUniforms["u_texture"] = 0;
     context->draw(*m_shadowBufferRectangle);
   }
 }
@@ -393,9 +391,9 @@ void Scene::createShadowBufferRectangle(RenderDevice* device, RenderContext* con
   m_shadowBufferRectangle->SP = sp;
   m_shadowBufferRectangle->VAO = vao;
   m_shadowBufferRectangle->IB = ib;
-  m_shadowBufferRectangle->Matrix4Uniforms["u_modelMatrix"] = Matrix44T<float>::GetIdentity();
-  m_shadowBufferRectangle->Matrix4Uniforms["u_viewMatrix"] = Matrix44T<float>::GetIdentity();
-  m_shadowBufferRectangle->Matrix4Uniforms["u_projectionMatrix"] = Matrix44T<float>::GetOrthographicProjection(
+  m_shadowBufferRectangle->Uniforms.Matrix4Uniforms["u_modelMatrix"] = Matrix44T<float>::GetIdentity();
+  //m_shadowBufferRectangle->Uniforms.Matrix4Uniforms["u_viewMatrix"] = Matrix44T<float>::GetIdentity();
+  m_shadowBufferRectangle->Uniforms.Matrix4Uniforms["u_projectionMatrix"] = Matrix44T<float>::GetOrthographicProjection(
         RectangleT<float>(0,0, context->width(), context->height()),
         0,
         5

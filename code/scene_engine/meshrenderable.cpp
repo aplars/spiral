@@ -212,27 +212,27 @@ void MeshRenderable::toGPU(const ConfigurationManager& config, unsigned int numb
     subMeshDrawData.TEX[2] = speculaTex;
 
     if(ambientTex) {
-      subMeshDrawData.Sampler2DUniforms["u_ambientTexture"] = 0;
+      subMeshDrawData.Uniforms.Sampler2DUniforms["u_ambientTexture"] = 0;
     }
     else {
-      subMeshDrawData.Vec4Uniforms["u_ambientMaterial"] = material->ambient();
+      subMeshDrawData.Uniforms.Vec4Uniforms["u_ambientMaterial"] = material->ambient();
     }
     if(diffuseTex) {
-      subMeshDrawData.Sampler2DUniforms["u_diffuseTexture"] = 1;
+      subMeshDrawData.Uniforms.Sampler2DUniforms["u_diffuseTexture"] = 1;
     }
     else {
-      subMeshDrawData.Vec4Uniforms["u_diffuseMaterial"] = material->diffuse();
+      subMeshDrawData.Uniforms.Vec4Uniforms["u_diffuseMaterial"] = material->diffuse();
     }
     if(speculaTex) {
-      subMeshDrawData.Sampler2DUniforms["u_specularTexture"] = 2;
+      subMeshDrawData.Uniforms.Sampler2DUniforms["u_specularTexture"] = 2;
     }
     else {
-      subMeshDrawData.Vec4Uniforms["u_specularMaterial"] = material->specular();
+      subMeshDrawData.Uniforms.Vec4Uniforms["u_specularMaterial"] = material->specular();
     }
-    subMeshDrawData.FloatUniforms["u_shininess"] = material->shininess();
-    subMeshDrawData.FloatUniforms["u_shininessStrength"] = material->shininessStrength();
+    subMeshDrawData.Uniforms.FloatUniforms["u_shininess"] = material->shininess();
+    subMeshDrawData.Uniforms.FloatUniforms["u_shininessStrength"] = material->shininessStrength();
 
-    subMeshDrawData.Matrix4Uniforms["u_modelMatrix"] = sa::Matrix44T<float>::GetIdentity();
+    subMeshDrawData.Uniforms.Matrix4Uniforms["u_modelMatrix"] = sa::Matrix44T<float>::GetIdentity();
     m_drawData[meshIndex] = subMeshDrawData;
     ++meshIndex;
   }
@@ -298,7 +298,7 @@ void MeshRenderable::applyTransformations() {
       unsigned int i = 0;
       for(Skeleton::JointMap::value_type j : skeleton->Joints) {
         std::string uniformName = std::string("u_bones") + std::string("[") + std::to_string(i) + std::string("]");
-        m_drawData[subMeshIndex].Matrix4Uniforms[uniformName] = j.second.Transformation;
+        m_drawData[subMeshIndex].Uniforms.Matrix4Uniforms[uniformName] = j.second.Transformation;
         i++;
       }
       ++subMeshIndex;
@@ -315,8 +315,7 @@ void MeshRenderable::applyTransformations() {
   {
     const std::set<MeshNodeModel*>& meshNodes = m_meshModel.getMeshNodes();
     for(MeshNodeModel* mesh : meshNodes) {
-      m_drawData[mesh->mesh()].Matrix4Uniforms["u_modelMatrix"] =  mesh->transformation();
-      //m_drawData[mesh->mesh()].Matrix4Uniforms[m_modelMatrixUniform] =  mesh->transformation();
+      m_drawData[mesh->mesh()].Uniforms.Matrix4Uniforms["u_modelMatrix"] =  mesh->transformation();
       m_drawDataDeque.push_back(m_drawData[mesh->mesh()]);
     }
   }

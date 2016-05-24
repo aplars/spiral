@@ -52,9 +52,9 @@ public:
    * @brief getDrawData returns the data needed to draw the mesh.
    * @return the data needed to render the mesh.
    */
-  const std::deque<sa::DrawData>& getDrawData() const { return m_drawDataDeque; }
+  const sa::DrawDataList& getDrawData() const { return m_drawDataDeque; }
 
-  std::deque<sa::DrawData>& getDrawData() { return m_drawDataDeque; }
+  sa::DrawDataList& getDrawData() { return m_drawDataDeque; }
 
   void applyAnimations(float dt);
   void applyTransformations();
@@ -73,7 +73,7 @@ private:
   std::string m_resourcePath;
   std::string m_resourceName;
   std::map<unsigned int, DrawData>  m_drawData;
-  std::deque<DrawData> m_drawDataDeque;
+  DrawDataList m_drawDataDeque;
   MeshModel m_meshModel;
   std::map<unsigned int, Image> m_ambientImage;
   std::map<unsigned int, Image> m_diffuseImage;

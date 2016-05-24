@@ -35,6 +35,7 @@ public:
   RenderDepthToTexturePtr createRenderDepthToTexture(unsigned int width, unsigned int height);
   void clear();
   void draw(DrawData drawData);
+  void draw(const DrawDataList& drawDataList, ShaderUniforms shaderUniforms);
 
   void makeDirty() {
     m_currentIB = nullptr;
@@ -57,6 +58,8 @@ public:
   }
 
 private:
+  void setUniforms(ShaderProgramPtr shader, ShaderUniforms uniforms);
+
   GLuint m_defaultFB;
   unsigned int m_width;
   unsigned int m_height;

@@ -79,8 +79,8 @@ void CubeRenderable::toGPU(const ConfigurationManager& config, RenderDevice *dev
   m_drawData.VAO = vao;
   m_drawData.IB = ib;
   //m_drawData.Matrix4Uniforms[sp->uniformLocation("u_modelMatrix")] = Matrix44T<float>::GetIdentity();
-  m_drawData.Matrix4Uniforms["u_modelMatrix"] = Matrix44T<float>::GetTranslate(m_position);
-  m_drawData.Vec4Uniforms["u_color"] = Vector4T<float>(1,0,0,0.5);
+  m_drawData.Uniforms.Matrix4Uniforms["u_modelMatrix"] = Matrix44T<float>::GetTranslate(m_position);
+  m_drawData.Uniforms.Vec4Uniforms["u_color"] = Vector4T<float>(1,0,0,0.5);
 }
 
 const DrawData& CubeRenderable::getDrawData() const

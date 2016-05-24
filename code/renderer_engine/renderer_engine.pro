@@ -45,7 +45,8 @@ HEADERS += \
     indexbuffer.h \
     texture.h \
     image.h \
-    framebuffer.h
+    framebuffer.h \
+    shaderuniforms.h
 
 CONFIG( debug, debug|release ) {
     DESTDIR = $$(SPAR_ROOT)/libs/lib-debug
