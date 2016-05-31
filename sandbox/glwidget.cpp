@@ -20,7 +20,13 @@ sa::MeshRenderable* meshRenderable;
 std::deque<sa::DrawData> drawDataDeque;
 
 sa::Scene* scene;
+static const int NUMKEYS = 1024;
+bool keys[NUMKEYS];
 
+QVector2D mouseDelta;
+
+int width = 0;
+int height = 0;
 struct Vertex {
   Vertex(float xx, float yy, float zz, float rr, float gg, float bb, float aa)
     : x(xx)
@@ -53,6 +59,10 @@ GLWidget::~GLWidget()
 
 
 void GLWidget::initializeGL() {
+  for(int i = 0; i < NUMKEYS; ++i) {
+    keys[i] = false;
+  }
+
   m_debugLogger = new QOpenGLDebugLogger(this);
   if (m_debugLogger->initialize())
   {
@@ -64,99 +74,111 @@ void GLWidget::initializeGL() {
   scene = new sa::Scene(this->width(), this->height());
   scene->camera().setEye({0,50,200});
   scene->setSun(sa::DirectionalLight(
-  {0,1,1},
-  {0.5,0.5, 0.5, 1},
-  {1.0,1.0, 1.0, 1}));
+  {1,1,1},
+  {0.75,0.75, 0.75, 1}));
 
-//    scene->addMeshEntity("desert_city", "desert_city.xml");
+
+//  scene->addMeshEntity("silenthill", "silenthill.xml");
+//  scene->addMeshEntity("desert_city", "desert_city.xml");
   scene->addMeshEntity("groundplane100x100", "groundplane100x100.xml");
   scene->addMeshEntity("bob0", "bob.xml");
   scene->getMeshEntity("bob0")->playSkeletalAnimation("");
   scene->addMeshEntity("motioncapture0", "motioncapture.xml");
   scene->getMeshEntity("motioncapture0")->playNodeAnimation("");
   scene->getMeshEntity("motioncapture0")->setPosition(120,0,40);
-  float LO = -200.0f;
-  float HI = 200.0f;
 
-  /*
-  float LO_H = 0.0f;
-  float HI_H = 3.1415*2;
-
-  for(int i = 0; i < 20; i++) {
-    std::string meshName = "bob" + std::to_string(i);
-    scene->addMeshEntity(meshName, "bob.xml");
-
-    float x = LO + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(HI-LO)));
-    float y = 0;//LO + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(HI-LO)));
-    float z = LO + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(HI-LO)));
-    //float h = LO_H + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(HI_H-LO_H)));
-
-    scene->getMeshEntity(meshName)->setPosition(sa::Vector3T<float>(x, y, z));
-    //scene->getMeshEntity(meshName)->setHeading(h);
-    scene->getMeshEntity(meshName)->playSkeletalAnimation("");
-  }
+//  float LO = -200.0f;
+//  float HI = 200.0f;
 
 
-  for(int i = 0; i < 20; i++) {
-    std::string meshName = "motioncapture" + std::to_string(i);
-    scene->addMeshEntity(meshName, "motioncapture.xml");
+//  float LO_H = 0.0f;
+//  float HI_H = 3.1415*2;
 
-    float x = LO + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(HI-LO)));
-    float y = 0;//LO + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(HI-LO)));
-    float z = LO + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(HI-LO)));
+//  for(int i = 0; i < 20; i++) {
+//    std::string meshName = "bob" + std::to_string(i);
+//    scene->addMeshEntity(meshName, "bob.xml");
 
-    scene->getMeshEntity(meshName)->setPosition(sa::Vector3T<float>(x, y, z));
-    scene->getMeshEntity(meshName)->playNodeAnimation("");
-  }
-  */
+//    float x = LO + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(HI-LO)));
+//    float y = 0;//LO + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(HI-LO)));
+//    float z = LO + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(HI-LO)));
+//    //float h = LO_H + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(HI_H-LO_H)));
+
+//    scene->getMeshEntity(meshName)->setPosition(sa::Vector3T<float>(x, y, z));
+//    //scene->getMeshEntity(meshName)->setHeading(h);
+//    scene->getMeshEntity(meshName)->playSkeletalAnimation("");
+//  }
+
+
+//  for(int i = 0; i < 20; i++) {
+//    std::string meshName = "motioncapture" + std::to_string(i);
+//    scene->addMeshEntity(meshName, "motioncapture.xml");
+
+//    float x = LO + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(HI-LO)));
+//    float y = 0;//LO + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(HI-LO)));
+//    float z = LO + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(HI-LO)));
+
+//    scene->getMeshEntity(meshName)->setPosition(sa::Vector3T<float>(x, y, z));
+//    scene->getMeshEntity(meshName)->playNodeAnimation("");
+//  }
+
 
   QTimer *timer = new QTimer(this);
   connect(timer, SIGNAL(timeout()), this, SLOT(update()));
   timer->start(16);
 }
 
-void GLWidget::resizeGL(int , int ) {
+void GLWidget::resizeGL(int w, int h) {
   renderContext.makeDirty();
 }
 
 float currentTime = 0.0;
 bool firstTime = true;
+float dt = 1/60.0;
 void GLWidget::paintGL(){
+
   if(firstTime) {
     renderContext.create(this->defaultFramebufferObject(), this->width(), this->height());
     scene->initialize(&renderDevice);
     firstTime = false;
   }
   renderContext.clear();
+  renderContext.setViewport(width(), height());
+
+  qDebug() << width() << " " << height();
+
+  if(keys[0x57])
+    scene->camera().moveForward(20*dt);
+  if(keys[0x53])
+    scene->camera().moveForward(-20*dt);
+  if(keys[65])
+    scene->camera().moveRight(20*dt);
+  if(keys[68])
+    scene->camera().moveRight(-20*dt);
+
+  scene->camera().rotate(mouseDelta.x(), mouseDelta.y(), 0);
 
   scene->toGPU(&renderDevice, &renderContext);
-  scene->update(1/60.0f);
+  scene->update(dt);
   scene->toCPU();
 
   scene->draw(&renderContext);
-  currentTime+=1/60.0;
+  currentTime+=dt;
+
+  mouseDelta.setX(0);
+  mouseDelta.setY(0);
 
 }
 
 void GLWidget::onMouseMove(MouseEvent event) {
-  scene->camera().rotate(-event.dx/500.0f, -event.dy/500.0f, 0);
+  mouseDelta.setX(-event.dx/500.0f);
+  mouseDelta.setY(-event.dy/500.0f);
 }
 
 void GLWidget::onKeyDown(KeyEvent event) {
-  if(event.keyCode == 0x57)
-    scene->camera().moveForward(0.5);
-  if(event.keyCode == 0x53)
-    scene->camera().moveForward(-0.5);
-  if(event.keyCode == 65)
-    scene->camera().moveRight(-0.5);
-  if(event.keyCode == 68)
-    scene->camera().moveRight(0.5);
-  if(event.keyCode == 76)
-    scene->m_createLightFrustum = true;
-  //qDebug() << "key: " << event.keyCode;
+  keys[event.keyCode] = true;
 
 }
 
-void GLWidget::onKeyUp(KeyEvent /*event*/) {
-
+void GLWidget::onKeyUp(KeyEvent event) {
+  keys[event.keyCode] = false;
 }

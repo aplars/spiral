@@ -11,8 +11,8 @@
 #include "adt/lru.h"
 #include "imagecache.h"
 #include "shadercache.h"
+#include "shadowmapping.h"
 #include <config/config.h>
-#include <boost/flyweight.hpp>
 
 namespace sa {
 class RenderDevice;
@@ -32,7 +32,10 @@ public:
   void setSun(const DirectionalLight& sun);
   void addMeshEntity(const std::string& name, const std::string& resourceName);
   void removeMeshEntity(const std::string& name);
-  StreamedMeshEntity* getMeshEntity(const std::string& name) { return m_meshes[name]; }
+  StreamedMeshEntity* getMeshEntity(const std::string& name)
+  {
+    return m_meshes[name];
+  }
   DebugEntityBox* getDebugBoxEntety(const std::string& name) {
     DebugBoxEntities::const_iterator it = m_debugBoxes.find(name);
     if(it == m_debugBoxes.end())
@@ -50,7 +53,7 @@ public:
   void draw(RenderContext* context);
   bool m_createLightFrustum = false;
 private:
-  void createShadowBufferRectangle(RenderDevice* device, RenderContext* context, float posx, float posy, float sw, float sh);
+  //void createShadowBufferRectangle(RenderDevice* device, RenderContext* context, float posx, float posy, float sw, float sh);
 
 
   typedef std::map<std::string, StreamedMeshEntity*> Entities;
@@ -59,22 +62,24 @@ private:
 
   bool m_firstTimeInToGPU = true;
 
-  std::vector<float> m_shadowMapCascadeDistance;
-
-  std::vector<Matrix44T<float>> m_depthBiasMVPMatrix;
   Matrix44T<float> m_projection;
-  std::vector<Matrix44T<float>> m_shadowProjections;
+
+  ShadowMapping m_shadowMapping;
+//  std::vector<float> m_shadowMapCascadeDistance;
+//  std::vector<Matrix44T<float>> m_depthBiasMVPMatrix;
+//  std::vector<Matrix44T<float>> m_cascadedProjections;
+//  std::vector<Matrix44T<float>> m_shadowMapProjections;
 
   FPSCamera m_camera;
   FPSCamera m_sunCamera;
   DirectionalLight m_sun;
+  sa::Vector4T<float> m_ambientColor = {0.5, 0.5, 0.5, 1.0};
   Entities m_meshes;
   std::deque<std::string> m_meshesToDelete;
   DebugBoxEntities m_debugBoxes;
   float m_currentTime = 0.0f;
 
   std::vector<RenderDepthToTexturePtr> m_shadowBufferTarget;
-  std::shared_ptr<DrawData> m_shadowBufferRectangle;
   AABBModel* m_lightFrustumAabb = nullptr;
 
   BackgroundWorker m_meshLoader;

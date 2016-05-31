@@ -33,6 +33,9 @@ public:
   void setUniformValueArray(const std::string& location, const std::vector<Matrix44T<float>>& values);
 private:
   void cacheUniforms();
+  std::string m_vsName;
+  std::string m_fsName;
+  std::string m_gsName;
   mutable QOpenGLShaderProgram m_glObject;
   std::map<std::string, int> m_uniformsCache;
 };

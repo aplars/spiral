@@ -20,6 +20,7 @@ public:
   RenderContext();
   ~RenderContext();
   bool create(GLuint defaultFB, unsigned int width, unsigned int height);
+
   void destroy();
   unsigned int width() const {
     return m_width;

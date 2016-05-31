@@ -26,8 +26,17 @@ int main(int argc, char *argv[]) {
 
   AssimpToSAModels::convertToXML(
         false,
+        QDir(qDataDir + "/import_models/models/Collada/silent+hill+2+-+tangstelle/model.dae"),
+        QDir(qDataDir + "/meshes/silenthill.xml"),
+        false,
+        200);
+
+
+  AssimpToSAModels::convertToXML(
+        false,
         QDir(qDataDir + "/import_models/models-nonbsd/MD5/Bob.md5mesh"),
         QDir(qDataDir + "/meshes/bob.xml"),
+        false,
         1);
 
 
@@ -35,14 +44,17 @@ int main(int argc, char *argv[]) {
         false,
         QDir(qDataDir + "/import_models/models/ASE/MotionCaptureROM.ase"),
         QDir(qDataDir + "/meshes/motioncapture.xml"),
+        false,
         1);
 
   AssimpToSAModels::convertToXML(
         false,
         QDir(qDataDir + "/import_models/models/OBJ/desert city.obj"),
         QDir(qDataDir + "/meshes/desert_city.xml"),
-        1);
+        true,
+        3);
   }
   qDebug() << "DONE! ";
   return 0;
+
 }

@@ -28,7 +28,7 @@ typedef std::shared_ptr<Skeleton> SkeletonPtr;
 class AssimpToSAModels
 {
 public:
-  static bool convertToXML(bool toXML, const QDir& sourceDir, const QDir& destDir, float scaleFactor);
+  static bool convertToXML(bool toXML, const QDir& sourceDir, const QDir& destDir, bool isStatic, float scaleFactor);
 
   static std::deque<sa::MaterialModel*> processMaterials(const aiScene* const scene);
 
@@ -63,6 +63,21 @@ private:
   {
     if(material->Get(pKey, type, idx, pOut) != AI_SUCCESS)
       pOut = defaultV;
+  }
+
+  static sa::MaterialModel::BlendMode getSaBlendModeFromAi(aiBlendMode aiBlendMode) {
+    switch(aiBlendMode) {
+    case aiBlendMode_Default:
+      return sa::MaterialModel::BlendMode::Default;
+      break;
+    case aiBlendMode_Additive:
+      return sa::MaterialModel::BlendMode::Additive;
+      break;
+    case _aiBlendMode_Force32Bit:
+      return sa::MaterialModel::BlendMode::Force32Bit;
+      break;
+
+    }
   }
 
   static sa::Vector3T<float> getSaVector3FromAi(const aiVector3D& v) {

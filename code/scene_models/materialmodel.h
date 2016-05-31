@@ -11,6 +11,13 @@ namespace sa {
 class MaterialModel
 {
 public:
+  enum BlendMode {
+    None,
+    Default,
+    Additive,
+    Force32Bit
+  };
+
   enum TextureMappingMode {
     Repeat         = 0x2901, // GL_REPEAT
     MirroredRepeat = 0x8370, // GL_MIRRORED_REPEAT
@@ -21,6 +28,7 @@ public:
   MaterialModel();
   MaterialModel(
       bool isTwoSided,
+      BlendMode blendMode,
       const char* texDirAmbient,
       const char* texDirDiffuse,
       const char* texDirSpecular,
@@ -37,6 +45,8 @@ public:
 
   bool isTwoSided() const { return m_isTwoSided; }
 
+  BlendMode blendMode() const;
+
   const std::string& texDirAmbient() const { return m_texDirAmbient; }
   const std::string& texDirDiffuse() const { return m_texDirDiffuse; }
   const std::string& texDirSpecular() const { return m_texDirSpecular; }
@@ -52,12 +62,14 @@ public:
   float shininessStrength() const { return m_shininessStrength; }
 
 
+
 private:
   friend class boost::serialization::access;
   template<class Archive>
   void serialize(Archive & ar, const unsigned int )
   {
     ar & BOOST_SERIALIZATION_NVP(m_isTwoSided);
+    ar & BOOST_SERIALIZATION_NVP(m_blendMode);
     ar & BOOST_SERIALIZATION_NVP(m_texDirAmbient);
     ar & BOOST_SERIALIZATION_NVP(m_texDirDiffuse);
     ar & BOOST_SERIALIZATION_NVP(m_texDirSpecular);
@@ -75,6 +87,7 @@ private:
   }
 
   bool m_isTwoSided;
+  BlendMode m_blendMode;
   std::string m_texDirAmbient;
   std::string m_texDirDiffuse;
   std::string m_texDirSpecular;

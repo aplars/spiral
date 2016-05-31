@@ -152,12 +152,13 @@ void MeshRenderable::toGPU(const ConfigurationManager& config, unsigned int numb
           device);
 
     int posAttr = sp->attributeLocation("posAttr");
-    int texAttr = sp->attributeLocation("texAttr");
     int norAttr = sp->attributeLocation("norAttr");
+    int texAttr = sp->attributeLocation("texAttr");
     int bAttr = sp->attributeLocation("bAttr");
     int wAttr = sp->attributeLocation("wAttr");
 
     ssp->bindAttributeLocation("posAttr", posAttr);
+    ssp->bindAttributeLocation("norAttr", norAttr);
     ssp->bindAttributeLocation("bAttr", bAttr);
     ssp->bindAttributeLocation("wAttr", wAttr);
     ssp->link();
@@ -214,15 +215,12 @@ void MeshRenderable::toGPU(const ConfigurationManager& config, unsigned int numb
     if(ambientTex) {
       subMeshDrawData.Uniforms.Sampler2DUniforms["u_ambientTexture"] = 0;
     }
-    else {
-      subMeshDrawData.Uniforms.Vec4Uniforms["u_ambientMaterial"] = material->ambient();
-    }
     if(diffuseTex) {
       subMeshDrawData.Uniforms.Sampler2DUniforms["u_diffuseTexture"] = 1;
     }
-    else {
+    //else {
       subMeshDrawData.Uniforms.Vec4Uniforms["u_diffuseMaterial"] = material->diffuse();
-    }
+    //}
     if(speculaTex) {
       subMeshDrawData.Uniforms.Sampler2DUniforms["u_specularTexture"] = 2;
     }
@@ -244,6 +242,14 @@ void MeshRenderable::toGPU(const ConfigurationManager& config, unsigned int numb
   {
     VisitorApplyTransformations visitor;
     m_meshModel.m_data.m_transformationTreeRoot->accept(&visitor);
+  }
+  if(m_meshModel.m_data.m_transformationTreeRoot)
+  {
+    const std::set<MeshNodeModel*>& meshNodes = m_meshModel.getMeshNodes();
+    for(MeshNodeModel* mesh : meshNodes) {
+      m_drawData[mesh->mesh()].Uniforms.Matrix4Uniforms["u_modelMatrix"] =  mesh->transformation();
+      m_drawDataDeque.push_back(m_drawData[mesh->mesh()]);
+    }
   }
 
 }
@@ -311,14 +317,21 @@ void MeshRenderable::applyTransformations() {
     VisitorApplyTransformations visitor;
     m_meshModel.m_data.m_transformationTreeRoot->accept(&visitor);
   }
-  if(m_meshModel.m_data.m_transformationTreeRoot)
+  if(m_meshModel.m_data.m_transformationTreeRoot /*&& m_meshModel.m_data.m_animations.size() > 0*/)
   {
     const std::set<MeshNodeModel*>& meshNodes = m_meshModel.getMeshNodes();
+    int i = 0;
+
     for(MeshNodeModel* mesh : meshNodes) {
       m_drawData[mesh->mesh()].Uniforms.Matrix4Uniforms["u_modelMatrix"] =  mesh->transformation();
       m_drawDataDeque.push_back(m_drawData[mesh->mesh()]);
+      i++;
     }
   }
+//  const std::set<MeshNodeModel*>& meshNodes = m_meshModel.getMeshNodes();
+//  for(MeshNodeModel* mesh : meshNodes) {
+//    m_drawDataDeque.push_back(m_drawData[mesh->mesh()]);
+//  }
 }
 
 std::deque<std::string> MeshRenderable::getSkeletalAnimations() const {

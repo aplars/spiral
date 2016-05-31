@@ -9,6 +9,7 @@ MaterialModel::MaterialModel()
 
 MaterialModel::MaterialModel(
     bool isTwoSided,
+    BlendMode blendMode,
     const char* texDirAmbient,
     const char* texDirDiffuse,
     const char* texDirSpecular,
@@ -36,6 +37,10 @@ MaterialModel::MaterialModel(
 
 }
 
+MaterialModel::BlendMode MaterialModel::blendMode() const
+{
+    return m_blendMode;
+}
 
 MaterialModel::TextureMappingMode MaterialModel::mappingModeAmbient() const
 {
@@ -51,4 +56,5 @@ MaterialModel::TextureMappingMode MaterialModel::mappingModeSpecular() const
 {
   return m_mappingModeSpecular;
 }
+
 }

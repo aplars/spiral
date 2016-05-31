@@ -55,7 +55,12 @@ namespace sa
 		Vector3T& operator+=(const Vector3T& other)  { xyz[0]+=other.xyz[0]; xyz[1]+=other.xyz[1]; xyz[2]+=other.xyz[2]; return *this; }
 		const Vector3T operator-(const Vector3T& other) const { return Vector3T(xyz[0] - other.xyz[0], xyz[1] - other.xyz[1], xyz[2] - other.xyz[2]); }
 		Vector3T& operator-=(const Vector3T& other)  { xyz[0]-=other.xyz[0]; xyz[1]-=other.xyz[1]; xyz[2]-=other.xyz[2]; return *this; }
-		const Vector3T operator-() const { return Vector3T() - *this; }
+    const Vector3T operator-(const T& other) const { return Vector3T(xyz[0] - other, xyz[1] - other, xyz[2] - other); }
+    Vector3T& operator-=(const T& other)  { xyz[0]-=other; xyz[1]-=other; xyz[2]-=other; return *this; }
+    const Vector3T operator+(const T& other) const { return Vector3T(xyz[0] + other, xyz[1] + other, xyz[2] + other); }
+    Vector3T& operator+=(const T& other)  { xyz[0]+=other; xyz[1]+=other; xyz[2]+=other; return *this; }
+
+    const Vector3T operator-() const { return Vector3T() - *this; }
 		const Vector3T operator+() const { return *this; }
 
 		T& operator[](unsigned int i);

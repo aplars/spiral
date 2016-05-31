@@ -24,7 +24,8 @@ HEADERS += PlaneT.h \
     Vector2T.h \
     Vector3T.h \
     Vector4T.h \
-    intersectiontests.h
+    intersectiontests.h \
+    sphere.h
 
 unix {
     target.path = /usr/lib

@@ -1,5 +1,6 @@
 #include "texture.h"
 #include "image.h"
+#include <QDebug>
 
 namespace sa {
 Texture::~Texture()
@@ -17,6 +18,7 @@ Texture::Texture(const Image& image, bool generateMipMaps)
   : m_glObject(image.getQObject(), convertMipMapGeneration(generateMipMaps))
 {
   m_glObject.setWrapMode(QOpenGLTexture::ClampToEdge);
+  qDebug() << m_glObject.format();
 }
 
 Texture::Texture(TextureFormat textureFormat, int width, int height, PixelFormat pixelFormat, PixelType pixelType, const void* data)

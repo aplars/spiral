@@ -10,7 +10,11 @@
 
 namespace sa {
 
-
+enum class Blending {
+  None,
+  Normal,
+  Addative
+};
 
 /**
  * @brief The DrawData struct contains all information needed to render a mesh.
@@ -18,7 +22,7 @@ namespace sa {
 struct DrawData {
   bool IsVisible = true;
   bool IsTwoSided = true;
-  bool IsAlphaBlended = false;
+  Blending BlendingFunction = Blending::Normal;
   static const int NUM_TEX_UNITS = 8;
   ShaderUniforms Uniforms;
   IndexBufferPtr IB;
@@ -60,6 +64,8 @@ public:
     m_spList.clear();
   }
 
+  size_t size() const { return m_list.size(); }
+
   DD_List::const_iterator begin() const {
     return m_list.begin();
   }
@@ -75,6 +81,9 @@ public:
   DD_List::iterator end() {
     return m_list.end();
   }
+
+  DD_List::reference operator[](int i) { return m_list[i]; }
+  DD_List::const_reference operator[](int i) const { return m_list[i]; }
 
   const SP_List& shaders() const { return m_spList; }
 

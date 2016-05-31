@@ -6,6 +6,8 @@ sa::ShaderProgram::~ShaderProgram()
 }
 
 sa::ShaderProgram::ShaderProgram(const char* vertexProgram, const char* fragmentProgram, const std::set<std::string>& defines)
+  : m_vsName(vertexProgram)
+  , m_fsName(fragmentProgram)
 {
   //Add the defines to the shaders.
   std::string vertexProgramWithDefines;
@@ -32,6 +34,9 @@ sa::ShaderProgram::ShaderProgram(const char* vertexProgram, const char* fragment
 }
 
 sa::ShaderProgram::ShaderProgram(const char* vertexProgram, const char* fragmentProgram, const char* geometryProgram, const std::set<std::string>& defines)
+  : m_vsName(vertexProgram)
+  , m_fsName(fragmentProgram)
+  , m_gsName(geometryProgram)
 {
   //Add the defines to the shaders.
   std::string vertexProgramWithDefines;

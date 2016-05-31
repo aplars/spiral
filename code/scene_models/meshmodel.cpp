@@ -9,6 +9,7 @@ namespace sa {
 MeshModel MeshModel::createGroundPlane(int width, int depth) {
   MaterialModel* material = new MaterialModel(
         false,
+        MaterialModel::BlendMode::None,
         "",
         "",
         "",

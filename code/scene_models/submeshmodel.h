@@ -20,7 +20,7 @@ public:
   struct Vertex {
     Vertex() {}
     Vertex(float xx, float yy, float zz, float uu, float vv, float nnx, float nny, float nnz)
-      : x(xx), y(yy), z(zz), u(uu), v(vv), nx(nnx), ny(nny), nz(nnz) {}
+      : x(xx), y(yy), z(zz), u(uu), v(vv), nx(nnx), ny(nny), nz(nnz) { normalizeNormal(); }
 
     float operator[](int i) const {
       if(i == 0) return x;

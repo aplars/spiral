@@ -73,7 +73,7 @@ void CubeRenderable::toGPU(const ConfigurationManager& config, RenderDevice *dev
 
   IndexBufferPtr ib = device->createIndexBuffer(faces, 12*3);
 
-  m_drawData.IsAlphaBlended = true;
+  m_drawData.BlendingFunction = Blending::Normal;
   m_drawData.IsTwoSided = false;
   m_drawData.SP = sp;
   m_drawData.VAO = vao;

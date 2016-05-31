@@ -1,8 +1,8 @@
 //#define NUMBER_OF_CASCADES 3
 
 attribute highp highp vec3 posAttr;
-attribute highp highp vec2 texAttr;
 attribute highp highp vec3 norAttr;
+attribute highp highp vec2 texAttr;
 #ifdef BONE_ANIMATION
 attribute highp highp vec4 bAttr;
 attribute highp highp vec4 wAttr;

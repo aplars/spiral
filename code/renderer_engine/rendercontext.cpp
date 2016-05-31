@@ -16,6 +16,7 @@ bool RenderContext::create(GLuint defaultFB, unsigned int width, unsigned int he
   initializeOpenGLFunctions();
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_CULL_FACE);
+  glEnable(GL_MULTISAMPLE);
   return true;
 }
 
@@ -29,6 +30,8 @@ void RenderContext::destroy() {
 
 void RenderContext::setViewport(unsigned int w, unsigned int h) {
   glViewport(0, 0, w, h);
+  m_width = w;
+  m_height = h;
 }
 
 void RenderContext::setCullFace(CullFace cf) {
@@ -75,9 +78,17 @@ void RenderContext::draw(DrawData drawData) {
     m_currentIsTwoSided = static_cast<int>(drawData.IsTwoSided);
   }
 
-  if(drawData.IsAlphaBlended) {
+  if(drawData.BlendingFunction == Blending::Normal) {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  }
+  else if (drawData.BlendingFunction == Blending::Addative)
+  {
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_ONE, GL_ONE);
+  }
+  else {
+    glDisable(GL_BLEND);
   }
   //Bind the texture units
   for(int i = 0; i < DrawData::NUM_TEX_UNITS; ++i)
@@ -139,8 +150,10 @@ void RenderContext::draw(const DrawDataList& drawDataList, ShaderUniforms shader
   //Set all global uniforms.
   for(ShaderProgramPtr shader : drawDataList.shaders()) {
     //Bind shader program if changed
-    shader->bind();
-    setUniforms(shader, shaderUniforms);
+    if(shader) {
+      shader->bind();
+      setUniforms(shader, shaderUniforms);
+    }
   }
   m_currentSP = nullptr;
   //Draw all objects.

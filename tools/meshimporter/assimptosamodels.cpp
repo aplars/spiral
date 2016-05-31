@@ -25,7 +25,9 @@ bool operator<(const aiString& a, const aiString& b) {
   //return strcmp(a.)
 }
 
-static const unsigned int ppsteps = aiProcess_CalcTangentSpace | // calculate tangents and bitangents if possible
+static unsigned int ppsteps =
+
+    //aiProcess_CalcTangentSpace | // calculate tangents and bitangents if possible
     aiProcess_JoinIdenticalVertices    | // join identical vertices/ optimize indexing
     aiProcess_ValidateDataStructure    | // perform a full validation of the loader's output
     aiProcess_ImproveCacheLocality     | // improve the cache locality of the output vertices
@@ -49,7 +51,7 @@ static const unsigned int ppsteps = aiProcess_CalcTangentSpace | // calculate ta
 //                                       aiProcess_FindInvalidData | aiProcess_LimitBoneWeights |
 //                                       aiProcess_ValidateDataStructure | 0;
 
-bool AssimpToSAModels::convertToXML(bool toXML, const QDir& sourceDir, const QDir& destDir, float scaleFactor)
+bool AssimpToSAModels::convertToXML(bool toXML, const QDir& sourceDir, const QDir& destDir, bool isStatic, float scaleFactor)
 {
   bool isOk = true;
   float g_smoothAngle = 80.f;
@@ -62,11 +64,13 @@ bool AssimpToSAModels::convertToXML(bool toXML, const QDir& sourceDir, const QDi
   aiSetImportPropertyInteger(props,AI_CONFIG_GLOB_MEASURE_TIME,1);
 
   std::string sourceDirString = sourceDir.absolutePath().toStdString();
+  if(isStatic)
+    ppsteps = ppsteps | aiProcess_PreTransformVertices;
   const aiScene* scene = (aiScene*)aiImportFileExWithProperties(
         sourceDirString.c_str(),
         ppsteps | /* configurable pp steps */
         aiProcess_GenSmoothNormals		   | // generate smooth normal vectors if not existing
-        aiProcess_SplitLargeMeshes         | // split large, unrenderable meshes into submeshes
+        //aiProcess_SplitLargeMeshes         | // split large, unrenderable meshes into submeshes
         aiProcess_Triangulate			   | // triangulate polygons with more than 3 edges
         //aiProcess_ConvertToLeftHanded	   | // convert everything to D3D left handed space
         aiProcess_SortByPType              | // make 'clean' meshes which consist of a single typ of primitives
@@ -103,7 +107,22 @@ bool AssimpToSAModels::convertToXML(bool toXML, const QDir& sourceDir, const QDi
       srccpy=QDir(srccpy.absolutePath() + QDir::separator() + QString(mat->texDirDiffuse().c_str()));
       QDir dstcpy = destDir;
       dstcpy.cdUp();
+
+
+      //create folder if needed.
+      QFileInfo fi =  QFileInfo(dstcpy.absolutePath() + QDir::separator() + QString(mat->texDirDiffuse().c_str()));
+
+
+      QDir mejkdir(fi.absoluteDir());
+      if(!mejkdir.exists()) {
+        //mejkdir.mkdir(".");
+        QDir::home().mkdir(fi.absoluteDir().absolutePath()); //make dir
+      }
+
       dstcpy=QDir(dstcpy.absolutePath() + QDir::separator() + QString(mat->texDirDiffuse().c_str()));
+
+
+      qDebug() << "copy " << srccpy.absolutePath() << " -- " << dstcpy.absolutePath();
       if(!QFile::copy(srccpy.absolutePath(), dstcpy.absolutePath())) {
         QDir srccpy = sourceDir;
         srccpy.cdUp();
@@ -182,6 +201,9 @@ std::deque<sa::MaterialModel*> AssimpToSAModels::processMaterials(const aiScene*
     aiColor4D diffuseColor, ambientColor, specularColor;
     float shininess, shininessStrength;
 
+    aiBlendMode blendMode;
+    GetMaterialProperty(material, AI_MATKEY_BLEND_FUNC, aiBlendMode_Default, blendMode);
+
     GetMaterialProperty(material, AI_MATKEY_SHININESS, 15.0f, shininess);
     GetMaterialProperty(material, AI_MATKEY_SHININESS_STRENGTH, 1.0f, shininessStrength);
     GetMaterialProperty(material, AI_MATKEY_COLOR_AMBIENT, aiColor4D(0.0, 0.0, 0.0, 1.0), ambientColor);
@@ -209,6 +231,7 @@ std::deque<sa::MaterialModel*> AssimpToSAModels::processMaterials(const aiScene*
 
     sa::MaterialModel* saMaterial = new sa::MaterialModel(
           static_cast<bool>(twoSided),
+          getSaBlendModeFromAi(blendMode),
           texDirAmbient.C_Str(),
           texDirDiffuse.C_Str(),
           texDirSpecular.C_Str(),
@@ -251,10 +274,12 @@ std::deque<sa::SubMeshModel*> AssimpToSAModels::processMeshes(
     //Procsses the faces and adds them to the model.
     for(unsigned int faceIt = 0; faceIt < mesh->mNumFaces; ++faceIt) {
       const aiFace face = mesh->mFaces[faceIt];
-      unsigned int a = face.mIndices[0];
-      unsigned int b = face.mIndices[1];
-      unsigned int c = face.mIndices[2];
-      saMesh->addFace(sa::SubMeshModel::Face(a, b, c));
+      if(face.mNumIndices == 3) {
+        unsigned int a = face.mIndices[0];
+        unsigned int b = face.mIndices[1];
+        unsigned int c = face.mIndices[2];
+        saMesh->addFace(sa::SubMeshModel::Face(a, b, c));
+      }
     }
 
     //std::map<unsigned int, boost::uuids::uuid>::const_iterator it = materialKeys.find(mesh->mMaterialIndex);

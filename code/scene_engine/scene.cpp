@@ -15,27 +15,27 @@ Scene::~Scene()
 }
 
 Scene::Scene(unsigned int width, unsigned int height)
-  : m_sun({1,0,1}, {0.5,0.5, 0.5, 1}, {1.0,1.0, 1.0, 1})
+  : m_sun({1,0,1}, {0.75, 0.75, 0.75, 1})
   , m_imageCache(1000)
   , m_textureCache(1000)
   , m_shaderCache(1000)
 {
+  std::vector<float> shadowMapCascadeDistance;
+  shadowMapCascadeDistance.push_back(25);
+  shadowMapCascadeDistance.push_back(75);
+  shadowMapCascadeDistance.push_back(175);
+  shadowMapCascadeDistance.push_back(300);
 
-  m_shadowMapCascadeDistance.push_back(100);
-  m_shadowMapCascadeDistance.push_back(125);
-  m_shadowMapCascadeDistance.push_back(150);
-  m_shadowMapCascadeDistance.push_back(400);
 
 
   float aspect = width/static_cast<float>(height);
   if(height > width)
     aspect = height/static_cast<float>(width);
-  m_projection = sa::Matrix44T<float>::GetPerspectiveProjection(sa::DegToRad(60.0f), aspect, 1, m_shadowMapCascadeDistance.back());
 
-  for(float dist : m_shadowMapCascadeDistance)
-  {
-    m_shadowProjections.push_back(sa::Matrix44T<float>::GetPerspectiveProjection(sa::DegToRad(60.0f), aspect, 1, dist));
-  }
+  m_shadowMapping.create(shadowMapCascadeDistance, aspect, 1024, 1024);
+
+  m_projection = sa::Matrix44T<float>::GetPerspectiveProjection(sa::DegToRad(60.0f), aspect, 0.1, m_shadowMapping.getShadowMapCascadeDistance().back());
+
   m_config.init("sa_config.conf");
 }
 
@@ -49,6 +49,8 @@ void Scene::setSun(const DirectionalLight& sun) {
 
 void Scene::addMeshEntity(const std::string& name, const std::string& resourceName) {
   m_meshes[name] = new StreamedMeshEntity(m_config.getParam("DATA_DIR") + "/meshes/", resourceName);
+  sa::AABBModel aabb = m_meshes[name]->getBoundingBox();
+  //addDebugBox(name+"db", aabb.getCenter()[0], aabb.getCenter()[1], aabb.getCenter()[2], aabb.getHalfSize()[0], aabb.getHalfSize()[1], aabb.getHalfSize()[2]);
 }
 
 void Scene::removeMeshEntity(const std::string& name) {
@@ -101,14 +103,11 @@ void Scene::toCPU() {
 void Scene::toGPUOnce(RenderDevice* device, RenderContext* context) {
   if(m_firstTimeInToGPU) {
     if(m_shadowBufferTarget.size() <= 0) {
-      for(int i = 0; i < m_shadowMapCascadeDistance.size(); i++) {
-        m_shadowBufferTarget.push_back(context->createRenderDepthToTexture(context->width(), context->height()));
+      for(int i = 0; i < m_shadowMapping.getNumberOfPasses(); i++) {
+        m_shadowBufferTarget.push_back(context->createRenderDepthToTexture(m_shadowMapping.getShadowMapWidth(), m_shadowMapping.getShadowMapHeight()));
       }
     }
 
-    if(!m_shadowBufferRectangle) {
-      createShadowBufferRectangle(device, context, 0, 0, context->width()/4, context->height()/4);
-    }
     m_firstTimeInToGPU = false;
   }
 }
@@ -126,7 +125,7 @@ void Scene::toGPU(RenderDevice* device, RenderContext* context) {
   for(Entities::value_type e : m_meshes) {
     if(e.second->currentDataStorage() == DataStorage::CPU)
     {
-      e.second->toGPU(m_config, m_shadowMapCascadeDistance.size(), m_textureCache, m_shaderCache, device, context);
+      e.second->toGPU(m_config, m_shadowMapping.getNumberOfPasses(), m_textureCache, m_shaderCache, device, context);
     }
   }
 
@@ -179,95 +178,39 @@ void Scene::update(float dt) {
 
   m_currentTime+=dt;
 }
-#include <scene_models/aabbmodel.h>
+
 
 void Scene::drawShadowPass(RenderContext* context) {
+  DrawDataList allToDraw;
+  for(Entities::value_type e : m_meshes) {
+    const DrawDataList& dds = e.second->getDrawData();
+    allToDraw.insert(allToDraw.end(), dds.begin(), dds.end());
+  }
 
-  m_depthBiasMVPMatrix.clear();
-  //unsigned int shadowPass = 0;
-  for(int shadowPass = 0; shadowPass < m_shadowMapCascadeDistance.size(); shadowPass++)
+
+  for(int shadowPass = 0; shadowPass < m_shadowMapping.getNumberOfPasses(); shadowPass++)
   {
-    context->setCullFace(RenderContext::CullFace::Front);
     m_shadowBufferTarget[shadowPass]->bind();
+    context->setCullFace(RenderContext::CullFace::Front);
     context->clear();
 
-    DrawDataList allToDraw;
-    for(Entities::value_type e : m_meshes) {
-      const DrawDataList& dds = e.second->getDrawData();
-      allToDraw.insert(allToDraw.end(), dds.begin(), dds.end());
-    }
-
-
-
-
-    std::array<Vector3T<float>, 8> frustumpoints = m_camera.getFrusumPoints(m_shadowProjections[shadowPass]);
-
-    Matrix44T<float> shadowCamView = m_sunCamera.viewMatrix();
-
-    Vector3T<float> min(std::numeric_limits<float>::max(), std::numeric_limits<float>::max(), std::numeric_limits<float>::max());
-    Vector3T<float> max(-std::numeric_limits<float>::max(), -std::numeric_limits<float>::max(), -std::numeric_limits<float>::max());
-
-    for(int i = 0; i < 8; ++i) {
-      Vector4T<float> vv = shadowCamView.Vec3Transform(frustumpoints[i]);
-      for(int j = 0; j < 3; ++j) {
-        min[j] = Min(vv[j], min[j]);
-        max[j] = Max(vv[j], max[j]);
-      }
-    }
-
-
-    {
-      Vector3T<float> mmin = frustumpoints[0];
-      Vector3T<float> mmax = mmin;
-
-      for(int i = 0; i < 8; ++i) {
-        Vector3T<float> vv = frustumpoints[i];
-        for(int j = 0; j < 3; ++j) {
-          if(vv[j] < mmin[j])
-            mmin[j] = vv[j];
-          if(vv[j] > mmax[j])
-            mmax[j] = vv[j];
-        }
-      }
-      if(!m_lightFrustumAabb && m_createLightFrustum)
-      {
-        m_lightFrustumAabb = new AABBModel();
-        *m_lightFrustumAabb = AABBModel::createFromMinMax(mmin, mmax);
-
-        m_createLightFrustum = false;
-      }
-    }
-
-    Matrix44T<float> ortho = Matrix44T<float>::GetOrthographicProjection(
-          min.X(), max.X(), min.Y(), max.Y(), -max.Z(), -min.Z()
-          );
-
-    static Matrix44T<float> biasMatrix(
-          0.5, 0.0, 0.0, 0.5,
-          0.0, 0.5, 0.0, 0.5,
-          0.0, 0.0, 0.5, 0.5,
-          0.0, 0.0, 0.0, 1.0);
-
-
-    m_depthBiasMVPMatrix.push_back(biasMatrix * ortho * m_sunCamera.viewMatrix());
 
 
     for(DrawDataList::value_type& dd : allToDraw) {
       dd.SP = dd.SSP;
-
-      //dd.Uniforms.Matrix4Uniforms["u_sunViewMatrix"] = m_sunCamera.viewMatrix();
-      dd.Uniforms.Matrix4Uniforms["u_projectionMatrix"] = ortho;
-
-
     }
-
-
     m_sceneSpecificShaderUniforms.Matrix4Uniforms["u_sunViewMatrix"] = m_sunCamera.viewMatrix();
+    m_sceneSpecificShaderUniforms.Matrix4Uniforms["u_shadowProjectionMatrix"] = m_shadowMapping.getShadowMapProjections()[shadowPass];
+    m_sceneSpecificShaderUniforms.Matrix4Uniforms["u_sunViewMatrix"] = m_sunCamera.viewMatrix();
+    m_sceneSpecificShaderUniforms.Vec3Uniforms["u_directionalLight.direction"] = m_sun.direction();
+    m_sceneSpecificShaderUniforms.Vec4Uniforms["u_directionalLight.diffuse"] = m_sun.diffuse();
 
 
     context->draw(allToDraw, m_sceneSpecificShaderUniforms);
     m_shadowBufferTarget[shadowPass]->release();
   }
+
+
 }
 
 
@@ -276,6 +219,7 @@ void Scene::draw(RenderContext* context) {
 
 
 
+  m_shadowMapping.updateShadowPass(m_camera, m_sunCamera);
   drawShadowPass(context);
 
 
@@ -294,111 +238,33 @@ void Scene::draw(RenderContext* context) {
   }
 
 
-  for(DrawDataList::value_type& dd : allToDraw) {
-    //dd.Uniforms.Matrix4Uniforms["u_viewMatrix"] = m_camera.viewMatrix();
-    dd.Uniforms.Matrix4Uniforms["u_projectionMatrix"] = m_projection;
-    dd.Uniforms.Matrix4ArrayUniforms["u_depthBiasMVPMatrix"] = m_depthBiasMVPMatrix;
-
-    dd.Uniforms.Vec3Uniforms["u_directionalLight.direction"] = m_sun.direction();
-    dd.Uniforms.Vec4Uniforms["u_directionalLight.ambient"] = m_sun.ambient();
-    dd.Uniforms.Vec4Uniforms["u_directionalLight.diffuse"] = m_sun.diffuse();
-
-    dd.Uniforms.Vec3Uniforms["u_eyePosition"] = m_camera.eye();
-
-
-    dd.Uniforms.FloatArrayUniforms["u_shadowMapCascadeDistance"] = m_shadowMapCascadeDistance;
-
-    for(int i = 0; i < m_shadowMapCascadeDistance.size(); ++i) {
-      dd.TEX[3+i] = m_shadowBufferTarget[i]->getDepthTexture();
-    }
-    std::vector<unsigned int> shadowMap;
-    for(int i = 0; i < m_shadowMapCascadeDistance.size(); ++i) {
-      shadowMap.push_back(3+i);
-    }
-    dd.Uniforms.Sampler2DArrayUniforms["u_shadowMap"] = shadowMap;
+  std::vector<unsigned int> shadowMap;
+  for(int i = 0; i < m_shadowMapping.getNumberOfPasses(); ++i) {
+    shadowMap.push_back(3+i);
   }
 
+  //qDebug() << "numObjectsToDraw: " << allToDraw.size();
+  for(DrawDataList::value_type& dd : allToDraw) {
+
+    for(int i = 0; i < m_shadowMapping.getNumberOfPasses(); ++i) {
+      dd.TEX[3+i] = m_shadowBufferTarget[i]->getDepthTexture();
+    }
+  }
+
+  m_sceneSpecificShaderUniforms.Sampler2DArrayUniforms["u_shadowMap"] = shadowMap;
   m_sceneSpecificShaderUniforms.Matrix4Uniforms["u_viewMatrix"] = m_camera.viewMatrix();
+  m_sceneSpecificShaderUniforms.Matrix4Uniforms["u_projectionMatrix"] = m_projection;
+  m_sceneSpecificShaderUniforms.Matrix4ArrayUniforms["u_depthBiasMVPMatrix"] = m_shadowMapping.getDepthBiasMVPMatrix();
+  m_sceneSpecificShaderUniforms.Vec3Uniforms["u_directionalLight.direction"] = m_sun.direction();
+  m_sceneSpecificShaderUniforms.Vec4Uniforms["u_directionalLight.diffuse"] = m_sun.diffuse();
+  m_sceneSpecificShaderUniforms.Vec4Uniforms["u_ambientColor"] = m_ambientColor;
+
+  m_sceneSpecificShaderUniforms.Vec3Uniforms["u_eyePosition"] = m_camera.eye();
+  m_sceneSpecificShaderUniforms.FloatArrayUniforms["u_shadowMapCascadeDistance"] = m_shadowMapping.getShadowMapCascadeDistance();
   context->draw(allToDraw, m_sceneSpecificShaderUniforms);
 
 
-  if(m_shadowBufferRectangle)
-  {
-    m_shadowBufferRectangle->TEX[0] = m_shadowBufferTarget[0]->getDepthTexture();
-    m_shadowBufferRectangle->Uniforms.Sampler2DUniforms["u_texture"] = 0;
-    context->draw(*m_shadowBufferRectangle);
-  }
 }
 
-void Scene::createShadowBufferRectangle(RenderDevice* device, RenderContext* context, float posx, float posy, float sw, float sh) {
-  static const char *vertexShaderSource =
-      "attribute highp vec3 posAttr;\n"
-      "attribute highp vec2 texAttr;\n"
-      "varying vec2 v_texAttr;\n"
-      "uniform highp mat4 u_modelMatrix;\n"
-      "uniform highp mat4 u_viewMatrix;\n"
-      "uniform highp mat4 u_projectionMatrix;\n"
-      "void main(void)\n"
-      "{\n"
-      "    v_texAttr = texAttr;\n"
-      "    gl_Position = u_projectionMatrix * u_viewMatrix * u_modelMatrix * vec4(posAttr, 1);\n"
-      "}\n";
-
-  static const char *fragmentShaderSource =
-      "varying vec2 v_texAttr;\n"
-      "uniform sampler2D u_texture;\n"
-      "void main(void)\n"
-      "{\n"
-      "    vec4 tex = texture2D(u_texture, v_texAttr);\n"
-      "    gl_FragColor = tex;\n"
-      "}\n";
-
-  float vertices[] {
-    // front
-    posx, posy,  0.0f, 0, 0,
-        posx + sw, posy,  0.0f, 1, 0,
-        posx + sw, posy + sh,  0.0f, 1, 1,
-        posx, posy + sh,  0.0f, 0, 1
-  };
-
-  unsigned int faces[] = {
-    // front
-    0, 1, 2,
-    2, 3, 0,
-  };
-  VertexBufferPtr vb = device->createVertexBuffer(vertices, 4*5*sizeof(float));
-
-  std::set<std::string> defines;
-  ShaderProgramPtr sp = device->createShaderProgram(
-        vertexShaderSource,
-        fragmentShaderSource,
-        defines);
-  int posAttr = sp->attributeLocation("posAttr");
-  int texAttr = sp->attributeLocation("texAttr");
-  VertexDescription vertexDesc =
-  {
-    {posAttr, sa::VertexDescriptionElement::Type::FLOAT, 3},
-    {texAttr, sa::VertexDescriptionElement::Type::FLOAT, 2},
-  };
-
-  VertexArrayPtr vao = context->createVertexArray(vertexDesc, vb);
-
-  IndexBufferPtr ib = device->createIndexBuffer(faces, 2*3);
-
-  m_shadowBufferRectangle.reset(new DrawData());
-  m_shadowBufferRectangle->IsAlphaBlended = true;
-  m_shadowBufferRectangle->IsTwoSided = true;
-  m_shadowBufferRectangle->SP = sp;
-  m_shadowBufferRectangle->VAO = vao;
-  m_shadowBufferRectangle->IB = ib;
-  m_shadowBufferRectangle->Uniforms.Matrix4Uniforms["u_modelMatrix"] = Matrix44T<float>::GetIdentity();
-  //m_shadowBufferRectangle->Uniforms.Matrix4Uniforms["u_viewMatrix"] = Matrix44T<float>::GetIdentity();
-  m_shadowBufferRectangle->Uniforms.Matrix4Uniforms["u_projectionMatrix"] = Matrix44T<float>::GetOrthographicProjection(
-        RectangleT<float>(0,0, context->width(), context->height()),
-        0,
-        5
-        );
-
-}
 
 }
