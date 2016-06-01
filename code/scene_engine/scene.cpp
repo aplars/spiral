@@ -4,6 +4,8 @@
 #include <math/intersectiontests.h>
 #include <renderer_engine/image.h>
 #include <renderer_engine/renderdevice.h>
+
+
 namespace sa {
 Scene::~Scene()
 {
@@ -39,18 +41,22 @@ Scene::Scene(unsigned int width, unsigned int height)
   m_config.init("sa_config.conf");
 }
 
-void Scene::initialize(RenderDevice* device) {
-
-}
 
 void Scene::setSun(const DirectionalLight& sun) {
   m_sun = sun;
 }
 
-void Scene::addMeshEntity(const std::string& name, const std::string& resourceName) {
-  m_meshes[name] = new StreamedMeshEntity(m_config.getParam("DATA_DIR") + "/meshes/", resourceName);
-  sa::AABBModel aabb = m_meshes[name]->getBoundingBox();
-  //addDebugBox(name+"db", aabb.getCenter()[0], aabb.getCenter()[1], aabb.getCenter()[2], aabb.getHalfSize()[0], aabb.getHalfSize()[1], aabb.getHalfSize()[2]);
+void Scene::setSunPosition(float phi, float theta) {
+  float x = cos(phi) * sin(theta);
+  float y = sin(phi) * sin(theta);
+  float z = cos(theta);
+  m_sun.setDirection(Vector3T<float>() - Vector3T<float>(x, y, z));
+}
+
+void Scene::addMeshEntity(const std::string& name, MeshRenderablePtr mesh) {
+  //MeshRenderablePtr mesh;
+  //mesh.reset(new MeshRenderable(m_config.getParam("DATA_DIR") + "/meshes/", resourceName));
+  m_meshes[name] = new StreamedMeshEntity(mesh);
 }
 
 void Scene::removeMeshEntity(const std::string& name) {
@@ -73,6 +79,7 @@ void Scene::toCPU() {
       if(e.second->currentDataStorage() == DataStorage::Disk)
       {
         //We don not want to load this sucker again therefore we set it as pending.
+        //if not set to pending it will try to laod again when its alreadiy loading.
         e.second->setPendingStorage();
         BackgroundWorkPtr work;
         work.reset(new BackgroundWork(e.second));
@@ -87,10 +94,10 @@ void Scene::toCPU() {
     }
     else {
       if(e.second->currentDataStorage() == DataStorage::GPU) {
-        e.second->setPendingStorage();
+//        e.second->setPendingStorage();
         e.second->unloadGPU();
         e.second->unloadCPU();
-        e.second->setDiskStorage();
+//        e.second->setDiskStorage();
       }
     }
   }
@@ -164,12 +171,12 @@ void Scene::update(float dt) {
   }
 
 
-#pragma omp parallel for
+//#pragma omp parallel for
   for(unsigned int i = 0; i < entetiesDeq.size(); ++i) {
     StreamedMeshEntity* e = entetiesDeq[i];
     e->applyAnimations(dt);
   }
-#pragma omp parallel for
+//#pragma omp parallel for
   for(unsigned int i = 0; i < entetiesDeq.size(); ++i) {
     StreamedMeshEntity* e = entetiesDeq[i];
     if(e->currentDataStorage() == DataStorage::GPU)
@@ -243,7 +250,6 @@ void Scene::draw(RenderContext* context) {
     shadowMap.push_back(3+i);
   }
 
-  //qDebug() << "numObjectsToDraw: " << allToDraw.size();
   for(DrawDataList::value_type& dd : allToDraw) {
 
     for(int i = 0; i < m_shadowMapping.getNumberOfPasses(); ++i) {

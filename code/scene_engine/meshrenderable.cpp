@@ -263,6 +263,16 @@ void MeshRenderable::unloadCPU() {
   m_meshModel.unload();
 }
 
+const sa::DrawDataList& MeshRenderable::getDrawData() const
+{
+  return m_drawDataDeque;
+}
+
+sa::DrawDataList& MeshRenderable::getDrawData()
+{
+  return m_drawDataDeque;
+}
+
 //void MeshRenderable::update(float currentTime) {
 //  //if(m_currentDataStorage == DataStorage::GPU) {
 //    applyAnimations(currentTime);

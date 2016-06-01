@@ -1,6 +1,4 @@
 #include "glwidget.h"
-#include <renderer_engine/renderdevice.h>
-#include <renderer_engine/rendercontext.h>
 #include <renderer_engine/vertexdescription.h>
 #include <scene_engine/meshrenderable.h>
 #include <scene_engine/fpscamera.h>
@@ -11,35 +9,21 @@
 #include <scene_engine/scene.h>
 #include <deque>
 
-sa::RenderDevice renderDevice;
-sa::RenderContext renderContext;
-sa::VertexArrayPtr vertexArray;
-sa::ShaderProgramPtr shaderProgram;
 
-sa::MeshRenderable* meshRenderable;
-std::deque<sa::DrawData> drawDataDeque;
 
-sa::Scene* scene;
-static const int NUMKEYS = 1024;
-bool keys[NUMKEYS];
+//struct Vertex {
+//  Vertex(float xx, float yy, float zz, float rr, float gg, float bb, float aa)
+//    : x(xx)
+//    , y(yy)
+//    , z(zz)
+//    , r(rr)
+//    , g(gg)
+//    , b(bb)
+//    , a(aa ){ }
 
-QVector2D mouseDelta;
-
-int width = 0;
-int height = 0;
-struct Vertex {
-  Vertex(float xx, float yy, float zz, float rr, float gg, float bb, float aa)
-    : x(xx)
-    , y(yy)
-    , z(zz)
-    , r(rr)
-    , g(gg)
-    , b(bb)
-    , a(aa ){ }
-
-  float x = 0, y = 0, z;
-  float r, g, b, a;
-} *vertices;
+//  float x = 0, y = 0, z;
+//  float r, g, b, a;
+//} *vertices;
 
 
 
@@ -78,14 +62,27 @@ void GLWidget::initializeGL() {
   {0.75,0.75, 0.75, 1}));
 
 
+  sa::ConfigurationManager config;
+  config.init("sa_config.conf");
+
+  sa::MeshRenderablePtr bobMesh;
+  bobMesh.reset(new sa::MeshRenderable(config.getParam("DATA_DIR") + "/meshes/", "bob.xml"));
+
+  sa::MeshRenderablePtr groundMesh;
+  groundMesh.reset(new sa::MeshRenderable(config.getParam("DATA_DIR") + "/meshes/", "groundplane100x100.xml"));
+
 //  scene->addMeshEntity("silenthill", "silenthill.xml");
 //  scene->addMeshEntity("desert_city", "desert_city.xml");
-  scene->addMeshEntity("groundplane100x100", "groundplane100x100.xml");
-  scene->addMeshEntity("bob0", "bob.xml");
+  scene->addMeshEntity("groundplane100x100", groundMesh);
+  scene->addMeshEntity("bob0", bobMesh);
   scene->getMeshEntity("bob0")->playSkeletalAnimation("");
-  scene->addMeshEntity("motioncapture0", "motioncapture.xml");
-  scene->getMeshEntity("motioncapture0")->playNodeAnimation("");
-  scene->getMeshEntity("motioncapture0")->setPosition(120,0,40);
+
+//  scene->addMeshEntity("bob1", bobMesh);
+//  scene->getMeshEntity("bob1")->setPosition(120,0,40);
+
+//  scene->addMeshEntity("motioncapture0", "motioncapture.xml");
+//  scene->getMeshEntity("motioncapture0")->playNodeAnimation("");
+//  scene->getMeshEntity("motioncapture0")->setPosition(120,0,40);
 
 //  float LO = -200.0f;
 //  float HI = 200.0f;
@@ -131,20 +128,16 @@ void GLWidget::resizeGL(int w, int h) {
   renderContext.makeDirty();
 }
 
-float currentTime = 0.0;
-bool firstTime = true;
-float dt = 1/60.0;
+
 void GLWidget::paintGL(){
 
   if(firstTime) {
     renderContext.create(this->defaultFramebufferObject(), this->width(), this->height());
-    scene->initialize(&renderDevice);
     firstTime = false;
   }
   renderContext.clear();
   renderContext.setViewport(width(), height());
 
-  qDebug() << width() << " " << height();
 
   if(keys[0x57])
     scene->camera().moveForward(20*dt);

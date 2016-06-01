@@ -163,6 +163,8 @@ void RenderContext::draw(const DrawDataList& drawDataList, ShaderUniforms shader
 }
 
 void RenderContext::setUniforms(ShaderProgramPtr shader, ShaderUniforms uniforms) {
+  if(shader == nullptr) return;
+
   for(FloatUniformsMap::value_type uniform : uniforms.FloatUniforms)
   {
     shader->setUniformValue(uniform.first, uniform.second);

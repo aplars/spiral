@@ -9,8 +9,8 @@ MainWindow::MainWindow(QWidget *parent) :
 {
   ui->setupUi(this);
 
-  GLWidget* view = new GLWidget(ui->centralWidget);
-  ui->verticalLayout->addWidget(view);
+ // GLWidget* view = new GLWidget(ui->centralWidget);
+  //ui->verticalLayout->addWidget(view);
 }
 
 MainWindow::~MainWindow()

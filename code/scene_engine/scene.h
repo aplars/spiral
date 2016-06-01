@@ -12,6 +12,7 @@
 #include "imagecache.h"
 #include "shadercache.h"
 #include "shadowmapping.h"
+#include "meshrenderable.h"
 #include <config/config.h>
 
 namespace sa {
@@ -25,12 +26,10 @@ class Scene
 public:
   ~Scene();
   Scene(unsigned int width, unsigned int height);
-
-  void initialize(RenderDevice* device);
-
   FPSCamera& camera() { return m_camera; }
   void setSun(const DirectionalLight& sun);
-  void addMeshEntity(const std::string& name, const std::string& resourceName);
+  void setSunPosition(float phi, float theta);
+  void addMeshEntity(const std::string& name, MeshRenderablePtr mesh);
   void removeMeshEntity(const std::string& name);
   StreamedMeshEntity* getMeshEntity(const std::string& name)
   {
@@ -90,6 +89,8 @@ private:
   ShaderCache m_shaderCache;
 
   ShaderUniforms m_sceneSpecificShaderUniforms;
+
+  std::map<std::string, MeshRenderablePtr> m_meshCache;
 
 };
 }

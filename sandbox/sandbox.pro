@@ -10,7 +10,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = sandbox
 TEMPLATE = app
-CONFIG += c++11
+CONFIG += c++14
 
 QMAKE_CXXFLAGS += -isystem $$(SPAR_ROOT)/thirdparty/boost/
 QMAKE_CXXFLAGS += -fopenmp
@@ -38,12 +38,15 @@ PRE_TARGETDEPS += "$${spar_lib_path}/libscene_models.a"
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    glwidget.cpp
+    glwidget.cpp \
+    globalsettingsform.cpp
 
 HEADERS  += mainwindow.h \
-    glwidget.h
+    glwidget.h \
+    globalsettingsform.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    globalsettingsform.ui
 
 CONFIG += mobility
 CONFIG += c++11

@@ -23,6 +23,7 @@ public:
   ~StreamedMeshEntity();
   StreamedMeshEntity() {}
   StreamedMeshEntity(const std::string& resourcePath, const std::string& resourceName);
+  StreamedMeshEntity(MeshRenderablePtr mesh);
   void setPosition(const Vector3T<float>& position);
   void setPosition(float x, float y, float z);
   const Vector3T<float>& getPosition() const;
@@ -57,7 +58,7 @@ public:
   DrawDataList& getDrawData();
 
 private:
-  DrawDataList m_emptyDrawData;
+  DrawDataList m_drawData;
   MeshRenderablePtr m_mesh;
   Vector3T<float> m_position;
   float m_heading = 0.0f;

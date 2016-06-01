@@ -52,9 +52,9 @@ public:
    * @brief getDrawData returns the data needed to draw the mesh.
    * @return the data needed to render the mesh.
    */
-  const sa::DrawDataList& getDrawData() const { return m_drawDataDeque; }
+  const sa::DrawDataList& getDrawData() const;
 
-  sa::DrawDataList& getDrawData() { return m_drawDataDeque; }
+  sa::DrawDataList& getDrawData();
 
   void applyAnimations(float dt);
   void applyTransformations();
