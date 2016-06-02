@@ -74,17 +74,18 @@ void Scene::toCPU() {
   std::array<PlaneT<float>, 6> frustum = m_camera.getFrustum(m_projection);
   for(Entities::value_type e : m_meshes) {
     AABBModel bbox = e.second->getBoundingBox();
-    IntersectionTests::Side side = IntersectionTests::FrustumAABBIntersect(frustum, bbox.getMin()-Vector3T<float>(10, 10, 10), bbox.getMax()+Vector3T<float>(10, 10, 10));
+    IntersectionTests::Side side = IntersectionTests::FrustumAABBIntersect(frustum, bbox.getMin()-Vector3T<float>(2, 2, 2), bbox.getMax()+Vector3T<float>(2, 2, 2));
     if(side == IntersectionTests::Inside || side == IntersectionTests::Intersect) {
       if(e.second->currentDataStorage() == DataStorage::Disk)
       {
+        //qDebug() << "is in frustum: " << e.first.c_str();
         //We don not want to load this sucker again therefore we set it as pending.
         //if not set to pending it will try to laod again when its alreadiy loading.
         e.second->setPendingStorage();
         BackgroundWorkPtr work;
         work.reset(new BackgroundWork(e.second));
         work->doWork = [=](StreamedMeshEntity* entity) {
-          entity->toCPU(m_imageCache);
+          entity->toCPU(m_imageCache, m_config.getParam("DATA_DIR") + "/shaders/");
         };
         work->workDone = [](StreamedMeshEntity* /*entity*/) {
         };
@@ -93,11 +94,9 @@ void Scene::toCPU() {
       }
     }
     else {
+      //qDebug() << "is NOT in frustum: " << e.first.c_str();
       if(e.second->currentDataStorage() == DataStorage::GPU) {
-//        e.second->setPendingStorage();
-        e.second->unloadGPU();
-        e.second->unloadCPU();
-//        e.second->setDiskStorage();
+        e.second->unload();
       }
     }
   }
@@ -177,11 +176,11 @@ void Scene::update(float dt) {
     e->applyAnimations(dt);
   }
 //#pragma omp parallel for
-  for(unsigned int i = 0; i < entetiesDeq.size(); ++i) {
-    StreamedMeshEntity* e = entetiesDeq[i];
-    if(e->currentDataStorage() == DataStorage::GPU)
-      e->applyTransformations();
-  }
+//  for(unsigned int i = 0; i < entetiesDeq.size(); ++i) {
+//    StreamedMeshEntity* e = entetiesDeq[i];
+//    if(e->currentDataStorage() == DataStorage::GPU)
+//      e->applyTransformations();
+//  }
 
   m_currentTime+=dt;
 }

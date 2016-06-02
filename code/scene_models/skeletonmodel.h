@@ -31,6 +31,7 @@ namespace sa
       );
       return out;
     }
+    void reset();
     void animate(float currentTime, const std::string& animName);
     void applyTransformations();
 	private:

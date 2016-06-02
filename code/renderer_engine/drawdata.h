@@ -16,6 +16,11 @@ enum class Blending {
   Addative
 };
 
+enum class PolygonMode {
+  Wire,
+  Fill
+};
+
 /**
  * @brief The DrawData struct contains all information needed to render a mesh.
  */
@@ -23,6 +28,7 @@ struct DrawData {
   bool IsVisible = true;
   bool IsTwoSided = true;
   Blending BlendingFunction = Blending::Normal;
+  PolygonMode PolygonDrawMode = PolygonMode::Fill;
   static const int NUM_TEX_UNITS = 8;
   ShaderUniforms Uniforms;
   IndexBufferPtr IB;

@@ -39,7 +39,7 @@ ShaderProgramPtr RenderDevice::createShaderProgram(const char* vertexProgram, co
   return sp;
 }
 
-static std::string readFromFile(const char* filePath) {
+std::string RenderDevice::readFromFile(const char* filePath) {
   std::string fileString;
   std::string line;
   std::ifstream file(filePath); // Open an input stream with the selected file
@@ -71,23 +71,6 @@ ShaderProgramPtr RenderDevice::createShaderProgram(const char* vertexProgram, co
 }
 
 ShaderProgramPtr RenderDevice::createShaderProgramFromFile(const char* vertexProgram, const char* fragmantProgram, const char* geometryProgram, const std::set<std::string>& defines) const {
-  std::function<std::string (const char*)> readFromFile = [](const char* filePath) {
-    std::string fileString;
-    std::string line;
-    std::ifstream file(filePath); // Open an input stream with the selected file
-    if (file.is_open()) { // If the file opened successfully
-      while (!file.eof()) { // While we are not at the end of the file
-        getline(file, line); // Get the current line
-
-          fileString.append(line); // Append the line to our file string
-        fileString.append("\n"); // Appand a new line character
-      }
-      file.close(); // Close the file
-    }
-
-    return fileString; // Return our string
-  };
-
   return createShaderProgram(
         readFromFile(vertexProgram).c_str(),
         readFromFile(fragmantProgram).c_str(),

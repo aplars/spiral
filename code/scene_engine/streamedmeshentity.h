@@ -11,7 +11,7 @@
 #include "imagecache.h"
 #include "texturecache.h"
 #include "shadercache.h"
-
+#include "meshrenderable.h"
 namespace sa {
 class RenderDevice;
 class RenderContext;
@@ -24,6 +24,9 @@ public:
   StreamedMeshEntity() {}
   StreamedMeshEntity(const std::string& resourcePath, const std::string& resourceName);
   StreamedMeshEntity(MeshRenderablePtr mesh);
+
+  std::string getName() const { return m_mesh->getName(); }
+
   void setPosition(const Vector3T<float>& position);
   void setPosition(float x, float y, float z);
   const Vector3T<float>& getPosition() const;
@@ -35,10 +38,9 @@ public:
   DataStorage currentDataStorage() const;
   void setPendingStorage();
   void setDiskStorage();
-  void toCPU(ImageCache& imageCache);
+  void toCPU(ImageCache& imageCache, const std::__cxx11::string &shaderPath);
   void toGPU(const ConfigurationManager& config, unsigned int numberOfShadowCascades, TextureCache& textureCache, ShaderCache& shaderCache, RenderDevice* device, RenderContext* context);
   void applyAnimations(float dt);
-  void applyTransformations();
   //Returns a list of all skeletal animations
   std::deque<std::string> getSkeletalAnimations() const;
   //play's an skeletal animation.
@@ -49,15 +51,22 @@ public:
   //play's an node animation.
   void playNodeAnimation(const std::string& animationName);
 
-  void unloadGPU();
-  void unloadCPU();
+  void unload();
   /**
    * @brief getDrawData returns the data needed to draw the mesh.
    * @return the data needed to render the mesh.
    */
-  DrawDataList& getDrawData();
+  DrawDataList getDrawData();
 
 private:
+  AABBModel m_boundingBox;
+  float m_nodeAnimationTime = 0;
+  float m_skeletonAnimationTime = 0;
+  std::string m_nodeAnimation = "NO_FUCKING_ANIMATION";
+  std::string m_skeletonAnimation = "NO_FUCKING_ANIMATION";
+
+  std::deque<MeshTransform> m_transforms;
+
   DrawDataList m_drawData;
   MeshRenderablePtr m_mesh;
   Vector3T<float> m_position;

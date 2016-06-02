@@ -42,7 +42,10 @@ const AABBModel& MeshRenderable::getBoundingBox() const {
   return m_meshModel.m_header.boundingBox;
 }
 
-void MeshRenderable::toCPU(ImageCache& imageCache) {
+void MeshRenderable::toCPU(ImageCache& imageCache, const std::string& shaderPath) {
+  if(m_currentDataStorage != DataStorage::Disk)
+    return;
+
   std::ifstream ifs((m_resourcePath + m_resourceName + ".data").c_str(), std::ios_base::binary);
   if(ifs.good()) {
     boost::archive::binary_iarchive ia(ifs);
@@ -77,6 +80,16 @@ void MeshRenderable::toCPU(ImageCache& imageCache) {
     }
     ++materialKey;
   }
+
+  m_vshCode = RenderDevice::readFromFile((shaderPath + "ubershader.vsh").c_str()),
+  m_fshCode = RenderDevice::readFromFile((shaderPath + "ubershader.fsh").c_str());
+  m_spKey = m_vshCode + m_fshCode;
+
+  m_vshShadowCode = RenderDevice::readFromFile((shaderPath + "ubershadowshader.vsh").c_str()),
+  m_fshShadowCode = RenderDevice::readFromFile((shaderPath + "ubershadowshader.fsh").c_str());
+  m_spShadowKey = m_vshShadowCode + m_fshShadowCode;
+
+  m_currentDataStorage = DataStorage::CPU;
 }
 
 std::set<std::string> getShaderDefinesFromMesh(const MeshModel& mesh) {
@@ -119,14 +132,37 @@ ShaderProgramPtr createShaderProgramFromFile(const std::set<std::string>& define
   return sp;
 }
 
+ShaderProgramPtr createShaderProgramFromCode(const std::string& key, const std::set<std::string>& defines, const std::string& vsh, const std::string& fsh, ShaderCache& cache, RenderDevice* device) {
+  ShaderProgramPtr sp;
+  std::string definesAsString;
+  for(auto define : defines) {
+    definesAsString+=define;
+  }
+  auto shaderkey = definesAsString + key;
+  if(!cache.try_get(shaderkey, sp)) {
+    sp = device->createShaderProgram(
+          vsh.c_str(),
+          fsh.c_str(),
+          defines);
+    cache.insert(shaderkey, sp);
+  }
+  return sp;
+}
+
 void set_insert_range(const std::set<std::string>& in, std::set<std::string>& out) {
   out.insert(in.begin(), in.end());
 }
 
 void MeshRenderable::toGPU(const ConfigurationManager& config, unsigned int numberOfShadowCascades, TextureCache& textureCache, ShaderCache& shaderCache, RenderDevice* device, RenderContext* context) {
+  if(m_currentDataStorage == DataStorage::GPU) {
+    m_numberOfInstances++;
+
+    return;
+  }
+  if(m_currentDataStorage != DataStorage::CPU)
+    return;
 
   std::set<std::string> globalDefines;
-
 
   globalDefines.insert("NUMBER_OF_CASCADES " + std::to_string(numberOfShadowCascades));
   set_insert_range(getShaderDefinesFromMesh(m_meshModel), globalDefines);
@@ -138,16 +174,19 @@ void MeshRenderable::toGPU(const ConfigurationManager& config, unsigned int numb
     set_insert_range(globalDefines, defines);
     set_insert_range(subMeshDefines, defines);
 
-    ShaderProgramPtr sp = createShaderProgramFromFile(
+    ShaderProgramPtr sp = createShaderProgramFromCode(
+          m_spKey,
           defines,
-          (config.getParam("DATA_DIR") + "/shaders/" + "ubershader.vsh"),
-          (config.getParam("DATA_DIR") + "/shaders/" + "ubershader.fsh"),
+          m_vshCode.c_str(),
+          m_fshCode.c_str(),
           shaderCache,
           device);
-    ShaderProgramPtr ssp = createShaderProgramFromFile(
+
+    ShaderProgramPtr ssp = createShaderProgramFromCode(
+          m_spShadowKey,
           defines,
-          (config.getParam("DATA_DIR") + "/shaders/" + "ubershadowshader.vsh"),
-          (config.getParam("DATA_DIR") + "/shaders/" + "ubershadowshader.fsh"),
+          m_vshShadowCode,
+          m_fshShadowCode,
           shaderCache,
           device);
 
@@ -251,16 +290,21 @@ void MeshRenderable::toGPU(const ConfigurationManager& config, unsigned int numb
       m_drawDataDeque.push_back(m_drawData[mesh->mesh()]);
     }
   }
-
+  m_numberOfInstances++;
+  m_currentDataStorage = DataStorage::GPU;
 }
 
-void MeshRenderable::unloadGPU() {
-  m_drawData.clear();
-  m_drawDataDeque.clear();
-}
-
-void MeshRenderable::unloadCPU() {
-  m_meshModel.unload();
+void MeshRenderable::unload() {
+  if(m_numberOfInstances <= 1) {
+    m_currentDataStorage = DataStorage::Pending;
+    m_drawData.clear();
+    m_drawDataDeque.clear();
+    m_meshModel.unload();
+    m_currentDataStorage = DataStorage::Disk;
+    qDebug() << "MeshRenderable::unload()";
+  }
+  if(m_numberOfInstances > 0)
+    m_numberOfInstances--;
 }
 
 const sa::DrawDataList& MeshRenderable::getDrawData() const
@@ -273,36 +317,45 @@ sa::DrawDataList& MeshRenderable::getDrawData()
   return m_drawDataDeque;
 }
 
-//void MeshRenderable::update(float currentTime) {
-//  //if(m_currentDataStorage == DataStorage::GPU) {
-//    applyAnimations(currentTime);
-//    applyTransformations();
-//  //}
-//}
+sa::DrawData MeshRenderable::getDrawData(unsigned int subMesh)
+{
+  return m_drawData[subMesh];
+}
 
-void MeshRenderable::applyAnimations(float dt) {
-  //dt = 0;
+
+void MeshRenderable::setAnimationFrame(const std::string& skeletalAnimationName, const std::string& nodeAnimationName, float currentSkeletalAnimationTime, float currentNodeAnimationTime) {
 
   if(m_meshModel.m_data.m_animations.size() > 0) {
-    MeshModel::Data::Animations::const_iterator nodeAnimIt =  m_meshModel.m_data.m_animations.find(m_currentNodeAnimation);
+    for(MeshModel::Data::Animations::value_type anim : m_meshModel.m_data.m_animations) {
+      VisitorApplyAnimation* visitor = new VisitorApplyAnimation(0, anim.second);
+      m_meshModel.m_data.m_transformationTreeRoot->accept(visitor);
+      delete visitor;
+
+    }
+
+    MeshModel::Data::Animations::const_iterator nodeAnimIt =  m_meshModel.m_data.m_animations.find(nodeAnimationName);
     if(m_meshModel.m_data.m_animations.end() != nodeAnimIt) {
-      VisitorApplyAnimation* visitor = new VisitorApplyAnimation(m_currentNodeAnimationTime, (*nodeAnimIt).second);
+      VisitorApplyAnimation* visitor = new VisitorApplyAnimation(currentNodeAnimationTime, (*nodeAnimIt).second);
       m_meshModel.m_data.m_transformationTreeRoot->accept(visitor);
       delete visitor;
     }
   }
 
-
   for(sa::MeshModel::Data::SubMeshes::value_type subMesh : m_meshModel.m_data.m_subMeshes) {
-    if(subMesh && subMesh->skeleton() && subMesh->skeleton()->Animations.end() != subMesh->skeleton()->Animations.find(m_currentSkeletalAnimation)) {
-      subMesh->skeleton()->animate(m_currentSkeletalAnimationTime, m_currentSkeletalAnimation);
+    if(subMesh && subMesh->skeleton())
+      subMesh->skeleton()->reset();
+    if(subMesh && subMesh->skeleton() && subMesh->skeleton()->Animations.end() != subMesh->skeleton()->Animations.find(skeletalAnimationName)) {
+      subMesh->skeleton()->animate(currentSkeletalAnimationTime, skeletalAnimationName);
     }
   }
-  m_currentSkeletalAnimationTime+=dt;
-  m_currentNodeAnimationTime+=dt;
+
+  //applyTransformations();
 }
 
+
 void MeshRenderable::applyTransformations() {
+  if(m_currentDataStorage != DataStorage::GPU)
+    return;
   if(m_meshModel.m_data.m_haveBones) {
     //////////////////////////////////////////////////
     //Apply the skeleton.
@@ -338,28 +391,16 @@ void MeshRenderable::applyTransformations() {
       i++;
     }
   }
-//  const std::set<MeshNodeModel*>& meshNodes = m_meshModel.getMeshNodes();
-//  for(MeshNodeModel* mesh : meshNodes) {
-//    m_drawDataDeque.push_back(m_drawData[mesh->mesh()]);
-//  }
 }
 
 std::deque<std::string> MeshRenderable::getSkeletalAnimations() const {
   return m_meshModel.m_header.skeletalAnimations;
 }
 
-void MeshRenderable::playSkeletalAnimation(const std::string& animationName) {
-  m_currentSkeletalAnimationTime = 0.0f;
-  m_currentSkeletalAnimation = animationName;
-}
 
 std::deque<std::string> MeshRenderable::getNodeAnimations() const {
   return m_meshModel.m_header.nodeAnimations;
 }
 
-void MeshRenderable::playNodeAnimation(const std::string& animationName) {
-  m_currentNodeAnimationTime = 0.0f;
-  m_currentNodeAnimation = animationName;
-}
 }
 

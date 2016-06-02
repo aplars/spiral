@@ -30,14 +30,14 @@ varying vec3 v_posAttr;
 float getSlopeScaledBias(vec3 N, vec3 L)
 {
   float cosTheta = dot(N, L);
-  float bias = 0.05*tan(acos(cosTheta)); // cosTheta is dot( n,l ), clamped between 0 and 1
-  bias = clamp(bias, 0,0.05);
+  float bias = 0.5*tan(acos(cosTheta)); // cosTheta is dot( n,l ), clamped between 0 and 1
+  bias = clamp(bias, 0,0.5);
   return bias;
 }
 
 void main()
 {
-  posAttr = posAttr + norAttr*0.02;
+  posAttr = posAttr - norAttr*0.1;
   mat4 boneTransform = mat4(0.0);
 #ifdef BONE_ANIMATION
   boneTransform  = u_bones[int(bAttr[0])] * wAttr[0];

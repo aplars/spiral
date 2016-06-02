@@ -7,6 +7,12 @@ namespace sa
 	Skeleton::Skeleton()
 	{ }
 
+  void Skeleton::reset() {
+    for(const std::string name : getAnimationNames()) {
+      animate(0, name);
+    }
+  }
+
   void Skeleton::animate(float currentTime, const std::string& animName)
   {
     float durationTime = Animations[animName].Duration;

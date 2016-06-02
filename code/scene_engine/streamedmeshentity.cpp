@@ -1,24 +1,25 @@
 #include "streamedmeshentity.h"
-#include "meshrenderable.h"
+
 
 namespace sa {
 StreamedMeshEntity::~StreamedMeshEntity()
 {
-  unloadGPU();
-  unloadCPU();
+  unload();
 }
 
 
 StreamedMeshEntity::StreamedMeshEntity(const std::string& resourcePath, const std::string& resourceName)
   : m_mesh(new MeshRenderable(resourcePath, resourceName))
   , m_currentStorage(DataStorage::Disk)
-{ }
+{
+  m_boundingBox = m_mesh->getBoundingBox();
+}
 
 StreamedMeshEntity::StreamedMeshEntity(MeshRenderablePtr mesh)
   : m_mesh(mesh)
   , m_currentStorage(DataStorage::Disk)
 {
-
+  m_boundingBox = m_mesh->getBoundingBox();
 }
 
 void StreamedMeshEntity::setPosition(const Vector3T<float>& position) {
@@ -42,7 +43,7 @@ float StreamedMeshEntity::getHeading() const {
 }
 
 AABBModel StreamedMeshEntity::getBoundingBox() const {
-  AABBModel transformedBox = m_mesh->getBoundingBox();
+  AABBModel transformedBox = m_boundingBox;
   transformedBox.transform(Matrix44T<float>::GetTranslate(m_position));
   return transformedBox;
 }
@@ -68,8 +69,8 @@ void StreamedMeshEntity::setDiskStorage() {
   m_mutex.unlock();
 }
 
-void StreamedMeshEntity::toCPU(ImageCache& imageCache) {
-  m_mesh->toCPU(imageCache);
+void StreamedMeshEntity::toCPU(ImageCache& imageCache, const std::string& shaderPath) {
+  m_mesh->toCPU(imageCache, shaderPath);
   m_mutex.lock();
   m_currentStorage = DataStorage::CPU;
   m_mutex.unlock();
@@ -83,27 +84,25 @@ void StreamedMeshEntity::toGPU(const ConfigurationManager& config, unsigned int 
 }
 
 void StreamedMeshEntity::applyAnimations(float dt) {
-  m_mesh->applyAnimations(dt);
+  m_mesh->setAnimationFrame(m_skeletonAnimation, m_nodeAnimation, m_skeletonAnimationTime, m_nodeAnimationTime);
+  m_skeletonAnimationTime+=dt;
+  m_nodeAnimationTime+=dt;
+
+  m_mesh->applyTransformations();
+  m_drawData = m_mesh->getDrawData();
+
+
 }
 
-void StreamedMeshEntity::applyTransformations() {
-//  //Apply the local transformations.
-//  m_mesh->applyTransformations();
-//  //Apply the position and orientation.
-//  m_drawData.clear();
-//  Matrix44T<float> movementTransformation = Matrix44T<float>::GetTranslate(m_position) * Matrix44T<float>::GetRotateY(m_heading);
-//  for(DrawData dd : m_mesh->getDrawData()) {
-//    dd.Uniforms.Matrix4Uniforms["u_modelMatrix"] = movementTransformation * dd.Uniforms.Matrix4Uniforms["u_modelMatrix"];
-//    m_drawData.push_back(dd);
-//  }
-}
+
 
 std::deque<std::string> StreamedMeshEntity::getSkeletalAnimations() const {
   return m_mesh->getSkeletalAnimations();
 }
 
 void StreamedMeshEntity::playSkeletalAnimation(const std::string& animationName) {
-  m_mesh->playSkeletalAnimation(animationName);
+  m_skeletonAnimation = animationName;
+  m_skeletonAnimationTime = 0;
 }
 
 std::deque<std::string> StreamedMeshEntity::getNodeAnimations() const {
@@ -111,43 +110,36 @@ std::deque<std::string> StreamedMeshEntity::getNodeAnimations() const {
 }
 
 void StreamedMeshEntity::playNodeAnimation(const std::string& animationName) {
-  m_mesh->playNodeAnimation(animationName);
+  m_nodeAnimation = animationName;
+  m_nodeAnimationTime = 0;
 }
 
-void StreamedMeshEntity::unloadGPU()
+void StreamedMeshEntity::unload()
 {
-  if(m_mesh.unique()) {
-    m_currentStorage = DataStorage::Pending;
-    m_mesh->unloadGPU();
-    qDebug() << "unloadGPU";
-    m_currentStorage = DataStorage::CPU;
-  }
-}
 
-void StreamedMeshEntity::unloadCPU()
-{
-  if(m_mesh.unique()) {
-    m_currentStorage = DataStorage::Pending;
-    m_mesh->unloadCPU();
-    qDebug() << "unloadCPU";
-  }
+  m_mutex.lock();
+  m_currentStorage = DataStorage::Pending;
+
+  m_mesh->unload();
+
   m_currentStorage = DataStorage::Disk;
+  m_mutex.unlock();
 }
 
-DrawDataList& StreamedMeshEntity::getDrawData() {
-  m_drawData.clear();
+
+DrawDataList StreamedMeshEntity::getDrawData() {
+  DrawDataList toDraw;
   if(m_currentStorage == DataStorage::GPU)
   {
-    //Apply the local transformations.
-    m_mesh->applyTransformations();
-    //Apply the position and orientation.
+    //m_drawData = m_mesh->getDrawData();
+
     Matrix44T<float> movementTransformation = Matrix44T<float>::GetTranslate(m_position) * Matrix44T<float>::GetRotateY(m_heading);
-    for(DrawData dd : m_mesh->getDrawData()) {
+    for(DrawData dd : m_drawData) {
       dd.Uniforms.Matrix4Uniforms["u_modelMatrix"] = movementTransformation * dd.Uniforms.Matrix4Uniforms["u_modelMatrix"];
-      m_drawData.push_back(dd);
+      toDraw.push_back(dd);
     }
+    return toDraw;
   }
-  return m_drawData;
-  //return m_mesh->getDrawData();
+  return toDraw;
 }
 }

@@ -21,6 +21,8 @@ public:
   RenderDevice();
   ~RenderDevice();
 
+  static std::string readFromFile(const char* filePath);
+
   VertexBufferPtr createVertexBuffer(const void* data, int sizeInBytes) const;
   template <typename T>
   VertexBufferPtr createVertexBuffer(const std::vector<T>& data) const;

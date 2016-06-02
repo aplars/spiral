@@ -15,10 +15,26 @@ class RenderContext;
 class VertexBuffer;
 class ConfigurationManager;
 typedef std::shared_ptr<VertexBuffer> VertexBufferPtr;
+
+class MeshTransform {
+public:
+  MeshTransform(unsigned int mesh, const std::string& uniform, const Matrix44T<float>& transform)
+    : Mesh(mesh)
+    , Uniform(uniform)
+    , Transform(transform)
+
+  { }
+
+  unsigned int Mesh = 0;
+  std::string Uniform = "";
+  Matrix44T<float> Transform;
+};
+
 class MeshRenderable {
 public:
   MeshRenderable(const std::string& resourcePath, const std::string& resourceName);
 
+  const std::string& getName() const { return m_resourceName; }
   const AABBModel& getBoundingBox() const;
 
   /**
@@ -30,7 +46,7 @@ public:
   /**
    * @brief toCPU loads the resource from HD to model (main memory).
    */
-  void toCPU(ImageCache& imageCache);
+  void toCPU(ImageCache& imageCache, const std::__cxx11::string &shaderPath);
 
   /**
    * @brief toGPU loads the model into the graphics memory. The model is not released when put on the graphics card.
@@ -40,8 +56,7 @@ public:
    */
   void toGPU(const ConfigurationManager& config, unsigned int numberOfShadowCascades, TextureCache& textureCache, ShaderCache& shaderCache, RenderDevice* device, RenderContext* context);
 
-  void unloadGPU();
-  void unloadCPU();
+  void unload();
   /**
    * @brief update updates the animations and applies them.
    * @param currentTime the current global time.
@@ -56,20 +71,21 @@ public:
 
   sa::DrawDataList& getDrawData();
 
-  void applyAnimations(float dt);
+  sa::DrawData getDrawData(unsigned int subMesh);
+
+
+  void setAnimationFrame(const std::string& skeletalAnimationName, const std::string& nodeAnimationName, float currentSkeletalAnimationTime, float currentNodeAnimationTime);
   void applyTransformations();
 
   //Returns a list of all skeletal animations
   std::deque<std::string> getSkeletalAnimations() const;
-  //play's an skeletal animation.
-  void playSkeletalAnimation(const std::string& animationName);
 
   //Returns a list of all node animations
   std::deque<std::string> getNodeAnimations() const;
-  //play's an node animation.
-  void playNodeAnimation(const std::string& animationName);
+
 private:
-  //DataStorage m_currentDataStorage = DataStorage::Disk;
+  unsigned int m_numberOfInstances = 0;
+  DataStorage m_currentDataStorage = DataStorage::Disk;
   std::string m_resourcePath;
   std::string m_resourceName;
   std::map<unsigned int, DrawData>  m_drawData;
@@ -78,14 +94,13 @@ private:
   std::map<unsigned int, Image> m_ambientImage;
   std::map<unsigned int, Image> m_diffuseImage;
   std::map<unsigned int, Image> m_specularImage;
+  std::string m_vshCode;
+  std::string m_fshCode;
+  std::string m_spKey;
 
-  //int m_modelMatrixUniform = 0;
-
-  float m_currentSkeletalAnimationTime = 0.0f;
-  std::string m_currentSkeletalAnimation = "__NO_FUCKING_ANIMATION_AT_ALL__";
-
-  float m_currentNodeAnimationTime = 0.0f;
-  std::string m_currentNodeAnimation = "__NO_FUCKING_ANIMATION_AT_ALL__";
+  std::string m_vshShadowCode;
+  std::string m_fshShadowCode;
+  std::string m_spShadowKey;
 };
 
 typedef std::shared_ptr<MeshRenderable> MeshRenderablePtr;

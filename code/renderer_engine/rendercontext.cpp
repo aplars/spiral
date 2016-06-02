@@ -90,6 +90,13 @@ void RenderContext::draw(DrawData drawData) {
   else {
     glDisable(GL_BLEND);
   }
+
+  if(drawData.PolygonDrawMode == PolygonMode::Fill) {
+    glPolygonMode( GL_FRONT_AND_BACK, GL_FILL);
+  }
+  else {
+    glPolygonMode( GL_FRONT_AND_BACK, GL_LINE);
+  }
   //Bind the texture units
   for(int i = 0; i < DrawData::NUM_TEX_UNITS; ++i)
   {

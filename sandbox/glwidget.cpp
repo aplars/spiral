@@ -71,19 +71,27 @@ void GLWidget::initializeGL() {
   sa::MeshRenderablePtr groundMesh;
   groundMesh.reset(new sa::MeshRenderable(config.getParam("DATA_DIR") + "/meshes/", "groundplane100x100.xml"));
 
+  sa::MeshRenderablePtr motioncaptureMesh;
+  motioncaptureMesh.reset(new sa::MeshRenderable(config.getParam("DATA_DIR") + "/meshes/", "motioncapture.xml"));
+
 //  scene->addMeshEntity("silenthill", "silenthill.xml");
 //  scene->addMeshEntity("desert_city", "desert_city.xml");
+
   scene->addMeshEntity("groundplane100x100", groundMesh);
+
   scene->addMeshEntity("bob0", bobMesh);
   scene->getMeshEntity("bob0")->playSkeletalAnimation("");
 
 //  scene->addMeshEntity("bob1", bobMesh);
 //  scene->getMeshEntity("bob1")->setPosition(120,0,40);
 
-//  scene->addMeshEntity("motioncapture0", "motioncapture.xml");
-//  scene->getMeshEntity("motioncapture0")->playNodeAnimation("");
-//  scene->getMeshEntity("motioncapture0")->setPosition(120,0,40);
+  scene->addMeshEntity("motioncaptureLeft", motioncaptureMesh);
+  scene->getMeshEntity("motioncaptureLeft")->playNodeAnimation("");
+  scene->getMeshEntity("motioncaptureLeft")->setPosition(-120,0,40);
 
+  scene->addMeshEntity("motioncaptureRight", motioncaptureMesh);
+  //scene->getMeshEntity("motioncapture1")->playNodeAnimation("");
+  scene->getMeshEntity("motioncaptureRight")->setPosition(120,0,40);
 //  float LO = -200.0f;
 //  float HI = 200.0f;
 
