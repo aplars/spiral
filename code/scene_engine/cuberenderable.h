@@ -63,7 +63,9 @@ public:
 
   ~CubeRenderable();
   CubeRenderable(float posx, float posy, float posz, float hw, float hh, float hd);
+  void setPosition(const Vector3T<float>& pos);
   void toGPU(const ConfigurationManager& config, RenderDevice* device, RenderContext* context);
+  void update(float dt);
   const DrawData& getDrawData() const;
 
 

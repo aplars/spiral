@@ -4,6 +4,7 @@
 #include <vector>
 #include <math/Matrix44T.h>
 
+
 namespace sa {
 class FPSCamera;
 
@@ -12,29 +13,14 @@ class ShadowMapping
 public:
   ShadowMapping() {}
 
-  void create(const std::vector<float>& shadowMapCascadeDist, float aspect, unsigned int shadowMapWidth, unsigned int shadowMapHeight)
-  {
-    float lastDist = 1;
-    m_shadowMapCascadeDistance = shadowMapCascadeDist;
-    for(float dist : m_shadowMapCascadeDistance)
-    {
-      m_cascadedProjections.push_back(sa::Matrix44T<float>::GetPerspectiveProjection(sa::DegToRad(60.0f), aspect, lastDist, dist));
-      //lastDist = dist;
-    }
-    m_shadowMapWidth = shadowMapWidth;
-    m_shadowMapheight = shadowMapHeight;
-
-    for(int shadowPass = 0; shadowPass < m_shadowMapCascadeDistance.size(); shadowPass++)
-    {
-      m_sphereradius.push_back(-1);
-    }
-  }
+  void create(const std::vector<float>& shadowMapCascadeDist, float aspect, unsigned int shadowMapWidth, unsigned int shadowMapHeight);
 
   unsigned int getNumberOfPasses() const { return m_shadowMapCascadeDistance.size(); }
   const std::vector<float>& getShadowMapCascadeDistance() const { return m_shadowMapCascadeDistance; }
 
   void updateShadowPass(const FPSCamera& camera, const FPSCamera& sunCamera);
 
+  bool isAABBVisibleFromSun(FPSCamera& sunCamera, const sa::Vector3T<float>& mins, const sa::Vector3T<float>& maxs) const;
 
   const std::vector<Matrix44T<float> >& getShadowMapProjections() const;
 
@@ -44,7 +30,11 @@ public:
 
   unsigned int getShadowMapHeight() const;
 
+  bool getStable() const;
+  void setStable(bool stable);
+
 private:
+  bool m_stable = false;
   std::vector<float> m_sphereradius;
   std::vector<float> m_shadowMapCascadeDistance;
   unsigned int m_shadowMapWidth = 0;

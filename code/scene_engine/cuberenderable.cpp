@@ -19,6 +19,10 @@ CubeRenderable::CubeRenderable(float posx, float posy, float posz, float hw, flo
 
 }
 
+void CubeRenderable::setPosition(const Vector3T<float>& pos) {
+  m_position = pos;
+}
+
 void CubeRenderable::toGPU(const ConfigurationManager& config, RenderDevice *device, RenderContext *context)
 {
   float vertices[] {
@@ -81,6 +85,11 @@ void CubeRenderable::toGPU(const ConfigurationManager& config, RenderDevice *dev
   //m_drawData.Matrix4Uniforms[sp->uniformLocation("u_modelMatrix")] = Matrix44T<float>::GetIdentity();
   m_drawData.Uniforms.Matrix4Uniforms["u_modelMatrix"] = Matrix44T<float>::GetTranslate(m_position);
   m_drawData.Uniforms.Vec4Uniforms["u_color"] = Vector4T<float>(1,0,0,0.5);
+  context->resetCurrentState();
+}
+
+void CubeRenderable::update(float dt) {
+  m_drawData.Uniforms.Matrix4Uniforms["u_modelMatrix"] = Matrix44T<float>::GetTranslate(m_position);
 }
 
 const DrawData& CubeRenderable::getDrawData() const

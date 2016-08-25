@@ -18,18 +18,18 @@ int main(int argc, char *argv[]) {
   QString qDataDir(dataDir.c_str());
   qDebug() << "Using dataDir: " << qDataDir;
 
-  Geometries::groundPlaneToXML(
-        false,
-        1000,
-        1000,
-        QDir(qDataDir + "/meshes/groundplane100x100.xml"));
+//  Geometries::groundPlaneToXML(
+//        false,
+//        1000,
+//        1000,
+//        QDir(qDataDir + "/meshes/groundplane100x100.xml"));
 
-  AssimpToSAModels::convertToXML(
-        false,
-        QDir(qDataDir + "/import_models/models/Collada/silent+hill+2+-+tangstelle/model.dae"),
-        QDir(qDataDir + "/meshes/silenthill.xml"),
-        false,
-        200);
+//  AssimpToSAModels::convertToXML(
+//        false,
+//        QDir(qDataDir + "/import_models/models/Collada/silent+hill+2+-+tangstelle/model.dae"),
+//        QDir(qDataDir + "/meshes/silenthill.xml"),
+//        false,
+//        200);
 
 
   AssimpToSAModels::convertToXML(
@@ -40,19 +40,33 @@ int main(int argc, char *argv[]) {
         1);
 
 
-  AssimpToSAModels::convertToXML(
-        false,
-        QDir(qDataDir + "/import_models/models/ASE/MotionCaptureROM.ase"),
-        QDir(qDataDir + "/meshes/motioncapture.xml"),
-        false,
-        1);
+//  AssimpToSAModels::convertToXML(
+//        false,
+//        QDir(qDataDir + "/import_models/models/ASE/MotionCaptureROM.ase"),
+//        QDir(qDataDir + "/meshes/motioncapture.xml"),
+//        false,
+//        1);
 
-  AssimpToSAModels::convertToXML(
-        false,
-        QDir(qDataDir + "/import_models/models/OBJ/desert city.obj"),
-        QDir(qDataDir + "/meshes/desert_city.xml"),
-        true,
-        3);
+//  AssimpToSAModels::convertToXML(
+//        false,
+//        QDir(qDataDir + "/import_models/models/OBJ/desert city.obj"),
+//        QDir(qDataDir + "/meshes/desert_city.xml"),
+//        true,
+//        3);
+
+//  AssimpToSAModels::convertToXML(
+//        false,
+//        QDir(qDataDir + "/import_models/models/Collada/Fortezza/model.dae"),
+//        QDir(qDataDir + "/meshes/Fortezza.xml"),
+//        true,
+//        1);
+
+//  AssimpToSAModels::convertToXML(
+//        false,
+//        QDir(qDataDir + "/import_models/models/OBJ/landscape.obj"),
+//        QDir(qDataDir + "/meshes/landscape.xml"),
+//        true,
+//        2000);
   }
   qDebug() << "DONE! ";
   return 0;

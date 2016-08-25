@@ -4,9 +4,11 @@ DirectionalLight::~DirectionalLight()
 { }
 
 DirectionalLight::DirectionalLight(const Vector3T<float>& direction,
-                                   const Vector4T<float>& diffuse)
+                                   const Vector4T<float>& diffuse,
+                                   const Vector4T<float>& ambient)
   : m_direction(direction.GetNormalized())
   , m_diffuse(diffuse)
+  , m_ambient(ambient)
 { }
 
 const Vector3T<float>& DirectionalLight::direction() const
@@ -27,5 +29,15 @@ const Vector4T<float>& DirectionalLight::diffuse() const
 void DirectionalLight::setDiffuse(const Vector4T<float> &diffuse)
 {
   m_diffuse = diffuse;
+}
+
+const Vector4T<float>& DirectionalLight::ambient() const
+{
+  return m_ambient;
+}
+
+void DirectionalLight::setAmbient(const Vector4T<float> &ambient)
+{
+  m_ambient = ambient;
 }
 }

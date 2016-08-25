@@ -2,7 +2,7 @@
 
 #include <iostream>
 #include <cmath>
-
+#include "ScalarT.h"
 namespace sa
 {
 	template <typename T>
@@ -75,6 +75,21 @@ namespace sa
 			Vector3T<U> v(static_cast<U>(xyz[0]), static_cast<U>(xyz[1]), static_cast<U>(xyz[2]));
 			return v;
 		}
+
+    static Vector3T MinVec3(const Vector3T& a, const Vector3T& b) {
+      Vector3T c;
+      for(unsigned int i = 0; i < 3; ++i) {
+        c[i] = Min(a[i], b[i]);
+      }
+      return c;
+    }
+    static Vector3T MaxVec3(const Vector3T& a, const Vector3T& b) {
+      Vector3T c;
+      for(unsigned int i = 0; i < 3; ++i) {
+        c[i] = Max(a[i], b[i]);
+      }
+      return c;
+    }
 
 	private:
 	};

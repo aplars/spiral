@@ -21,6 +21,11 @@ enum class PolygonMode {
   Fill
 };
 
+enum class DrawPrimitive {
+  Triangles,
+  TriangleStrip,
+};
+
 /**
  * @brief The DrawData struct contains all information needed to render a mesh.
  */
@@ -29,7 +34,8 @@ struct DrawData {
   bool IsTwoSided = true;
   Blending BlendingFunction = Blending::Normal;
   PolygonMode PolygonDrawMode = PolygonMode::Fill;
-  static const int NUM_TEX_UNITS = 8;
+  DrawPrimitive Primitive = DrawPrimitive::Triangles;
+  static const int NUM_TEX_UNITS = 16;
   ShaderUniforms Uniforms;
   IndexBufferPtr IB;
   VertexArrayPtr VAO;

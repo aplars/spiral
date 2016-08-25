@@ -8,15 +8,17 @@ StreamedMeshEntity::~StreamedMeshEntity()
 }
 
 
-StreamedMeshEntity::StreamedMeshEntity(const std::string& resourcePath, const std::string& resourceName)
+StreamedMeshEntity::StreamedMeshEntity(const std::string& resourcePath, const std::string& resourceName, bool castShadow)
   : m_mesh(new MeshRenderable(resourcePath, resourceName))
   , m_currentStorage(DataStorage::Disk)
+  , m_castShadow(castShadow)
 {
   m_boundingBox = m_mesh->getBoundingBox();
 }
 
-StreamedMeshEntity::StreamedMeshEntity(MeshRenderablePtr mesh)
+StreamedMeshEntity::StreamedMeshEntity(MeshRenderablePtr mesh, bool castShadow)
   : m_mesh(mesh)
+  , m_castShadow(castShadow)
   , m_currentStorage(DataStorage::Disk)
 {
   m_boundingBox = m_mesh->getBoundingBox();
@@ -69,8 +71,8 @@ void StreamedMeshEntity::setDiskStorage() {
   m_mutex.unlock();
 }
 
-void StreamedMeshEntity::toCPU(ImageCache& imageCache, const std::string& shaderPath) {
-  m_mesh->toCPU(imageCache, shaderPath);
+void StreamedMeshEntity::toCPU(ImageCache& imageCache, const std::string& texturePath, const std::string& shaderPath) {
+  m_mesh->toCPU(imageCache, texturePath, shaderPath);
   m_mutex.lock();
   m_currentStorage = DataStorage::CPU;
   m_mutex.unlock();
@@ -141,5 +143,10 @@ DrawDataList StreamedMeshEntity::getDrawData() {
     return toDraw;
   }
   return toDraw;
+}
+
+bool StreamedMeshEntity::getCastShadow() const
+{
+  return m_castShadow;
 }
 }

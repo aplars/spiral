@@ -6,6 +6,7 @@
 
 #include <renderer_engine/renderdevice.h>
 #include <renderer_engine/rendercontext.h>
+#include "models/globalsettingsmodel.h"
 
 namespace sa {
 class MeshRenderable;
@@ -17,17 +18,19 @@ public:
   GLWidget(QWidget* parent = nullptr);
   ~GLWidget();
 
+  void setModel(GlobalSettingsModel* globalSettingsModel);
   // QOpenGLWidget interface
 protected:
   void initializeGL();
   void resizeGL(int w, int h);
   void paintGL();
 
-
   void onMouseMove(MouseEvent event);
   void onKeyDown(KeyEvent event);
   void onKeyUp(KeyEvent event);
 private:
+  GlobalSettingsModel* m_globalSettingsModel = nullptr;
+
   QOpenGLDebugLogger *m_debugLogger = nullptr;
 
   sa::RenderDevice renderDevice;

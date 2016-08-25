@@ -45,6 +45,23 @@ namespace sa
 			E[3] += other.E[3];
 			return *this;
 		}
+
+    static Vector4T Min(const Vector4T& a, const Vector4T& b) {
+      Vector4T c;
+      for(unsigned int i = 0; i < 4; ++i) {
+        c[i] = Min(a[i], b[i]);
+      }
+      return c;
+    }
+    static Vector4T Max(const Vector4T& a, const Vector4T& b) {
+      Vector4T c;
+      for(unsigned int i = 0; i < 4; ++i) {
+        c[i] = Max(a[i], b[i]);
+      }
+      return c;
+    }
+
+
 		const T* GetConstPtr() const { return &E[0]; }
 
 		T E[4];

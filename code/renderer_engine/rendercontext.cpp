@@ -69,7 +69,8 @@ void RenderContext::clear() {
 void RenderContext::draw(DrawData drawData) {
   //glClearColor(0.3, 0.3, 0.3, 1);
 
-  if(static_cast<int>(drawData.IsTwoSided) != m_currentIsTwoSided) {
+  //if(static_cast<int>(drawData.IsTwoSided) != m_currentIsTwoSided)
+  {
     if(drawData.IsTwoSided)
       glDisable(GL_CULL_FACE);
     else
@@ -78,7 +79,8 @@ void RenderContext::draw(DrawData drawData) {
     m_currentIsTwoSided = static_cast<int>(drawData.IsTwoSided);
   }
 
-  if(drawData.BlendingFunction == Blending::Normal) {
+  if(drawData.BlendingFunction == Blending::Normal)
+  {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   }
@@ -91,7 +93,8 @@ void RenderContext::draw(DrawData drawData) {
     glDisable(GL_BLEND);
   }
 
-  if(drawData.PolygonDrawMode == PolygonMode::Fill) {
+  if(drawData.PolygonDrawMode == PolygonMode::Fill)
+  {
     glPolygonMode( GL_FRONT_AND_BACK, GL_FILL);
   }
   else {
@@ -100,24 +103,24 @@ void RenderContext::draw(DrawData drawData) {
   //Bind the texture units
   for(int i = 0; i < DrawData::NUM_TEX_UNITS; ++i)
   {
-    if(drawData.TEX[i] != m_currentTEX[i])
+    //if(drawData.TEX[i] != m_currentTEX[i])
     {
       if(drawData.TEX[i]) {
         drawData.TEX[i]->bind(i);
         drawData.TEX[i]->bind();
         m_currentTEX[i] = drawData.TEX[i];
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        /*glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-
+        */
 
       }
     }
   }
 
   //Bind shader program if changed
-  if(drawData.SP != m_currentSP)
+  //if(drawData.SP != m_currentSP)
   {
     if(drawData.SP)
       drawData.SP->bind();
@@ -128,7 +131,7 @@ void RenderContext::draw(DrawData drawData) {
   setUniforms(m_currentSP, drawData.Uniforms);
 
   //Bind the vertex array if changed.
-  if(drawData.VAO != m_currentVAO)
+  //if(drawData.VAO != m_currentVAO)
   {
     if(drawData.VAO)
       drawData.VAO->bind();
@@ -143,13 +146,21 @@ void RenderContext::draw(DrawData drawData) {
       drawData.IB->bind();
       m_currentIB = drawData.IB;
     }
-    if(drawData.IsVisible)
-      glDrawElements(GL_TRIANGLES, drawData.IB->numberOfIndices(), GL_UNSIGNED_INT, 0);
+    if(drawData.IsVisible) {
+      if(drawData.Primitive == DrawPrimitive::Triangles)
+        glDrawElements(GL_TRIANGLES, drawData.IB->numberOfIndices(), GL_UNSIGNED_INT, 0);
+      else
+        glDrawElements(GL_TRIANGLE_STRIP, drawData.IB->numberOfIndices(), GL_UNSIGNED_INT, 0);
+    }
   }
   else {
     //No index buffer. Draw using the number of triangles attribute instead.
-    if(drawData.IsVisible)
-      glDrawArrays(GL_TRIANGLES, 0, drawData.NumberOfTrianglesToDraw);
+    if(drawData.IsVisible) {
+      if(drawData.Primitive == DrawPrimitive::Triangles)
+        glDrawArrays(GL_TRIANGLES, 0, drawData.NumberOfTrianglesToDraw);
+      else
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, drawData.NumberOfTrianglesToDraw);
+    }
   }
 }
 

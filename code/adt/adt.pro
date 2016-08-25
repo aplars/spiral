@@ -32,3 +32,5 @@ unix {
     INSTALLS += target
 }
 
+SOURCES +=
+

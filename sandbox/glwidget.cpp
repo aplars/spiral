@@ -41,6 +41,14 @@ GLWidget::~GLWidget()
 }
 
 
+void GLWidget::setModel(GlobalSettingsModel* globalSettingsModel) {
+  m_globalSettingsModel = globalSettingsModel;
+  m_globalSettingsModel->PropertyChanged += [this](const std::string&) {
+    scene->setTime(m_globalSettingsModel->julianDay(), m_globalSettingsModel->timeOfDay());
+    scene->setAtmosphereFogDensity(m_globalSettingsModel->fogDensity());
+    scene->setUseStableShadowMapping(m_globalSettingsModel->useStableShadowMapping());
+  };
+}
 
 void GLWidget::initializeGL() {
   for(int i = 0; i < NUMKEYS; ++i) {
@@ -57,13 +65,21 @@ void GLWidget::initializeGL() {
 
   scene = new sa::Scene(this->width(), this->height());
   scene->camera().setEye({0,50,200});
-  scene->setSun(sa::DirectionalLight(
-  {1,1,1},
-  {0.75,0.75, 0.75, 1}));
+//  scene->setSun(sa::DirectionalLight(
+//  {1,1,1},
+//  {0.75,0.75, 0.75, 1},
+//  {0.2,0.2, 0.2, 1}));
 
 
   sa::ConfigurationManager config;
   config.init("sa_config.conf");
+
+
+  sa::MeshRenderablePtr fortezza;
+  fortezza.reset(new sa::MeshRenderable(config.getParam("DATA_DIR") + "/meshes/", "Fortezza.xml"));
+
+  sa::MeshRenderablePtr silenthill;
+  silenthill.reset(new sa::MeshRenderable(config.getParam("DATA_DIR") + "/meshes/", "silenthill.xml"));
 
   sa::MeshRenderablePtr bobMesh;
   bobMesh.reset(new sa::MeshRenderable(config.getParam("DATA_DIR") + "/meshes/", "bob.xml"));
@@ -74,24 +90,32 @@ void GLWidget::initializeGL() {
   sa::MeshRenderablePtr motioncaptureMesh;
   motioncaptureMesh.reset(new sa::MeshRenderable(config.getParam("DATA_DIR") + "/meshes/", "motioncapture.xml"));
 
-//  scene->addMeshEntity("silenthill", "silenthill.xml");
-//  scene->addMeshEntity("desert_city", "desert_city.xml");
+  sa::MeshRenderablePtr landscapeMesh;
+  landscapeMesh.reset(new sa::MeshRenderable(config.getParam("DATA_DIR") + "/meshes/", "landscape.xml"));
 
-  scene->addMeshEntity("groundplane100x100", groundMesh);
 
-  scene->addMeshEntity("bob0", bobMesh);
+
+//  scene->addMeshEntity("silenthill", silenthill);
+  scene->addMeshEntity("landscape", landscapeMesh, false);
+ // scene->addMeshEntity("desert_city", "desert_city.xml");
+
+//  scene->addMeshEntity("fortezza", fortezza);
+  //scene->addMeshEntity("groundplane100x100", groundMesh);
+
+
+  scene->addMeshEntity("bob0", bobMesh, true);
   scene->getMeshEntity("bob0")->playSkeletalAnimation("");
 
 //  scene->addMeshEntity("bob1", bobMesh);
 //  scene->getMeshEntity("bob1")->setPosition(120,0,40);
 
-  scene->addMeshEntity("motioncaptureLeft", motioncaptureMesh);
+  scene->addMeshEntity("motioncaptureLeft", motioncaptureMesh, true);
   scene->getMeshEntity("motioncaptureLeft")->playNodeAnimation("");
   scene->getMeshEntity("motioncaptureLeft")->setPosition(-120,0,40);
 
-  scene->addMeshEntity("motioncaptureRight", motioncaptureMesh);
+  //scene->addMeshEntity("motioncaptureRight", motioncaptureMesh);
   //scene->getMeshEntity("motioncapture1")->playNodeAnimation("");
-  scene->getMeshEntity("motioncaptureRight")->setPosition(120,0,40);
+  //scene->getMeshEntity("motioncaptureRight")->setPosition(120,0,40);
 //  float LO = -200.0f;
 //  float HI = 200.0f;
 

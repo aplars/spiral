@@ -17,18 +17,20 @@ Scene::~Scene()
 }
 
 Scene::Scene(unsigned int width, unsigned int height)
-  : m_sun({1,0,1}, {0.75, 0.75, 0.75, 1})
+  : m_sun({1,0,1}, {0.75, 0.75, 0.75, 1}, {0.2, 0.2, 0.2, 1})
+  , m_sky(5400, 5, 10, 1)
   , m_imageCache(1000)
   , m_textureCache(1000)
   , m_shaderCache(1000)
 {
   std::vector<float> shadowMapCascadeDistance;
-  shadowMapCascadeDistance.push_back(25);
+  shadowMapCascadeDistance.push_back(50);
   shadowMapCascadeDistance.push_back(75);
-  shadowMapCascadeDistance.push_back(175);
-  shadowMapCascadeDistance.push_back(300);
+  shadowMapCascadeDistance.push_back(250);
+  shadowMapCascadeDistance.push_back(500);
+  shadowMapCascadeDistance.push_back(3000);
 
-
+  //shadowMapCascadeDistance.push_back(200);
 
   float aspect = width/static_cast<float>(height);
   if(height > width)
@@ -41,6 +43,29 @@ Scene::Scene(unsigned int width, unsigned int height)
   m_config.init("sa_config.conf");
 }
 
+void Scene::setTime(double julianDay, double timeOfDay)
+{
+  m_sky.JulianDay = julianDay;
+  m_sky.TimeOfDay = timeOfDay;
+}
+
+void Scene::setSunSimulationTimeScale(double timeScale) {
+  m_sky.TimeScale = timeScale;
+}
+
+void Scene::runSunSimulation(bool runSimulation) {
+  m_sky.IsRunningSimulation = runSimulation;
+}
+
+void Scene::setAtmosphereFogDensity(float desity)
+{
+  m_sky.FogDensity = desity;
+}
+
+void Scene::setUseStableShadowMapping(bool stable)
+{
+  m_shadowMapping.setStable(stable);
+}
 
 void Scene::setSun(const DirectionalLight& sun) {
   m_sun = sun;
@@ -53,10 +78,12 @@ void Scene::setSunPosition(float phi, float theta) {
   m_sun.setDirection(Vector3T<float>() - Vector3T<float>(x, y, z));
 }
 
-void Scene::addMeshEntity(const std::string& name, MeshRenderablePtr mesh) {
+void Scene::addMeshEntity(const std::string& name, MeshRenderablePtr mesh, bool castShadow) {
   //MeshRenderablePtr mesh;
   //mesh.reset(new MeshRenderable(m_config.getParam("DATA_DIR") + "/meshes/", resourceName));
-  m_meshes[name] = new StreamedMeshEntity(mesh);
+  m_meshes[name] = new StreamedMeshEntity(mesh, castShadow);
+//  addDebugBox(name+"db", mesh->getBoundingBox().getCenter()[0], mesh->getBoundingBox().getCenter()[1], mesh->getBoundingBox().getCenter()[1],
+//      mesh->getBoundingBox().getHalfSize()[0], mesh->getBoundingBox().getHalfSize()[1], mesh->getBoundingBox().getHalfSize()[2]);
 }
 
 void Scene::removeMeshEntity(const std::string& name) {
@@ -72,10 +99,14 @@ void Scene::addDebugBox(const std::string& name, float posx, float posy, float p
 
 void Scene::toCPU() {
   std::array<PlaneT<float>, 6> frustum = m_camera.getFrustum(m_projection);
+
   for(Entities::value_type e : m_meshes) {
     AABBModel bbox = e.second->getBoundingBox();
     IntersectionTests::Side side = IntersectionTests::FrustumAABBIntersect(frustum, bbox.getMin()-Vector3T<float>(2, 2, 2), bbox.getMax()+Vector3T<float>(2, 2, 2));
-    if(side == IntersectionTests::Inside || side == IntersectionTests::Intersect) {
+    bool isInFrustums = (side == IntersectionTests::Inside || side == IntersectionTests::Intersect);
+    isInFrustums = isInFrustums | m_shadowMapping.isAABBVisibleFromSun(m_sunCamera, bbox.getMin()-Vector3T<float>(2, 2, 2), bbox.getMax()+Vector3T<float>(2, 2, 2));
+
+    if(isInFrustums) {
       if(e.second->currentDataStorage() == DataStorage::Disk)
       {
         //qDebug() << "is in frustum: " << e.first.c_str();
@@ -85,7 +116,7 @@ void Scene::toCPU() {
         BackgroundWorkPtr work;
         work.reset(new BackgroundWork(e.second));
         work->doWork = [=](StreamedMeshEntity* entity) {
-          entity->toCPU(m_imageCache, m_config.getParam("DATA_DIR") + "/shaders/");
+          entity->toCPU(m_imageCache, m_config.getParam("DATA_DIR") + "/textures/", m_config.getParam("DATA_DIR") + "/shaders/");
         };
         work->workDone = [](StreamedMeshEntity* /*entity*/) {
         };
@@ -103,7 +134,8 @@ void Scene::toCPU() {
 
   Vector3T<float> centerpoint = m_camera.getFrusumCenterPoint(m_projection);
 
-  m_sunCamera.setLookAt(centerpoint + m_sun.direction(), centerpoint, Vector3T<float>(0, 1, 0));
+  //m_sunCamera.setLookAt(centerpoint + m_sun.direction(), centerpoint, Vector3T<float>(0, 1, 0));
+  m_sunCamera.setLookAt(m_sun.direction(), Vector3T<float>(0, 0, 0), Vector3T<float>(0, 1, 0));
 }
 
 void Scene::toGPUOnce(RenderDevice* device, RenderContext* context) {
@@ -114,6 +146,9 @@ void Scene::toGPUOnce(RenderDevice* device, RenderContext* context) {
       }
     }
 
+    m_sky.toGPU(m_config, device, context);
+    //addDebugBox("thesun", m_sky.getSunPosition()[0], m_sky.getSunPosition()[1], m_sky.getSunPosition()[2], 100, 100, 100);
+    //addDebugBox("thesun", 100, 0, 0, 10, 10, 10);
     m_firstTimeInToGPU = false;
   }
 }
@@ -182,6 +217,18 @@ void Scene::update(float dt) {
 //      e->applyTransformations();
 //  }
 
+  m_sky.update(dt, m_camera.eye());
+
+  m_sun.setDirection(m_sky.getSunPosition().GetNormalized());
+
+  //m_debugBoxes["thesun"]->setPosition(m_sky.getSunPosition());
+
+  //m_camera.setLookAt(m_sky.getSunPosition(), Vector3T<float>(0,0,0), Vector3T<float>(0,1,0));
+  //m_camera.setLookAt(m_camera.eye(), m_sky.getSunPosition(), Vector3T<float>(0,1,0));
+  for(DebugBoxEntities::value_type db : m_debugBoxes)
+  {
+    db.second->update(dt);
+  }
   m_currentTime+=dt;
 }
 
@@ -189,10 +236,22 @@ void Scene::update(float dt) {
 void Scene::drawShadowPass(RenderContext* context) {
   DrawDataList allToDraw;
   for(Entities::value_type e : m_meshes) {
-    const DrawDataList& dds = e.second->getDrawData();
-    allToDraw.insert(allToDraw.end(), dds.begin(), dds.end());
+    if(e.second->getCastShadow()) {
+      const DrawDataList& dds = e.second->getDrawData();
+      allToDraw.insert(allToDraw.end(), dds.begin(), dds.end());
+    }
   }
 
+  for(DrawDataList::value_type& dd : allToDraw) {
+    dd.SP = dd.SSP;
+  }
+
+  m_sceneSpecificShaderUniforms.Matrix4Uniforms["u_sunViewMatrix"] = m_sunCamera.viewMatrix();
+  m_sceneSpecificShaderUniforms.Matrix4Uniforms["u_sunViewMatrix"] = m_sunCamera.viewMatrix();
+  m_sceneSpecificShaderUniforms.Vec3Uniforms["u_directionalLight.direction"] = m_sun.direction();
+  m_sceneSpecificShaderUniforms.Vec4Uniforms["u_directionalLight.diffuse"] = m_sun.diffuse();
+  m_sceneSpecificShaderUniforms.Vec4Uniforms["u_directionalLight.ambient"] = m_sun.ambient();
+  m_sceneSpecificShaderUniforms.FloatUniforms["u_fogDensity"] = m_sky.FogDensity;
 
   for(int shadowPass = 0; shadowPass < m_shadowMapping.getNumberOfPasses(); shadowPass++)
   {
@@ -202,14 +261,7 @@ void Scene::drawShadowPass(RenderContext* context) {
 
 
 
-    for(DrawDataList::value_type& dd : allToDraw) {
-      dd.SP = dd.SSP;
-    }
-    m_sceneSpecificShaderUniforms.Matrix4Uniforms["u_sunViewMatrix"] = m_sunCamera.viewMatrix();
     m_sceneSpecificShaderUniforms.Matrix4Uniforms["u_shadowProjectionMatrix"] = m_shadowMapping.getShadowMapProjections()[shadowPass];
-    m_sceneSpecificShaderUniforms.Matrix4Uniforms["u_sunViewMatrix"] = m_sunCamera.viewMatrix();
-    m_sceneSpecificShaderUniforms.Vec3Uniforms["u_directionalLight.direction"] = m_sun.direction();
-    m_sceneSpecificShaderUniforms.Vec4Uniforms["u_directionalLight.diffuse"] = m_sun.diffuse();
 
 
     context->draw(allToDraw, m_sceneSpecificShaderUniforms);
@@ -226,6 +278,8 @@ void Scene::draw(RenderContext* context) {
 
 
   m_shadowMapping.updateShadowPass(m_camera, m_sunCamera);
+
+
   drawShadowPass(context);
 
 
@@ -246,15 +300,18 @@ void Scene::draw(RenderContext* context) {
 
   std::vector<unsigned int> shadowMap;
   for(int i = 0; i < m_shadowMapping.getNumberOfPasses(); ++i) {
-    shadowMap.push_back(3+i);
+    shadowMap.push_back(4+i);
   }
 
   for(DrawDataList::value_type& dd : allToDraw) {
 
     for(int i = 0; i < m_shadowMapping.getNumberOfPasses(); ++i) {
-      dd.TEX[3+i] = m_shadowBufferTarget[i]->getDepthTexture();
+      dd.TEX[4+i] = m_shadowBufferTarget[i]->getDepthTexture();
     }
   }
+  DrawData skyDd = m_sky.getDrawData();
+
+  allToDraw.push_back(skyDd);
 
   m_sceneSpecificShaderUniforms.Sampler2DArrayUniforms["u_shadowMap"] = shadowMap;
   m_sceneSpecificShaderUniforms.Matrix4Uniforms["u_viewMatrix"] = m_camera.viewMatrix();
@@ -266,6 +323,8 @@ void Scene::draw(RenderContext* context) {
 
   m_sceneSpecificShaderUniforms.Vec3Uniforms["u_eyePosition"] = m_camera.eye();
   m_sceneSpecificShaderUniforms.FloatArrayUniforms["u_shadowMapCascadeDistance"] = m_shadowMapping.getShadowMapCascadeDistance();
+  m_sceneSpecificShaderUniforms.Vec3Uniforms["u_sunPosition"] = m_sky.getSunPosition();
+
   context->draw(allToDraw, m_sceneSpecificShaderUniforms);
 
 

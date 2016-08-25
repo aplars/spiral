@@ -13,6 +13,8 @@
 #include "shadercache.h"
 #include "shadowmapping.h"
 #include "meshrenderable.h"
+#include "sky/sky.h"
+
 #include <config/config.h>
 
 namespace sa {
@@ -26,10 +28,14 @@ class Scene
 public:
   ~Scene();
   Scene(unsigned int width, unsigned int height);
+
+  void setTime(double julianDay, double timeOfDay);
+  void setSunSimulationTimeScale(double timeScale);
+  void runSunSimulation(bool runSimulation);
+  void setAtmosphereFogDensity(float desity);
+  void setUseStableShadowMapping(bool stable);
   FPSCamera& camera() { return m_camera; }
-  void setSun(const DirectionalLight& sun);
-  void setSunPosition(float phi, float theta);
-  void addMeshEntity(const std::string& name, MeshRenderablePtr mesh);
+  void addMeshEntity(const std::string& name, MeshRenderablePtr mesh, bool castShadow);
   void removeMeshEntity(const std::string& name);
   StreamedMeshEntity* getMeshEntity(const std::string& name)
   {
@@ -52,6 +58,9 @@ public:
   void draw(RenderContext* context);
   bool m_createLightFrustum = false;
 private:
+  void setSun(const DirectionalLight& sun);
+  void setSunPosition(float phi, float theta);
+
   //void createShadowBufferRectangle(RenderDevice* device, RenderContext* context, float posx, float posy, float sw, float sh);
 
 
@@ -64,10 +73,6 @@ private:
   Matrix44T<float> m_projection;
 
   ShadowMapping m_shadowMapping;
-//  std::vector<float> m_shadowMapCascadeDistance;
-//  std::vector<Matrix44T<float>> m_depthBiasMVPMatrix;
-//  std::vector<Matrix44T<float>> m_cascadedProjections;
-//  std::vector<Matrix44T<float>> m_shadowMapProjections;
 
   FPSCamera m_camera;
   FPSCamera m_sunCamera;
@@ -76,6 +81,8 @@ private:
   Entities m_meshes;
   std::deque<std::string> m_meshesToDelete;
   DebugBoxEntities m_debugBoxes;
+  sky::Sky m_sky;
+
   float m_currentTime = 0.0f;
 
   std::vector<RenderDepthToTexturePtr> m_shadowBufferTarget;

@@ -22,8 +22,8 @@ class StreamedMeshEntity
 public:
   ~StreamedMeshEntity();
   StreamedMeshEntity() {}
-  StreamedMeshEntity(const std::string& resourcePath, const std::string& resourceName);
-  StreamedMeshEntity(MeshRenderablePtr mesh);
+  StreamedMeshEntity(const std::string& resourcePath, const std::string& resourceName, bool castShadow);
+  StreamedMeshEntity(MeshRenderablePtr mesh, bool castShadow);
 
   std::string getName() const { return m_mesh->getName(); }
 
@@ -38,7 +38,7 @@ public:
   DataStorage currentDataStorage() const;
   void setPendingStorage();
   void setDiskStorage();
-  void toCPU(ImageCache& imageCache, const std::__cxx11::string &shaderPath);
+  void toCPU(ImageCache& imageCache, const std::string& dataDir, const std::__cxx11::string &shaderPath);
   void toGPU(const ConfigurationManager& config, unsigned int numberOfShadowCascades, TextureCache& textureCache, ShaderCache& shaderCache, RenderDevice* device, RenderContext* context);
   void applyAnimations(float dt);
   //Returns a list of all skeletal animations
@@ -52,13 +52,17 @@ public:
   void playNodeAnimation(const std::string& animationName);
 
   void unload();
+
+  bool getCastShadow() const;
   /**
    * @brief getDrawData returns the data needed to draw the mesh.
    * @return the data needed to render the mesh.
    */
   DrawDataList getDrawData();
 
+
 private:
+  bool m_castShadow = false;
   AABBModel m_boundingBox;
   float m_nodeAnimationTime = 0;
   float m_skeletonAnimationTime = 0;

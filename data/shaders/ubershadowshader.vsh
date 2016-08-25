@@ -37,7 +37,7 @@ float getSlopeScaledBias(vec3 N, vec3 L)
 
 void main()
 {
-  posAttr = posAttr - norAttr*0.1;
+  //posAttr = posAttr + norAttr*1.4;
   mat4 boneTransform = mat4(0.0);
 #ifdef BONE_ANIMATION
   boneTransform  = u_bones[int(bAttr[0])] * wAttr[0];
@@ -51,11 +51,13 @@ void main()
   mat4 viewmodelbone = viewmodel * boneTransform;
 
   vec4 N = (u_modelMatrix * boneTransform * vec4(norAttr, 0));
+  vec4 P = (u_modelMatrix * boneTransform * vec4(posAttr, 1));
 
+ // N.xyz = normalize(N.xyz);
+  //P.xyz+=N.xyz*15.5;
 
-  float bias = 0.1;//getSlopeScaledBias(N, u_directionalLight.direction);
-  vec4 pos = u_shadowProjectionMatrix * u_sunViewMatrix * ((u_modelMatrix * boneTransform * vec4(posAttr, 1.0)));
-  //pos.z+=0.1;
+  float bias = 0.0;//getSlopeScaledBias(N, u_directionalLight.direction);
+  vec4 pos = u_shadowProjectionMatrix * u_sunViewMatrix * P;
   if(pos.z < -0.999) pos.z = -0.999;
   gl_Position = pos;
 }

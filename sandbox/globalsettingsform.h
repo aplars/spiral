@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <adt/subject.h>
+#include "models/globalsettingsmodel.h"
 
 namespace Ui {
 class GlobalSettingsForm;
@@ -16,8 +17,12 @@ public:
   explicit GlobalSettingsForm(QWidget *parent = 0);
   ~GlobalSettingsForm();
 
+  void setModel(GlobalSettingsModel *model);
+
+  void updateUi();
 private:
   Ui::GlobalSettingsForm *ui;
+  GlobalSettingsModel* m_model;
 };
 
 #endif // GLOBALSETTINGSFORM_H

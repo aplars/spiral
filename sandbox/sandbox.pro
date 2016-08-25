@@ -39,11 +39,13 @@ PRE_TARGETDEPS += "$${spar_lib_path}/libscene_models.a"
 SOURCES += main.cpp\
         mainwindow.cpp \
     glwidget.cpp \
-    globalsettingsform.cpp
+    globalsettingsform.cpp \
+    models/globalsettingsmodel.cpp
 
 HEADERS  += mainwindow.h \
     glwidget.h \
-    globalsettingsform.h
+    globalsettingsform.h \
+    models/globalsettingsmodel.h
 
 FORMS    += mainwindow.ui \
     globalsettingsform.ui

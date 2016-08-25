@@ -42,7 +42,7 @@ const AABBModel& MeshRenderable::getBoundingBox() const {
   return m_meshModel.m_header.boundingBox;
 }
 
-void MeshRenderable::toCPU(ImageCache& imageCache, const std::string& shaderPath) {
+void MeshRenderable::toCPU(ImageCache& imageCache, const std::string& texturePath, const std::string& shaderPath) {
   if(m_currentDataStorage != DataStorage::Disk)
     return;
 
@@ -88,6 +88,21 @@ void MeshRenderable::toCPU(ImageCache& imageCache, const std::string& shaderPath
   m_vshShadowCode = RenderDevice::readFromFile((shaderPath + "ubershadowshader.vsh").c_str()),
   m_fshShadowCode = RenderDevice::readFromFile((shaderPath + "ubershadowshader.fsh").c_str());
   m_spShadowKey = m_vshShadowCode + m_fshShadowCode;
+
+  Image img((texturePath +  "EarthClearSky2.png").c_str());
+  unsigned char *data = new unsigned char [4 * img.getWidth()];
+  for(unsigned int x = 0; x < img.getWidth(); ++x) {
+    Image::Color c = img.getAveragedSlice(x);
+    unsigned index = 4 * x;
+
+    data[index+0] = c.b*255;
+    data[index+1] = c.g*255;
+    data[index+2] = c.r*255;
+    data[index+3] = c.a*255;
+  }
+  //m_atmosphereFogImg = Image(data, img.getWidth(), 1);
+  m_atmosphereFogImg = Image((texturePath +  "EarthClearSky2.png").c_str());
+  m_atmosphereFogImg.save("atmosphereFogImg.png");
 
   m_currentDataStorage = DataStorage::CPU;
 }
@@ -242,6 +257,7 @@ void MeshRenderable::toGPU(const ConfigurationManager& config, unsigned int numb
     sa::VertexArrayPtr vao = context->createVertexArray(vertexDesc, vb);
     sa::IndexBufferPtr ib = device->createIndexBuffer(sm->getIndices());
 
+    subMeshDrawData.PolygonDrawMode = PolygonMode::Fill;
     subMeshDrawData.IsTwoSided = material->isTwoSided();
     subMeshDrawData.VAO = vao;
     subMeshDrawData.IB = ib;
@@ -250,6 +266,7 @@ void MeshRenderable::toGPU(const ConfigurationManager& config, unsigned int numb
     subMeshDrawData.TEX[0] = ambientTex;
     subMeshDrawData.TEX[1] = diffuseTex;
     subMeshDrawData.TEX[2] = speculaTex;
+    subMeshDrawData.TEX[3] = device->createTextureFromImage(m_atmosphereFogImg, Texture::ClampToEdge);
 
     if(ambientTex) {
       subMeshDrawData.Uniforms.Sampler2DUniforms["u_ambientTexture"] = 0;
@@ -266,6 +283,8 @@ void MeshRenderable::toGPU(const ConfigurationManager& config, unsigned int numb
     else {
       subMeshDrawData.Uniforms.Vec4Uniforms["u_specularMaterial"] = material->specular();
     }
+    subMeshDrawData.Uniforms.Sampler2DUniforms["u_aeralPerspectiveFogColorTexture"] = 3;
+
     subMeshDrawData.Uniforms.FloatUniforms["u_shininess"] = material->shininess();
     subMeshDrawData.Uniforms.FloatUniforms["u_shininessStrength"] = material->shininessStrength();
 

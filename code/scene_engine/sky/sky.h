@@ -1,0 +1,58 @@
+#ifndef SKY_H
+#define SKY_H
+#include <memory>
+#include <renderer_engine/drawdata.h>
+
+namespace sa {
+class ConfigurationManager;
+class RenderDevice;
+class RenderContext;
+namespace sky {
+class Sky
+{
+public:
+  struct Vertex {
+    Vertex() {}
+    Vertex(float xx, float yy, float zz, float u, float v)
+      : x(xx)
+      , y(yy)
+      , z(zz) {}
+
+
+    float x = 0;
+    float y = 0;
+    float z = 0;
+    float u = 0;
+    float v = 0;
+  };
+
+  Sky();
+
+  Sky(float radius, int Slices, int Sides, float dampening);
+
+  Vector3T<float> getSunPosition() const;
+  void toGPU(const ConfigurationManager& config, RenderDevice* device, RenderContext* context);
+
+  void update(float dt, const Vector3T<float>& cameraPosition);
+
+  DrawData getDrawData() const { return m_drawData; }
+
+  double TimeOfDay = 16;
+  double JulianDay = 180;
+  double SunTheta;
+  double SunPhi;
+  double Latitude = 44.0;
+  double Longitude = 36.0;
+  double TimeScale = 1.0;
+  float FogDensity = 0.0005;
+  bool IsRunningSimulation = false;
+private:
+  Vector3T<float> getSunDirection (double jday);
+  float m_radius = 0;
+  std::vector<Vertex> m_vertices;
+  std::vector<unsigned int> m_indices;
+  DrawData m_drawData;
+};
+}
+}
+#endif // SKY_H

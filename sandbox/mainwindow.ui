@@ -86,7 +86,7 @@ QToolButton { /* all types of tool button */
    <widget class="QWidget" name="dockWidgetContents_2">
     <layout class="QVBoxLayout" name="verticalLayout_2">
      <item>
-      <widget class="GlobalSettingsForm" name="widget_2" native="true"/>
+      <widget class="GlobalSettingsForm" name="globalSettingsForm" native="true"/>
      </item>
     </layout>
    </widget>

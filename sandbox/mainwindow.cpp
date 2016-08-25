@@ -3,14 +3,18 @@
 #include "ui_mainwindow.h"
 #include "glwidget.h"
 
+#include "models/globalsettingsmodel.h"
+
 MainWindow::MainWindow(QWidget *parent) :
   QMainWindow(parent),
   ui(new Ui::MainWindow)
 {
   ui->setupUi(this);
 
- // GLWidget* view = new GLWidget(ui->centralWidget);
-  //ui->verticalLayout->addWidget(view);
+  GlobalSettingsModel* globalSettingsModel = new GlobalSettingsModel();
+  ui->globalSettingsForm->setModel(globalSettingsModel);
+  ui->widget->setModel(globalSettingsModel);
+
 }
 
 MainWindow::~MainWindow()

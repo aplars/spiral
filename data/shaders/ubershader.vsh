@@ -21,7 +21,6 @@ uniform highp mat4 u_depthBiasMVPMatrix[NUMBER_OF_CASCADES];
 uniform highp mat4 u_bones[100];
 #endif
 
-
 void main()
 {
   mat4 boneTransform = mat4(0.0);
@@ -37,7 +36,7 @@ void main()
   mat4 viewmodelbone = viewmodel * boneTransform;
   vec4 posAttr4 = vec4(viewmodelbone * vec4(posAttr, 1));
 
-  v_posAttr = posAttr4.xyz/posAttr4.w;
+  v_posAttr = posAttr4.xyz;
   v_texAttr = texAttr;
   v_norAttr = (u_modelMatrix * boneTransform * vec4(norAttr, 0));
 

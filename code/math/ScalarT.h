@@ -43,19 +43,30 @@ namespace sa
 		return sin(a);
 	}
 
-	template <typename T>
+
+  template <typename T>
+  T Cos(const T& a)
+  {
+    return cos(a);
+  }
+
+  template <typename T>
+  T Atan2(const T& y, const T& x)
+  {
+    return atan2(y, x);
+  }
+
+  template <typename T>
 	T Pow(const T& a, int p)
 	{
 		return pow(a, p);
 	}
 
-
-	template <typename T>
-	T Cos(const T& a)
-	{
-		return cos(a);
-	}
-
+  template <typename T>
+  T Sqrt(const T& a)
+  {
+    return static_cast<T>(sqrt(static_cast<double>(a)));
+  }
 	template <typename T>
     T Random()
     {
@@ -118,5 +129,35 @@ namespace sa
 	T DegToRad(const T& deg) {
 		return (deg * Pi<T>() / static_cast<T>(180.0));
 	}
+
+  template <typename T>
+  T RadToDeg(const T& rad) {
+    return (rad*static_cast<T>(180.0)/Pi<T>());
+  }
+
+  template <typename T>
+  T SinDeg(const T& a)
+  {
+    return sin(DegToRad(a));
+  }
+
+  template <typename T>
+  T CosDeg(const T& a)
+  {
+    return cos(DegToRad(a));
+  }
+
+  template <typename T>
+  T Atan2Deg(const T& y, const T& x)
+  {
+    return DegToRad(atan2(y, x));
+  }
+
+  template <typename T>
+  T Fmod(const T& y, const T& x)
+  {
+    return fmod(y, x);
+  }
+
 
 }
