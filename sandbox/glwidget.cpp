@@ -63,7 +63,9 @@ void GLWidget::initializeGL() {
 //    m_debugLogger->startLogging();
   }
 
-  scene = new sa::Scene(this->width(), this->height());
+  sa::ConfigurationManager config;
+  config.init("sa_config.conf");
+  scene = new sa::Scene(this->width(), this->height(), config);
   scene->camera().setEye({0,50,200});
 //  scene->setSun(sa::DirectionalLight(
 //  {1,1,1},
@@ -71,8 +73,6 @@ void GLWidget::initializeGL() {
 //  {0.2,0.2, 0.2, 1}));
 
 
-  sa::ConfigurationManager config;
-  config.init("sa_config.conf");
 
 
   sa::MeshRenderablePtr fortezza;

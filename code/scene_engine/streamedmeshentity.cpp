@@ -91,9 +91,7 @@ void StreamedMeshEntity::applyAnimations(float dt) {
   m_nodeAnimationTime+=dt;
 
   m_mesh->applyTransformations();
-  m_drawData = m_mesh->getDrawData();
-
-
+//  m_drawData = m_mesh->getDrawData();
 }
 
 
@@ -129,16 +127,21 @@ void StreamedMeshEntity::unload()
 }
 
 
-DrawDataList StreamedMeshEntity::getDrawData() {
+DrawDataList StreamedMeshEntity::getDrawData(RenderPass pass) {
   DrawDataList toDraw;
+
+  m_drawData = m_mesh->getDrawData(pass);
   if(m_currentStorage == DataStorage::GPU)
   {
-    //m_drawData = m_mesh->getDrawData();
+    if(pass == RenderPass::Shadow && !m_castShadow) {
 
-    Matrix44T<float> movementTransformation = Matrix44T<float>::GetTranslate(m_position) * Matrix44T<float>::GetRotateY(m_heading);
-    for(DrawData dd : m_drawData) {
-      dd.Uniforms.Matrix4Uniforms["u_modelMatrix"] = movementTransformation * dd.Uniforms.Matrix4Uniforms["u_modelMatrix"];
-      toDraw.push_back(dd);
+    }
+    else {
+      Matrix44T<float> movementTransformation = Matrix44T<float>::GetTranslate(m_position) * Matrix44T<float>::GetRotateY(m_heading);
+      for(DrawData dd : m_drawData) {
+        dd.Uniforms.Matrix4Uniforms["u_modelMatrix"] = movementTransformation * dd.Uniforms.Matrix4Uniforms["u_modelMatrix"];
+        toDraw.push_back(dd);
+      }
     }
     return toDraw;
   }

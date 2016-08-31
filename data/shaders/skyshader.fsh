@@ -7,17 +7,13 @@ uniform sampler2D u_fogColor;
 
 void main(void)
 {
-  vec3 fragmentPos = v_fragmentPosition.xyz;///v_fragmentPosition.w;
+  vec3 fragmentPos = v_fragmentPosition.xyz;
   float dist = distance(fragmentPos, v_sunPosition);
   float falloff = dist;
-  //if(falloff > 200)
-  //falloff = 100/dist;
-  falloff = 300/dist;
+
+  falloff = 400/dist;
   if(falloff < 0) falloff = 0;
   if(falloff > 1) falloff = 1;
-  float sun = 0;
-
-  //falloff = 0;
 
   vec4 tex = texture2D(u_texture, v_texAttr);
 

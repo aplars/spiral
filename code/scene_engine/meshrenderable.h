@@ -8,6 +8,7 @@
 #include "imagecache.h"
 #include "texturecache.h"
 #include "shadercache.h"
+#include "renderpass.h"
 
 namespace sa {
 class RenderDevice;
@@ -32,6 +33,7 @@ public:
 
 class MeshRenderable {
 public:
+
   MeshRenderable(const std::string& resourcePath, const std::string& resourceName);
 
   const std::string& getName() const { return m_resourceName; }
@@ -67,11 +69,7 @@ public:
    * @brief getDrawData returns the data needed to draw the mesh.
    * @return the data needed to render the mesh.
    */
-  const sa::DrawDataList& getDrawData() const;
-
-  sa::DrawDataList& getDrawData();
-
-  sa::DrawData getDrawData(unsigned int subMesh);
+  sa::DrawDataList getDrawData(RenderPass pass);
 
 
   void setAnimationFrame(const std::string& skeletalAnimationName, const std::string& nodeAnimationName, float currentSkeletalAnimationTime, float currentNodeAnimationTime);
@@ -102,6 +100,10 @@ private:
   std::string m_vshShadowCode;
   std::string m_fshShadowCode;
   std::string m_spShadowKey;
+
+  std::string m_vshSunLightShaftsCode;
+  std::string m_fshSunLightShaftsCode;
+  std::string m_spSunLightShaftsKey;
 };
 
 typedef std::shared_ptr<MeshRenderable> MeshRenderablePtr;

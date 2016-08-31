@@ -12,6 +12,7 @@
 #include "texturecache.h"
 #include "shadercache.h"
 #include "meshrenderable.h"
+
 namespace sa {
 class RenderDevice;
 class RenderContext;
@@ -58,7 +59,7 @@ public:
    * @brief getDrawData returns the data needed to draw the mesh.
    * @return the data needed to render the mesh.
    */
-  DrawDataList getDrawData();
+  DrawDataList getDrawData(RenderPass pass);
 
 
 private:

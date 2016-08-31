@@ -44,7 +44,7 @@ public:
 private:
   void runThread();
 
-  typedef std::auto_ptr<std::thread> ThreadScopedPtr;
+  typedef std::unique_ptr<std::thread> ThreadScopedPtr;
   ThreadScopedPtr m_thread;
 
   typedef std::deque<BackgroundWorkPtr> WorkQueue;

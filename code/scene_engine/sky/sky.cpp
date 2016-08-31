@@ -132,6 +132,13 @@ void Sky::toGPU(const ConfigurationManager& config, RenderDevice* device, Render
         (dataDir + "/shaders/skyshader.vsh").c_str(),
         (dataDir + "/shaders/skyshader.fsh").c_str(),
         defines);
+
+  m_spBlackAndWhite = device->createShaderProgramFromFile(
+        (dataDir + "/shaders/skyshaderblackandwhite.vsh").c_str(),
+        (dataDir + "/shaders/skyshaderblackandwhite.fsh").c_str(),
+        defines);
+
+
   int posAttr = sp->attributeLocation("posAttr");
   int texAttr = sp->attributeLocation("texAttr");
   VertexDescription vertexDesc =
@@ -171,7 +178,7 @@ void Sky::toGPU(const ConfigurationManager& config, RenderDevice* device, Render
   m_drawData.TEX[1] = device->createTextureFromImage(fogImg, Texture::ClampToEdge);
   delete []data;
   data = nullptr;
-  m_drawData.SP = sp;
+  m_drawData.Current_SP = sp;
   m_drawData.VAO = vao;
   m_drawData.IB = ib;
 
@@ -188,8 +195,16 @@ void Sky::toGPU(const ConfigurationManager& config, RenderDevice* device, Render
   context->resetCurrentState();
 }
 
-
-double kuk = 0;
+DrawData Sky::getDrawData(RenderPass renderPass)
+{
+  DrawData outData;
+  outData = m_drawData;
+  if(renderPass == RenderPass::SunLightShafts)
+  {
+    outData.Current_SP = m_spBlackAndWhite;
+  }
+  return outData;
+}
 
 Vector3T<float> Sky::getSunDirection (double jday)
 {

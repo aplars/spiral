@@ -14,7 +14,7 @@
 #include "shadowmapping.h"
 #include "meshrenderable.h"
 #include "sky/sky.h"
-
+#include "sky/lightshafts.h"
 #include <config/config.h>
 
 namespace sa {
@@ -22,12 +22,14 @@ class RenderDevice;
 class RenderContext;
 class RenderDepthToTexture;
 typedef std::shared_ptr<RenderDepthToTexture> RenderDepthToTexturePtr;
+class RenderToTexture;
+typedef std::shared_ptr<RenderToTexture> RenderToTexturePtr;
 
 class Scene
 {
 public:
   ~Scene();
-  Scene(unsigned int width, unsigned int height);
+  Scene(unsigned int width, unsigned int height, ConfigurationManager config);
 
   void setTime(double julianDay, double timeOfDay);
   void setSunSimulationTimeScale(double timeScale);
@@ -55,8 +57,11 @@ public:
   void toGPU(RenderDevice* device, RenderContext* context);
   void update(float dt);
   void drawShadowPass(RenderContext* context);
+  void drawUberPass(RenderContext* context);
+  void drawLightShaftsPass(RenderContext* context);
   void draw(RenderContext* context);
   bool m_createLightFrustum = false;
+  
 private:
   void setSun(const DirectionalLight& sun);
   void setSunPosition(float phi, float theta);
@@ -66,6 +71,9 @@ private:
 
   typedef std::map<std::string, StreamedMeshEntity*> Entities;
   typedef std::map<std::string, DebugEntityBox*> DebugBoxEntities;
+
+  unsigned int m_screenWidth, m_screenheight;
+
   ConfigurationManager m_config;
 
   bool m_firstTimeInToGPU = true;
@@ -82,10 +90,12 @@ private:
   std::deque<std::string> m_meshesToDelete;
   DebugBoxEntities m_debugBoxes;
   sky::Sky m_sky;
-
+  LightShafts m_lightShafts;
   float m_currentTime = 0.0f;
 
   std::vector<RenderDepthToTexturePtr> m_shadowBufferTarget;
+  RenderToTexturePtr m_sunLightShaftsTarget;
+
   AABBModel* m_lightFrustumAabb = nullptr;
 
   BackgroundWorker m_meshLoader;

@@ -2,6 +2,7 @@
 #define SKY_H
 #include <memory>
 #include <renderer_engine/drawdata.h>
+#include "../renderpass.h"
 
 namespace sa {
 class ConfigurationManager;
@@ -13,10 +14,12 @@ class Sky
 public:
   struct Vertex {
     Vertex() {}
-    Vertex(float xx, float yy, float zz, float u, float v)
+    Vertex(float xx, float yy, float zz, float uu, float vv)
       : x(xx)
       , y(yy)
-      , z(zz) {}
+      , z(zz)
+      , u(uu)
+      , v(vv){}
 
 
     float x = 0;
@@ -35,7 +38,7 @@ public:
 
   void update(float dt, const Vector3T<float>& cameraPosition);
 
-  DrawData getDrawData() const { return m_drawData; }
+  DrawData getDrawData(RenderPass renderPass);
 
   double TimeOfDay = 16;
   double JulianDay = 180;
@@ -51,6 +54,7 @@ private:
   float m_radius = 0;
   std::vector<Vertex> m_vertices;
   std::vector<unsigned int> m_indices;
+  ShaderProgramPtr m_spBlackAndWhite;
   DrawData m_drawData;
 };
 }

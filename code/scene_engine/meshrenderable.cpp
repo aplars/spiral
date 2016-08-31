@@ -27,7 +27,8 @@ BOOST_CLASS_EXPORT(sa::TransformationNodeModel);
 namespace sa {
 MeshRenderable::MeshRenderable(const std::string& resourcePath, const std::string& resourceName)
   : m_resourcePath(resourcePath)
-  , m_resourceName(resourceName) {
+  , m_resourceName(resourceName)
+{
   std::ifstream ifs((m_resourcePath + m_resourceName + ".header").c_str(), std::ios_base::binary);
   if(ifs.good())
   {
@@ -88,6 +89,10 @@ void MeshRenderable::toCPU(ImageCache& imageCache, const std::string& texturePat
   m_vshShadowCode = RenderDevice::readFromFile((shaderPath + "ubershadowshader.vsh").c_str()),
   m_fshShadowCode = RenderDevice::readFromFile((shaderPath + "ubershadowshader.fsh").c_str());
   m_spShadowKey = m_vshShadowCode + m_fshShadowCode;
+
+  m_vshSunLightShaftsCode = RenderDevice::readFromFile((shaderPath + "blackshader.vsh").c_str()),
+  m_fshSunLightShaftsCode = RenderDevice::readFromFile((shaderPath + "blackshader.fsh").c_str());
+  m_spSunLightShaftsKey = m_vshSunLightShaftsCode + m_fshSunLightShaftsCode;
 
   Image img((texturePath +  "EarthClearSky2.png").c_str());
   unsigned char *data = new unsigned char [4 * img.getWidth()];
@@ -189,7 +194,7 @@ void MeshRenderable::toGPU(const ConfigurationManager& config, unsigned int numb
     set_insert_range(globalDefines, defines);
     set_insert_range(subMeshDefines, defines);
 
-    ShaderProgramPtr sp = createShaderProgramFromCode(
+    ShaderProgramPtr uberSp = createShaderProgramFromCode(
           m_spKey,
           defines,
           m_vshCode.c_str(),
@@ -197,7 +202,7 @@ void MeshRenderable::toGPU(const ConfigurationManager& config, unsigned int numb
           shaderCache,
           device);
 
-    ShaderProgramPtr ssp = createShaderProgramFromCode(
+    ShaderProgramPtr shadowMapSp = createShaderProgramFromCode(
           m_spShadowKey,
           defines,
           m_vshShadowCode,
@@ -205,17 +210,31 @@ void MeshRenderable::toGPU(const ConfigurationManager& config, unsigned int numb
           shaderCache,
           device);
 
-    int posAttr = sp->attributeLocation("posAttr");
-    int norAttr = sp->attributeLocation("norAttr");
-    int texAttr = sp->attributeLocation("texAttr");
-    int bAttr = sp->attributeLocation("bAttr");
-    int wAttr = sp->attributeLocation("wAttr");
+    ShaderProgramPtr SunLightShaftsSp = createShaderProgramFromCode(
+          m_spSunLightShaftsKey,
+          defines,
+          m_vshSunLightShaftsCode,
+          m_fshSunLightShaftsCode,
+          shaderCache,
+          device);
 
-    ssp->bindAttributeLocation("posAttr", posAttr);
-    ssp->bindAttributeLocation("norAttr", norAttr);
-    ssp->bindAttributeLocation("bAttr", bAttr);
-    ssp->bindAttributeLocation("wAttr", wAttr);
-    ssp->link();
+    int posAttr = uberSp->attributeLocation("posAttr");
+    int norAttr = uberSp->attributeLocation("norAttr");
+    int texAttr = uberSp->attributeLocation("texAttr");
+    int bAttr = uberSp->attributeLocation("bAttr");
+    int wAttr = uberSp->attributeLocation("wAttr");
+
+    shadowMapSp->bindAttributeLocation("posAttr", posAttr);
+    shadowMapSp->bindAttributeLocation("norAttr", norAttr);
+    shadowMapSp->bindAttributeLocation("bAttr", bAttr);
+    shadowMapSp->bindAttributeLocation("wAttr", wAttr);
+    shadowMapSp->link();
+
+    SunLightShaftsSp->bindAttributeLocation("posAttr", posAttr);
+    SunLightShaftsSp->bindAttributeLocation("norAttr", norAttr);
+    SunLightShaftsSp->bindAttributeLocation("bAttr", bAttr);
+    SunLightShaftsSp->bindAttributeLocation("wAttr", wAttr);
+    SunLightShaftsSp->link();
 
     sa::VertexDescription vertexDesc =
     {
@@ -261,8 +280,9 @@ void MeshRenderable::toGPU(const ConfigurationManager& config, unsigned int numb
     subMeshDrawData.IsTwoSided = material->isTwoSided();
     subMeshDrawData.VAO = vao;
     subMeshDrawData.IB = ib;
-    subMeshDrawData.SP = sp;
-    subMeshDrawData.SSP = ssp;
+    subMeshDrawData.Uber_SP = uberSp;
+    subMeshDrawData.ShadowMap_SP = shadowMapSp;
+    subMeshDrawData.SunLightShafts_SP = SunLightShaftsSp;
     subMeshDrawData.TEX[0] = ambientTex;
     subMeshDrawData.TEX[1] = diffuseTex;
     subMeshDrawData.TEX[2] = speculaTex;
@@ -326,19 +346,32 @@ void MeshRenderable::unload() {
     m_numberOfInstances--;
 }
 
-const sa::DrawDataList& MeshRenderable::getDrawData() const
+DrawDataList MeshRenderable::getDrawData(RenderPass pass)
 {
-  return m_drawDataDeque;
-}
-
-sa::DrawDataList& MeshRenderable::getDrawData()
-{
-  return m_drawDataDeque;
-}
-
-sa::DrawData MeshRenderable::getDrawData(unsigned int subMesh)
-{
-  return m_drawData[subMesh];
+  if(pass == RenderPass::Uber) {
+    DrawDataList drawData;
+    for(DrawData dd : m_drawDataDeque) {
+      dd.Current_SP = dd.Uber_SP;
+      drawData.push_back(dd);
+    }
+    return drawData;
+  }
+  else if(pass == RenderPass::Shadow) {
+    DrawDataList drawData;
+    for(DrawData dd : m_drawDataDeque) {
+      dd.Current_SP = dd.ShadowMap_SP;
+      drawData.push_back(dd);
+    }
+    return drawData;
+  }
+  else if(pass == RenderPass::SunLightShafts) {
+    DrawDataList drawData;
+    for(DrawData dd : m_drawDataDeque) {
+      dd.Current_SP = dd.SunLightShafts_SP;
+      drawData.push_back(dd);
+    }
+    return drawData;
+  }
 }
 
 

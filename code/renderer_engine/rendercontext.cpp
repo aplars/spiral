@@ -62,12 +62,16 @@ RenderDepthToTexturePtr RenderContext::createRenderDepthToTexture(unsigned int w
   return RenderDepthToTexturePtr(new RenderDepthToTexture(m_defaultFB, width, height));
 }
 
+RenderToTexturePtr RenderContext::createRenderToTexture(unsigned int width, unsigned int height) {
+  return RenderToTexturePtr(new RenderToTexture(m_defaultFB, width, height));
+}
+
 void RenderContext::clear() {
   glClear(GL_COLOR_BUFFER_BIT| GL_DEPTH_BUFFER_BIT);
 }
 
 void RenderContext::draw(DrawData drawData) {
-  //glClearColor(0.3, 0.3, 0.3, 1);
+  glClearColor(1, 0.3, 0.3, 1);
 
   //if(static_cast<int>(drawData.IsTwoSided) != m_currentIsTwoSided)
   {
@@ -122,9 +126,9 @@ void RenderContext::draw(DrawData drawData) {
   //Bind shader program if changed
   //if(drawData.SP != m_currentSP)
   {
-    if(drawData.SP)
-      drawData.SP->bind();
-    m_currentSP = drawData.SP;
+    if(drawData.Current_SP)
+      drawData.Current_SP->bind();
+    m_currentSP = drawData.Current_SP;
   }
   //Set shader uniforms. This is usually cheap operation and therefore all uniforms
   //are written. Not just the ones that have changed.

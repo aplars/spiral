@@ -39,30 +39,35 @@ struct DrawData {
   ShaderUniforms Uniforms;
   IndexBufferPtr IB;
   VertexArrayPtr VAO;
-  ShaderProgramPtr SP;
-  ShaderProgramPtr SSP;
+  ShaderProgramPtr Current_SP;
+  ShaderProgramPtr Uber_SP;
+  ShaderProgramPtr ShadowMap_SP;
+  ShaderProgramPtr SunLightShafts_SP;
+
   TexturePtr TEX[NUM_TEX_UNITS];
   unsigned int NumberOfTrianglesToDraw;
 };
 
-//typedef std::deque<DrawData> DrawDataList;
 class DrawDataList {
   typedef std::deque<DrawData> DD_List;
   typedef std::set<ShaderProgramPtr> SP_List;
 public:
   void push_back(DD_List::const_reference e) {
     m_list.push_back(e);
-    m_spList.insert(e.SP);
-    m_spList.insert(e.SSP);
+    m_spList.insert(e.Current_SP);
+    m_spList.insert(e.Uber_SP);
+    m_spList.insert(e.ShadowMap_SP);
+    m_spList.insert(e.SunLightShafts_SP);
   }
 
   template< class InputIt >
   void insert(DD_List::iterator pos, InputIt first, InputIt last) {
     m_list.insert(pos, first, last);
     std::for_each(first, last, [this](const_reference dd) {
-      m_spList.insert(dd.SP);
-      m_spList.insert(dd.SSP);
-
+      m_spList.insert(dd.Current_SP);
+      m_spList.insert(dd.Uber_SP);
+      m_spList.insert(dd.ShadowMap_SP);
+      m_spList.insert(dd.SunLightShafts_SP);
     });
   }
 

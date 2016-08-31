@@ -30,7 +30,9 @@ SOURCES += meshrenderable.cpp \
     shadowmapping.cpp \
     sky/sky.cpp \
     terrain/simple/terrain.cpp \
-    terrain/plane/plane.cpp
+    terrain/plane/plane.cpp \
+    sky/lightshafts.cpp \
+    rectanglerenderable.cpp
 
 HEADERS += meshrenderable.h \
     scene.h \
@@ -48,7 +50,10 @@ HEADERS += meshrenderable.h \
     shadowmapping.h \
     sky/sky.h \
     terrain/simple/terrain.h \
-    terrain/plane/plane.h
+    terrain/plane/plane.h \
+    renderpass.h \
+    sky/lightshafts.h \
+    rectanglerenderable.h
 
 CONFIG( debug, debug|release ) {
     DESTDIR = $$(SPAR_ROOT)/libs/lib-debug
@@ -70,4 +75,10 @@ DISTFILES += \
     ../../data/shaders/ubershadowshader.fsh \
     ../../data/shaders/ubershadowshader.vsh \
     ../../data/shaders/skyshader.fsh \
-    ../../data/shaders/skyshader.vsh
+    ../../data/shaders/skyshader.vsh \
+    ../../data/shaders/blackshader.fsh \
+    ../../data/shaders/blackshader.vsh \
+    ../../data/shaders/skyshaderblackandwhite.fsh \
+    ../../data/shaders/skyshaderblackandwhite.vsh \
+    ../../data/shaders/lightshafts.fsh \
+    ../../data/shaders/lightshafts.vsh

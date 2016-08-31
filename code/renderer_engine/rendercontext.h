@@ -34,6 +34,8 @@ public:
 
   VertexArrayPtr createVertexArray(VertexDescription description, VertexBufferPtr buffer);
   RenderDepthToTexturePtr createRenderDepthToTexture(unsigned int width, unsigned int height);
+  RenderToTexturePtr createRenderToTexture(unsigned int width, unsigned int height);
+
   void clear();
   void draw(DrawData drawData);
   void draw(const DrawDataList& drawDataList, ShaderUniforms shaderUniforms);

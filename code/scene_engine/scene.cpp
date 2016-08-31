@@ -16,12 +16,17 @@ Scene::~Scene()
   }
 }
 
-Scene::Scene(unsigned int width, unsigned int height)
-  : m_sun({1,0,1}, {0.75, 0.75, 0.75, 1}, {0.2, 0.2, 0.2, 1})
+Scene::Scene(unsigned int width, unsigned int height, ConfigurationManager config)
+  : m_screenWidth(width)
+  , m_screenheight(height)
+  , m_config(config)
+  , m_sun({1,0,1}, {0.75, 0.75, 0.75, 1}, {0.2, 0.2, 0.2, 1})
   , m_sky(5400, 5, 10, 1)
+  , m_lightShafts(config)
   , m_imageCache(1000)
   , m_textureCache(1000)
   , m_shaderCache(1000)
+
 {
   std::vector<float> shadowMapCascadeDistance;
   shadowMapCascadeDistance.push_back(50);
@@ -40,7 +45,7 @@ Scene::Scene(unsigned int width, unsigned int height)
 
   m_projection = sa::Matrix44T<float>::GetPerspectiveProjection(sa::DegToRad(60.0f), aspect, 0.1, m_shadowMapping.getShadowMapCascadeDistance().back());
 
-  m_config.init("sa_config.conf");
+
 }
 
 void Scene::setTime(double julianDay, double timeOfDay)
@@ -79,8 +84,6 @@ void Scene::setSunPosition(float phi, float theta) {
 }
 
 void Scene::addMeshEntity(const std::string& name, MeshRenderablePtr mesh, bool castShadow) {
-  //MeshRenderablePtr mesh;
-  //mesh.reset(new MeshRenderable(m_config.getParam("DATA_DIR") + "/meshes/", resourceName));
   m_meshes[name] = new StreamedMeshEntity(mesh, castShadow);
 //  addDebugBox(name+"db", mesh->getBoundingBox().getCenter()[0], mesh->getBoundingBox().getCenter()[1], mesh->getBoundingBox().getCenter()[1],
 //      mesh->getBoundingBox().getHalfSize()[0], mesh->getBoundingBox().getHalfSize()[1], mesh->getBoundingBox().getHalfSize()[2]);
@@ -147,6 +150,10 @@ void Scene::toGPUOnce(RenderDevice* device, RenderContext* context) {
     }
 
     m_sky.toGPU(m_config, device, context);
+    m_lightShafts.toGPU(m_config, device, context);
+
+    m_sunLightShaftsTarget = context->createRenderToTexture(m_screenWidth, m_screenheight);
+
     //addDebugBox("thesun", m_sky.getSunPosition()[0], m_sky.getSunPosition()[1], m_sky.getSunPosition()[2], 100, 100, 100);
     //addDebugBox("thesun", 100, 0, 0, 10, 10, 10);
     m_firstTimeInToGPU = false;
@@ -234,17 +241,16 @@ void Scene::update(float dt) {
 
 
 void Scene::drawShadowPass(RenderContext* context) {
+  m_shadowMapping.updateShadowPass(m_camera, m_sunCamera);
+
+
   DrawDataList allToDraw;
+
   for(Entities::value_type e : m_meshes) {
-    if(e.second->getCastShadow()) {
-      const DrawDataList& dds = e.second->getDrawData();
-      allToDraw.insert(allToDraw.end(), dds.begin(), dds.end());
-    }
+    DrawDataList dds = e.second->getDrawData(RenderPass::Shadow);
+    allToDraw.insert(allToDraw.end(), dds.begin(), dds.end());
   }
 
-  for(DrawDataList::value_type& dd : allToDraw) {
-    dd.SP = dd.SSP;
-  }
 
   m_sceneSpecificShaderUniforms.Matrix4Uniforms["u_sunViewMatrix"] = m_sunCamera.viewMatrix();
   m_sceneSpecificShaderUniforms.Matrix4Uniforms["u_sunViewMatrix"] = m_sunCamera.viewMatrix();
@@ -259,10 +265,7 @@ void Scene::drawShadowPass(RenderContext* context) {
     context->setCullFace(RenderContext::CullFace::Front);
     context->clear();
 
-
-
     m_sceneSpecificShaderUniforms.Matrix4Uniforms["u_shadowProjectionMatrix"] = m_shadowMapping.getShadowMapProjections()[shadowPass];
-
 
     context->draw(allToDraw, m_sceneSpecificShaderUniforms);
     m_shadowBufferTarget[shadowPass]->release();
@@ -273,23 +276,18 @@ void Scene::drawShadowPass(RenderContext* context) {
 
 
 
-void Scene::draw(RenderContext* context) {
-
-
-
-  m_shadowMapping.updateShadowPass(m_camera, m_sunCamera);
-
-
-  drawShadowPass(context);
-
-
-
+void Scene::drawUberPass(RenderContext* context)
+{
   context->setCullFace(RenderContext::CullFace::Back);
   context->setViewport(context->width(), context->height());
 
   DrawDataList allToDraw;
+  DrawData skyDd = m_sky.getDrawData(RenderPass::Uber);
+
+  allToDraw.push_back(skyDd);
+
   for(Entities::value_type e : m_meshes) {
-    const DrawDataList& dds = e.second->getDrawData();
+    DrawDataList dds = e.second->getDrawData(RenderPass::Uber);
     allToDraw.insert(allToDraw.end(), dds.begin(), dds.end());
   }
 
@@ -309,9 +307,7 @@ void Scene::draw(RenderContext* context) {
       dd.TEX[4+i] = m_shadowBufferTarget[i]->getDepthTexture();
     }
   }
-  DrawData skyDd = m_sky.getDrawData();
 
-  allToDraw.push_back(skyDd);
 
   m_sceneSpecificShaderUniforms.Sampler2DArrayUniforms["u_shadowMap"] = shadowMap;
   m_sceneSpecificShaderUniforms.Matrix4Uniforms["u_viewMatrix"] = m_camera.viewMatrix();
@@ -326,6 +322,53 @@ void Scene::draw(RenderContext* context) {
   m_sceneSpecificShaderUniforms.Vec3Uniforms["u_sunPosition"] = m_sky.getSunPosition();
 
   context->draw(allToDraw, m_sceneSpecificShaderUniforms);
+}
+
+void Scene::drawLightShaftsPass(RenderContext *context)
+{
+  context->setCullFace(RenderContext::CullFace::Back);
+  context->setViewport(context->width(), context->height());
+  m_sunLightShaftsTarget->bind();
+  context->clear();
+  DrawDataList allToDraw;
+
+  for(Entities::value_type e : m_meshes) {
+    DrawDataList dds = e.second->getDrawData(RenderPass::SunLightShafts);
+    allToDraw.insert(allToDraw.end(), dds.begin(), dds.end());
+  }
+
+  //Add the sun drawable
+  DrawData skyDd = m_sky.getDrawData(RenderPass::SunLightShafts);
+
+  allToDraw.push_back(skyDd);
+
+
+  m_sceneSpecificShaderUniforms.Matrix4Uniforms["u_viewMatrix"] = m_camera.viewMatrix();
+  m_sceneSpecificShaderUniforms.Matrix4Uniforms["u_projectionMatrix"] = m_projection;
+  m_sceneSpecificShaderUniforms.Vec3Uniforms["u_sunPosition"] = m_sky.getSunPosition();
+
+  context->draw(allToDraw, m_sceneSpecificShaderUniforms);
+  m_sunLightShaftsTarget->release();
+
+  context->setCullFace(RenderContext::CullFace::Back);
+  context->setViewport(context->width(), context->height());
+  context->clear();
+  DrawDataList dds;
+  DrawData lightShaftsDD = m_lightShafts.getDrawData();
+  lightShaftsDD.TEX[0] = m_sunLightShaftsTarget->getTexture();
+
+  dds.push_back(lightShaftsDD);
+
+  m_sceneSpecificShaderUniforms.Sampler2DUniforms["u_textur"] = 0;
+
+  context->draw(dds, m_sceneSpecificShaderUniforms);
+
+}
+
+void Scene::draw(RenderContext* context) {
+  drawShadowPass(context);
+  drawLightShaftsPass(context);
+  //drawUberPass(context);
 
 
 }

@@ -22,4 +22,23 @@ private:
   unsigned int m_height;
 };
 typedef std::shared_ptr<RenderDepthToTexture> RenderDepthToTexturePtr;
+
+class RenderToTexture : public QOpenGLFunctions
+{
+public:
+  ~RenderToTexture();
+  RenderToTexture(GLuint defaultFB, unsigned int width, unsigned int height);
+  void bind();
+  void release();
+  TexturePtr getTexture() const;
+
+private:
+  GLuint m_defaultFB;
+
+  GLuint m_glObject;
+  TexturePtr m_texture;
+  unsigned int m_width;
+  unsigned int m_height;
+};
+typedef std::shared_ptr<RenderToTexture> RenderToTexturePtr;
 }

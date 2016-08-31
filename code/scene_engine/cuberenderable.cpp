@@ -79,7 +79,7 @@ void CubeRenderable::toGPU(const ConfigurationManager& config, RenderDevice *dev
 
   m_drawData.BlendingFunction = Blending::Normal;
   m_drawData.IsTwoSided = false;
-  m_drawData.SP = sp;
+  m_drawData.Current_SP = sp;
   m_drawData.VAO = vao;
   m_drawData.IB = ib;
   //m_drawData.Matrix4Uniforms[sp->uniformLocation("u_modelMatrix")] = Matrix44T<float>::GetIdentity();
