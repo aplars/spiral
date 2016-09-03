@@ -13,7 +13,8 @@ namespace sa {
 enum class Blending {
   None,
   Normal,
-  Addative
+  Addative,
+  SRC_ALPHA_ONE
 };
 
 enum class PolygonMode {

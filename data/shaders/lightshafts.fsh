@@ -1,35 +1,34 @@
-//uniform float exposure;
-//uniform float decay;
-//uniform float density;
-//uniform float weight;
-//uniform vec2 lightPositionOnScreen;
+uniform float u_exposure;
+uniform float u_decay;
+uniform float u_density;
+uniform float u_weight;
+uniform vec2 u_sunPositionOnScreen;
 uniform sampler2D u_texture;
 varying vec2 v_texAttr;
 
-//const int NUM_SAMPLES = 100 ;
+const int NUM_SAMPLES = 100 ;
 void main()
 {	
-	/*
-	vec2 deltaTextCoord = vec2( v_texAttr.st - lightPositionOnScreen.xy );
+	vec3 color = vec3(0,0,0);
+	vec2 deltaTextCoord = vec2( v_texAttr.st - u_sunPositionOnScreen.xy );
 	vec2 textCoo = v_texAttr.st;
-	deltaTextCoord *= 1.0 /  float(NUM_SAMPLES) * density;
+	deltaTextCoord *= 1.0 /  float(NUM_SAMPLES) * u_density;
 	float illuminationDecay = 1.0;
 		
 	for(int i=0; i < NUM_SAMPLES ; i++)
 	{
-			textCoo -= deltaTextCoord;
-			vec4 samp = texture2D(myTexture, textCoo );
+		  textCoo -= deltaTextCoord;
+			vec4 samp = texture2D(u_texture, textCoo);
 			
-			samp *= illuminationDecay * weight;
+			samp *= illuminationDecay * u_weight;
 			
-			gl_FragColor += samp;
+			color += samp;
 			
-			illuminationDecay *= decay;
+			illuminationDecay *= u_decay;
 	}
-	
-	gl_FragColor *= exposure;
-	*/
-	//gl_FragColor = vec4(1,1,1,1);//texture2D(u_lightShaftTexture, v_texAttr);
-	gl_FragColor = texture2D(u_texture, v_texAttr);
+
+	gl_FragColor = vec4(color*u_exposure, 1);
+
+	//gl_FragColor = texture2D(u_texture, v_texAttr);
 
 }

@@ -29,7 +29,7 @@ void RenderContext::destroy() {
 }
 
 void RenderContext::setViewport(unsigned int w, unsigned int h) {
-  glViewport(0, 0, w, h);
+  //glViewport(0, 0, w, h);
   m_width = w;
   m_height = h;
 }
@@ -70,8 +70,14 @@ void RenderContext::clear() {
   glClear(GL_COLOR_BUFFER_BIT| GL_DEPTH_BUFFER_BIT);
 }
 
+void RenderContext::clearDepthBuffer()
+{
+  glClear(GL_DEPTH_BUFFER_BIT);
+}
+
 void RenderContext::draw(DrawData drawData) {
-  glClearColor(1, 0.3, 0.3, 1);
+  glClearColor(0, 0, 0.0, 1);
+  glViewport(0, 0, m_width, m_height);
 
   //if(static_cast<int>(drawData.IsTwoSided) != m_currentIsTwoSided)
   {
@@ -92,6 +98,10 @@ void RenderContext::draw(DrawData drawData) {
   {
     glEnable(GL_BLEND);
     glBlendFunc(GL_ONE, GL_ONE);
+  }
+  else if( drawData.BlendingFunction == Blending::SRC_ALPHA_ONE) {
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE);
   }
   else {
     glDisable(GL_BLEND);
@@ -188,6 +198,10 @@ void RenderContext::setUniforms(ShaderProgramPtr shader, ShaderUniforms uniforms
   if(shader == nullptr) return;
 
   for(FloatUniformsMap::value_type uniform : uniforms.FloatUniforms)
+  {
+    shader->setUniformValue(uniform.first, uniform.second);
+  }
+  for(Vec2UniformsMap::value_type uniform : uniforms.Vec2Uniforms)
   {
     shader->setUniformValue(uniform.first, uniform.second);
   }

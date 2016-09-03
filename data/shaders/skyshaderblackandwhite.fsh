@@ -12,8 +12,8 @@ void main(void)
 
   vec4 tex = texture2D(u_texture, v_texAttr);
 
-  if(dist > 400)
-    gl_FragColor =  vec4(tex);
+  if(dist > 300)
+    gl_FragColor =  vec4(tex.r/20.0, tex.g/20.0, tex.b/20.0, 1.0);// vec4(0,0,0.0,1);
   else
     gl_FragColor =  vec4(1,1,1,1);
 

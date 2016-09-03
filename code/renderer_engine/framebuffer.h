@@ -12,14 +12,18 @@ public:
   void release();
   TexturePtr getTexture() const;
   TexturePtr getDepthTexture() const;
+  unsigned int getWidth() const;
+
+  unsigned int getHeight() const;
+
 private:
   GLuint m_defaultFB;
+  unsigned int m_width;
+  unsigned int m_height;
 
   GLuint m_glObject;
   TexturePtr m_texture;
   TexturePtr m_depthTexture;
-  unsigned int m_width;
-  unsigned int m_height;
 };
 typedef std::shared_ptr<RenderDepthToTexture> RenderDepthToTexturePtr;
 
@@ -32,13 +36,17 @@ public:
   void release();
   TexturePtr getTexture() const;
 
+  unsigned int getWidth() const;
+
+  unsigned int getHeight() const;
+
 private:
   GLuint m_defaultFB;
+  unsigned int m_width;
+  unsigned int m_height;
 
   GLuint m_glObject;
   TexturePtr m_texture;
-  unsigned int m_width;
-  unsigned int m_height;
 };
 typedef std::shared_ptr<RenderToTexture> RenderToTexturePtr;
 }

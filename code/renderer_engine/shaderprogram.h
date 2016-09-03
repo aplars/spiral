@@ -22,6 +22,7 @@ public:
   int uniformLocation(const char* name) const;
 
   void setUniformValue(const std::string& location, float value);
+  void setUniformValue(const std::string& location, const Vector2T<float> &value);
   void setUniformValue(const std::string& location, const Vector3T<float> &value);
   void setUniformValue(const std::string& location, const Vector4T<float> &value);
   void setUniformValue(const std::string& location, const Matrix44T<float>& value);

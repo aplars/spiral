@@ -158,6 +158,7 @@ void GLWidget::initializeGL() {
 
 void GLWidget::resizeGL(int w, int h) {
   renderContext.makeDirty();
+  //renderContext.setViewport(w, h);
 }
 
 

@@ -14,9 +14,10 @@ public:
 
   LightShafts(const ConfigurationManager &config);
   void toGPU(const ConfigurationManager& config, RenderDevice* device, RenderContext* context);
-
+  const Matrix44T<float>& getProjection() const;
   DrawData getDrawData();
 private:
+  Matrix44T<float> m_projection;
   RectangleRenderable m_cubeRenderable;
 };
 }

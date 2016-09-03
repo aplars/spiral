@@ -37,6 +37,7 @@ public:
   RenderToTexturePtr createRenderToTexture(unsigned int width, unsigned int height);
 
   void clear();
+  void clearDepthBuffer();
   void draw(DrawData drawData);
   void draw(const DrawDataList& drawDataList, ShaderUniforms shaderUniforms);
 

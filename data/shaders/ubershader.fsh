@@ -243,5 +243,4 @@ void main()
 
    finalColor.rgb = aeralPerspectiveFog(finalColor.rgb, dist, dir, u_directionalLight.direction, fogColor, u_fogDensity);
    gl_FragColor =  finalColor ;
-   //gl_FragColor = vec4(fogColor.rgb, 1);
 }

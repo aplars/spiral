@@ -63,7 +63,10 @@ public:
 
 
 private:
+  MeshRenderablePtr m_mesh;
   bool m_castShadow = false;
+  DataStorage m_currentStorage;
+
   AABBModel m_boundingBox;
   float m_nodeAnimationTime = 0;
   float m_skeletonAnimationTime = 0;
@@ -73,10 +76,9 @@ private:
   std::deque<MeshTransform> m_transforms;
 
   DrawDataList m_drawData;
-  MeshRenderablePtr m_mesh;
+
   Vector3T<float> m_position;
   float m_heading = 0.0f;
-  DataStorage m_currentStorage;
   mutable std::mutex m_mutex;
 };
 }

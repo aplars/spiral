@@ -88,7 +88,7 @@ void CubeRenderable::toGPU(const ConfigurationManager& config, RenderDevice *dev
   context->resetCurrentState();
 }
 
-void CubeRenderable::update(float dt) {
+void CubeRenderable::update(float /*dt*/) {
   m_drawData.Uniforms.Matrix4Uniforms["u_modelMatrix"] = Matrix44T<float>::GetTranslate(m_position);
 }
 

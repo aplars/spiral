@@ -10,8 +10,8 @@ StreamedMeshEntity::~StreamedMeshEntity()
 
 StreamedMeshEntity::StreamedMeshEntity(const std::string& resourcePath, const std::string& resourceName, bool castShadow)
   : m_mesh(new MeshRenderable(resourcePath, resourceName))
-  , m_currentStorage(DataStorage::Disk)
   , m_castShadow(castShadow)
+  , m_currentStorage(DataStorage::Disk)
 {
   m_boundingBox = m_mesh->getBoundingBox();
 }

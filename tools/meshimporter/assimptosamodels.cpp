@@ -150,6 +150,7 @@ bool AssimpToSAModels::convertToXML(bool toXML, const QDir& sourceDir, const QDi
 
 
 
+
     //Save the header
     {
       std::string destDirString = (destDir.absolutePath().toStdString())+".header";

@@ -173,7 +173,7 @@ void set_insert_range(const std::set<std::string>& in, std::set<std::string>& ou
   out.insert(in.begin(), in.end());
 }
 
-void MeshRenderable::toGPU(const ConfigurationManager& config, unsigned int numberOfShadowCascades, TextureCache& textureCache, ShaderCache& shaderCache, RenderDevice* device, RenderContext* context) {
+void MeshRenderable::toGPU(const ConfigurationManager& /*config*/, unsigned int numberOfShadowCascades, TextureCache& textureCache, ShaderCache& shaderCache, RenderDevice* device, RenderContext* context) {
   if(m_currentDataStorage == DataStorage::GPU) {
     m_numberOfInstances++;
 
@@ -276,6 +276,7 @@ void MeshRenderable::toGPU(const ConfigurationManager& config, unsigned int numb
     sa::VertexArrayPtr vao = context->createVertexArray(vertexDesc, vb);
     sa::IndexBufferPtr ib = device->createIndexBuffer(sm->getIndices());
 
+    subMeshDrawData.BlendingFunction = Blending::None;
     subMeshDrawData.PolygonDrawMode = PolygonMode::Fill;
     subMeshDrawData.IsTwoSided = material->isTwoSided();
     subMeshDrawData.VAO = vao;
@@ -368,10 +369,13 @@ DrawDataList MeshRenderable::getDrawData(RenderPass pass)
     DrawDataList drawData;
     for(DrawData dd : m_drawDataDeque) {
       dd.Current_SP = dd.SunLightShafts_SP;
+      dd.BlendingFunction = Blending::None;
       drawData.push_back(dd);
     }
     return drawData;
   }
+  DrawDataList drawData;
+  return drawData;
 }
 
 

@@ -58,6 +58,7 @@ public:
   void update(float dt);
   void drawShadowPass(RenderContext* context);
   void drawUberPass(RenderContext* context);
+  void createLightShaftsPass(RenderContext* context);
   void drawLightShaftsPass(RenderContext* context);
   void draw(RenderContext* context);
   bool m_createLightFrustum = false;

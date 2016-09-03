@@ -4,7 +4,8 @@
 #include <math/intersectiontests.h>
 #include <renderer_engine/image.h>
 #include <renderer_engine/renderdevice.h>
-
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 namespace sa {
 Scene::~Scene()
@@ -135,7 +136,7 @@ void Scene::toCPU() {
     }
   }
 
-  Vector3T<float> centerpoint = m_camera.getFrusumCenterPoint(m_projection);
+  //Vector3T<float> centerpoint = m_camera.getFrusumCenterPoint(m_projection);
 
   //m_sunCamera.setLookAt(centerpoint + m_sun.direction(), centerpoint, Vector3T<float>(0, 1, 0));
   m_sunCamera.setLookAt(m_sun.direction(), Vector3T<float>(0, 0, 0), Vector3T<float>(0, 1, 0));
@@ -144,7 +145,7 @@ void Scene::toCPU() {
 void Scene::toGPUOnce(RenderDevice* device, RenderContext* context) {
   if(m_firstTimeInToGPU) {
     if(m_shadowBufferTarget.size() <= 0) {
-      for(int i = 0; i < m_shadowMapping.getNumberOfPasses(); i++) {
+      for(unsigned int i = 0; i < m_shadowMapping.getNumberOfPasses(); i++) {
         m_shadowBufferTarget.push_back(context->createRenderDepthToTexture(m_shadowMapping.getShadowMapWidth(), m_shadowMapping.getShadowMapHeight()));
       }
     }
@@ -259,9 +260,10 @@ void Scene::drawShadowPass(RenderContext* context) {
   m_sceneSpecificShaderUniforms.Vec4Uniforms["u_directionalLight.ambient"] = m_sun.ambient();
   m_sceneSpecificShaderUniforms.FloatUniforms["u_fogDensity"] = m_sky.FogDensity;
 
-  for(int shadowPass = 0; shadowPass < m_shadowMapping.getNumberOfPasses(); shadowPass++)
+  for(unsigned int shadowPass = 0; shadowPass < m_shadowMapping.getNumberOfPasses(); shadowPass++)
   {
     m_shadowBufferTarget[shadowPass]->bind();
+    context->setViewport(m_shadowBufferTarget[shadowPass]->getWidth(), m_shadowBufferTarget[shadowPass]->getHeight());
     context->setCullFace(RenderContext::CullFace::Front);
     context->clear();
 
@@ -297,13 +299,13 @@ void Scene::drawUberPass(RenderContext* context)
 
 
   std::vector<unsigned int> shadowMap;
-  for(int i = 0; i < m_shadowMapping.getNumberOfPasses(); ++i) {
+  for(unsigned int i = 0; i < m_shadowMapping.getNumberOfPasses(); ++i) {
     shadowMap.push_back(4+i);
   }
 
   for(DrawDataList::value_type& dd : allToDraw) {
 
-    for(int i = 0; i < m_shadowMapping.getNumberOfPasses(); ++i) {
+    for(unsigned int i = 0; i < m_shadowMapping.getNumberOfPasses(); ++i) {
       dd.TEX[4+i] = m_shadowBufferTarget[i]->getDepthTexture();
     }
   }
@@ -324,11 +326,11 @@ void Scene::drawUberPass(RenderContext* context)
   context->draw(allToDraw, m_sceneSpecificShaderUniforms);
 }
 
-void Scene::drawLightShaftsPass(RenderContext *context)
+void Scene::createLightShaftsPass(RenderContext *context)
 {
-  context->setCullFace(RenderContext::CullFace::Back);
-  context->setViewport(context->width(), context->height());
   m_sunLightShaftsTarget->bind();
+  context->setCullFace(RenderContext::CullFace::Back);
+  context->setViewport(m_sunLightShaftsTarget->getWidth(), m_sunLightShaftsTarget->getHeight());
   context->clear();
   DrawDataList allToDraw;
 
@@ -350,28 +352,46 @@ void Scene::drawLightShaftsPass(RenderContext *context)
   context->draw(allToDraw, m_sceneSpecificShaderUniforms);
   m_sunLightShaftsTarget->release();
 
+}
+
+void Scene::drawLightShaftsPass(RenderContext *context)
+{
+  glm::vec3 sunPositionInScreenCoords = glm::project(
+        glm::make_vec3(m_sky.getSunPosition().GetConstPtr()) + glm::vec3(m_camera.eye().X(), m_camera.eye().Y(), m_camera.eye().Z()),
+        glm::make_mat4(m_camera.viewMatrix().GetConstPtr()),
+        glm::make_mat4(m_projection.GetConstPtr()),
+        glm::vec4(0, 0, context->width(), context->height()));
+
+  qDebug() << sunPositionInScreenCoords.x << ", " << sunPositionInScreenCoords.y;
+  sunPositionInScreenCoords.x/=context->width();
+  sunPositionInScreenCoords.y/=context->height();
+  if(sunPositionInScreenCoords.x < 0.0f || sunPositionInScreenCoords.x > 1.0f)
+    return;
+  if(sunPositionInScreenCoords.y < 0.0f || sunPositionInScreenCoords.y > 1.0f)
+    return;
+
   context->setCullFace(RenderContext::CullFace::Back);
   context->setViewport(context->width(), context->height());
-  context->clear();
+  //context->clear();
   DrawDataList dds;
   DrawData lightShaftsDD = m_lightShafts.getDrawData();
   lightShaftsDD.TEX[0] = m_sunLightShaftsTarget->getTexture();
 
   dds.push_back(lightShaftsDD);
 
-  m_sceneSpecificShaderUniforms.Sampler2DUniforms["u_textur"] = 0;
-
+  m_sceneSpecificShaderUniforms.Sampler2DUniforms["u_texture"] = 0;
+  m_sceneSpecificShaderUniforms.Vec2Uniforms["u_sunPositionOnScreen"] =
+      Vector2T<float>(sunPositionInScreenCoords.x, sunPositionInScreenCoords.y);
   context->draw(dds, m_sceneSpecificShaderUniforms);
 
 }
 
 void Scene::draw(RenderContext* context) {
   drawShadowPass(context);
+  createLightShaftsPass(context);
+
+  drawUberPass(context);
+
   drawLightShaftsPass(context);
-  //drawUberPass(context);
-
-
 }
-
-
 }
