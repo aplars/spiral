@@ -30,7 +30,7 @@ class Scene
 public:
   ~Scene();
   Scene(unsigned int width, unsigned int height, ConfigurationManager config);
-
+  void resize(unsigned int w, unsigned int h);
   void setTime(double julianDay, double timeOfDay);
   void setSunSimulationTimeScale(double timeScale);
   void runSunSimulation(bool runSimulation);

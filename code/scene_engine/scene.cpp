@@ -49,6 +49,12 @@ Scene::Scene(unsigned int width, unsigned int height, ConfigurationManager confi
 
 }
 
+void Scene::resize(unsigned int w, unsigned int h)
+{
+  m_screenWidth = w;
+  m_screenheight = h;
+}
+
 void Scene::setTime(double julianDay, double timeOfDay)
 {
   m_sky.JulianDay = julianDay;
@@ -281,7 +287,7 @@ void Scene::drawShadowPass(RenderContext* context) {
 void Scene::drawUberPass(RenderContext* context)
 {
   context->setCullFace(RenderContext::CullFace::Back);
-  context->setViewport(context->width(), context->height());
+  context->setViewport(m_screenWidth, m_screenheight);
 
   DrawDataList allToDraw;
   DrawData skyDd = m_sky.getDrawData(RenderPass::Uber);
@@ -371,8 +377,7 @@ void Scene::drawLightShaftsPass(RenderContext *context)
     return;
 
   context->setCullFace(RenderContext::CullFace::Back);
-  context->setViewport(context->width(), context->height());
-  //context->clear();
+  context->setViewport(m_screenWidth, m_screenheight);
   DrawDataList dds;
   DrawData lightShaftsDD = m_lightShafts.getDrawData();
   lightShaftsDD.TEX[0] = m_sunLightShaftsTarget->getTexture();

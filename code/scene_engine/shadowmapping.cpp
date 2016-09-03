@@ -18,7 +18,7 @@ void ShadowMapping::create(const std::vector<float> &shadowMapCascadeDist, float
   m_shadowMapWidth = shadowMapWidth;
   m_shadowMapheight = shadowMapHeight;
 
-  for(int shadowPass = 0; shadowPass < m_shadowMapCascadeDistance.size(); shadowPass++)
+  for(unsigned int shadowPass = 0; shadowPass < m_shadowMapCascadeDistance.size(); shadowPass++)
   {
     m_sphereradius.push_back(-1);
   }
@@ -28,7 +28,7 @@ void ShadowMapping::updateShadowPass(const FPSCamera& camera, const FPSCamera& s
   m_depthBiasMVPMatrix.clear();
   m_shadowMapProjections.clear();
 
-  for(int shadowPass = 0; shadowPass < getNumberOfPasses(); shadowPass++)
+  for(unsigned int shadowPass = 0; shadowPass < getNumberOfPasses(); shadowPass++)
   {
 
     std::array<Vector3T<float>, 8> frustumpoints = camera.getFrusumPoints(m_cascadedProjections[shadowPass]);

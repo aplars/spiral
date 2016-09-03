@@ -50,7 +50,7 @@ public:
   float FogDensity = 0.0005;
   bool IsRunningSimulation = false;
 private:
-  Vector3T<float> getSunDirection (double jday);
+  //Vector3T<float> getSunDirection (double jday);
   float m_radius = 0;
   std::vector<Vertex> m_vertices;
   std::vector<unsigned int> m_indices;

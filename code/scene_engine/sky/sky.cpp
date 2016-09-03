@@ -45,7 +45,6 @@ Sky::Sky(float radius, int slices, int sides, float dampening) {
     }
   }
 
-  int ind = 0;
   for (j = 1; j <= slices; j++)
   {
     for (i = 0; i <= sides; i++)
@@ -78,7 +77,7 @@ Vector3T<float> Sky::getSunPosition() const {
   return SunPos;
 }
 
-void Sky::update(float dt, const Vector3T<float>& cameraPosition) {
+void Sky::update(float /*dt*/, const Vector3T<float>& cameraPosition) {
 
 //  if(IsRunningSimulation)
 //    TimeOfDay += dt*TimeScale;
@@ -95,13 +94,6 @@ void Sky::update(float dt, const Vector3T<float>& cameraPosition) {
 
   SunTheta = Pi<float>() / 2 - asin(sin(Latitude) * sin(declination) - cos(Latitude) * cos(declination) * cos(Pi<float>() * solarTime / 12));
   SunPhi   = atan( -cos(declination) * sin(Pi<float>() * solarTime / 12) / ((cos(Latitude) * cos(declination) - sin(Latitude) * sin(declination) * sin(Pi<float>() * solarTime / 12))));
-
-  double deg = RadToDeg(SunTheta);
-  //qDebug() << deg;
-  //if (SunPhi < 0) SunPhi = 2 * Pi<float>() + SunPhi;
-
-
-
 
   m_drawData.Uniforms.Vec3Uniforms["u_cameraPosition"] = cameraPosition;
 
@@ -206,11 +198,11 @@ DrawData Sky::getDrawData(RenderPass renderPass)
   return outData;
 }
 
-Vector3T<float> Sky::getSunDirection (double jday)
-{
-  Vector3T<float> res;
-  return res;
-}
+//Vector3T<float> Sky::getSunDirection (double jday)
+//{
+//  Vector3T<float> res;
+//  return res;
+//}
 
 }
 }

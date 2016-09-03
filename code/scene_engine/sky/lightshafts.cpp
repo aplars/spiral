@@ -8,7 +8,6 @@ namespace sa {
 LightShafts::LightShafts(const ConfigurationManager& config)
   : m_cubeRenderable(0, 0, 0, 100, 100, 100, (config.getParam("DATA_DIR") + "/shaders/lightshafts.vsh").c_str(), (config.getParam("DATA_DIR") + "/shaders/lightshafts.fsh").c_str())
 {
-  //orthoProjection = sa::Matrix44T<float>::GetPerspectiveProjection(sa::DegToRad(60.0f), 1, 0.1, 500);
   m_projection = sa::Matrix44T<float>::GetOrthographicProjection(-100, 100, -100, 100, 0.0, 50);
 }
 
