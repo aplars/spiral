@@ -70,7 +70,7 @@ public:
   };
 
   ~RectangleRenderable();
-  RectangleRenderable(float posx, float posy, float posz, float hw, float hh, float hd, std::string vertexShader="", std::string fragmentShader="");
+  RectangleRenderable(float posx, float posy, float posz, float hw, float hh, std::string vertexShader="", std::string fragmentShader="");
   void setPosition(const Vector3T<float>& pos);
   void toGPU(const ConfigurationManager& config, RenderDevice* device, RenderContext* context);
   void update(float dt);
@@ -83,7 +83,7 @@ private:
 
   ShaderProgramPtr m_shaderProgram;
   Vector3T<float> m_position;
-  Vector3T<float> m_size;
+  Vector2T<float> m_size;
   DrawData m_drawData;
 };
 }

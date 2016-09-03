@@ -159,7 +159,7 @@ void Scene::toGPUOnce(RenderDevice* device, RenderContext* context) {
     m_sky.toGPU(m_config, device, context);
     m_lightShafts.toGPU(m_config, device, context);
 
-    m_sunLightShaftsTarget = context->createRenderToTexture(m_screenWidth, m_screenheight);
+    m_sunLightShaftsTarget = context->createRenderToTexture(m_screenWidth/2, m_screenheight/2);
 
     //addDebugBox("thesun", m_sky.getSunPosition()[0], m_sky.getSunPosition()[1], m_sky.getSunPosition()[2], 100, 100, 100);
     //addDebugBox("thesun", 100, 0, 0, 10, 10, 10);
@@ -366,11 +366,11 @@ void Scene::drawLightShaftsPass(RenderContext *context)
         glm::make_vec3(m_sky.getSunPosition().GetConstPtr()) + glm::vec3(m_camera.eye().X(), m_camera.eye().Y(), m_camera.eye().Z()),
         glm::make_mat4(m_camera.viewMatrix().GetConstPtr()),
         glm::make_mat4(m_projection.GetConstPtr()),
-        glm::vec4(0, 0, context->width(), context->height()));
+        glm::vec4(0, 0, m_sunLightShaftsTarget->getWidth(), m_sunLightShaftsTarget->getHeight()));
 
-  qDebug() << sunPositionInScreenCoords.x << ", " << sunPositionInScreenCoords.y;
-  sunPositionInScreenCoords.x/=context->width();
-  sunPositionInScreenCoords.y/=context->height();
+  //qDebug() << sunPositionInScreenCoords.x << ", " << sunPositionInScreenCoords.y;
+  sunPositionInScreenCoords.x /= m_sunLightShaftsTarget->getWidth();
+  sunPositionInScreenCoords.y /= m_sunLightShaftsTarget->getHeight();
   if(sunPositionInScreenCoords.x < 0.0f || sunPositionInScreenCoords.x > 1.0f)
     return;
   if(sunPositionInScreenCoords.y < 0.0f || sunPositionInScreenCoords.y > 1.0f)
@@ -396,7 +396,6 @@ void Scene::draw(RenderContext* context) {
   createLightShaftsPass(context);
 
   drawUberPass(context);
-
   drawLightShaftsPass(context);
 }
 }

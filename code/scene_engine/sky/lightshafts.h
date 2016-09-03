@@ -18,7 +18,7 @@ public:
   DrawData getDrawData();
 private:
   Matrix44T<float> m_projection;
-  RectangleRenderable m_cubeRenderable;
+  RectangleRenderable m_rectangleRenderable;
 };
 }
 #endif // LIGHTSHAFTS_H

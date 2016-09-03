@@ -12,9 +12,9 @@ RectangleRenderable::~RectangleRenderable()
 
 }
 
-RectangleRenderable::RectangleRenderable(float posx, float posy, float posz, float hw, float hh, float hd, std::string vertexShader, std::string fragmentShader)
+RectangleRenderable::RectangleRenderable(float posx, float posy, float posz, float hw, float hh, std::string vertexShader, std::string fragmentShader)
   : m_position(posx, posy, posz)
-  , m_size(hw, hh, hd)
+  , m_size(hw, hh)
   , m_vertexShader(vertexShader)
   , m_fragmentShader(fragmentShader)
 {
