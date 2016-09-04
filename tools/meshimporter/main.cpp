@@ -34,18 +34,18 @@ int main(int argc, char *argv[]) {
 
   AssimpToSAModels::convertToXML(
         false,
-        QDir(qDataDir + "/import_models/models-nonbsd/MD5/Bob.md5mesh"),
+        QDir(qDataDir + "/rawmeshes/md5/bob/Bob.md5mesh"),
         QDir(qDataDir + "/meshes/bob.xml"),
         false,
         1);
 
 
-//  AssimpToSAModels::convertToXML(
-//        false,
-//        QDir(qDataDir + "/import_models/models/ASE/MotionCaptureROM.ase"),
-//        QDir(qDataDir + "/meshes/motioncapture.xml"),
-//        false,
-//        1);
+  AssimpToSAModels::convertToXML(
+        false,
+        QDir(qDataDir + "/rawmeshes/ase/motioncapture/MotionCaptureROM.ase"),
+        QDir(qDataDir + "/meshes/motioncapture.xml"),
+        false,
+        1);
 
 //  AssimpToSAModels::convertToXML(
 //        false,
@@ -61,12 +61,12 @@ int main(int argc, char *argv[]) {
 //        true,
 //        1);
 
-//  AssimpToSAModels::convertToXML(
-//        false,
-//        QDir(qDataDir + "/import_models/models/OBJ/landscape.obj"),
-//        QDir(qDataDir + "/meshes/landscape.xml"),
-//        true,
-//        2000);
+  AssimpToSAModels::convertToXML(
+        false,
+        QDir(qDataDir + "/rawmeshes/obj/landscape/landscape.obj"),
+        QDir(qDataDir + "/meshes/landscape.xml"),
+        true,
+        2000);
   }
   qDebug() << "DONE! ";
   return 0;

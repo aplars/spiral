@@ -21,7 +21,7 @@ RectangleRenderable::RectangleRenderable(float posx, float posy, float posz, flo
 
 }
 
-void RectangleRenderable::setPosition(const Vector3T<float>& pos) {
+void RectangleRenderable::setPosition(const glm::vec3 &pos) {
   m_position = pos;
 }
 
@@ -75,13 +75,13 @@ void RectangleRenderable::toGPU(const ConfigurationManager& config, RenderDevice
   m_drawData.VAO = vao;
   m_drawData.IB = ib;
   //m_drawData.Matrix4Uniforms[sp->uniformLocation("u_modelMatrix")] = Matrix44T<float>::GetIdentity();
-  m_drawData.Uniforms.Matrix4Uniforms["u_modelMatrix"] = Matrix44T<float>::GetTranslate(m_position);
+  m_drawData.Uniforms.Matrix4Uniforms["u_modelMatrix"] = Matrix44T<float>::GetTranslate(m_position.x, m_position.y, m_position.z);
   m_drawData.Uniforms.Vec4Uniforms["u_color"] = Vector4T<float>(1,0,0,0.5);
   context->resetCurrentState();
 }
 
 void RectangleRenderable::update(float dt) {
-  m_drawData.Uniforms.Matrix4Uniforms["u_modelMatrix"] = Matrix44T<float>::GetTranslate(m_position);
+  m_drawData.Uniforms.Matrix4Uniforms["u_modelMatrix"] = Matrix44T<float>::GetTranslate(m_position.x, m_position.y, m_position.z);
 }
 
 DrawData RectangleRenderable::getDrawData()

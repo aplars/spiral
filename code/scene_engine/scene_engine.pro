@@ -17,7 +17,7 @@ QMAKE_CXXFLAGS += -fopenmp
 
 INCLUDEPATH += "$$(SPAR_ROOT)/code/"
 INCLUDEPATH += "$$(SPAR_ROOT)/thirdparty/boost"
-INCLUDEPATH += "$$(SPAR_ROOT)/thirdparty/glm"
+INCLUDEPATH += "$$(SPAR_ROOT)/thirdparty/glm/"
 
 SOURCES += meshrenderable.cpp \
     scene.cpp \

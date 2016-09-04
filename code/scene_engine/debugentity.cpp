@@ -14,7 +14,7 @@ DebugEntityBox::DebugEntityBox(float posx, float posy, float posz, float hw, flo
 
 }
 
-void DebugEntityBox::setPosition(const Vector3T<float> &pos)
+void DebugEntityBox::setPosition(const glm::vec3 &pos)
 {
  m_renderable->setPosition(pos);
 }

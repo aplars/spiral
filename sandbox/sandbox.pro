@@ -18,6 +18,7 @@ QMAKE_CXXFLAGS += -fopenmp
 
 INCLUDEPATH += "$(SPAR_ROOT)/code"
 INCLUDEPATH += "$$(SPAR_ROOT)/thirdparty/boost"
+INCLUDEPATH += "$$(SPAR_ROOT)/thirdparty/glm/"
 
 LIBS += "-L$$(SPAR_ROOT)/thirdparty/lib/"
 CONFIG( debug, debug|release ) {

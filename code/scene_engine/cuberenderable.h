@@ -3,6 +3,7 @@
 #include <vector>
 #include <array>
 #include <renderer_engine/drawdata.h>
+#include <glm/vec3.hpp>
 
 namespace sa {
 class RenderDevice;
@@ -63,15 +64,15 @@ public:
 
   ~CubeRenderable();
   CubeRenderable(float posx, float posy, float posz, float hw, float hh, float hd);
-  void setPosition(const Vector3T<float>& pos);
+  void setPosition(const glm::vec3& pos);
   void toGPU(const ConfigurationManager& config, RenderDevice* device, RenderContext* context);
   void update(float dt);
   const DrawData& getDrawData() const;
 
 
 private:
-  Vector3T<float> m_position;
-  Vector3T<float> m_size;
+  glm::vec3 m_position;
+  glm::vec3 m_size;
   DrawData m_drawData;
 
 };

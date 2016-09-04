@@ -3,6 +3,8 @@
 #include <vector>
 #include <array>
 #include <renderer_engine/drawdata.h>
+#include <glm/vec3.hpp>
+#include <glm/vec2.hpp>
 
 namespace sa {
 class RenderDevice;
@@ -71,7 +73,7 @@ public:
 
   ~RectangleRenderable();
   RectangleRenderable(float posx, float posy, float posz, float hw, float hh, std::string vertexShader="", std::string fragmentShader="");
-  void setPosition(const Vector3T<float>& pos);
+  void setPosition(const glm::vec3& pos);
   void toGPU(const ConfigurationManager& config, RenderDevice* device, RenderContext* context);
   void update(float dt);
   DrawData getDrawData();
@@ -82,8 +84,8 @@ private:
   std::string m_fragmentShader;
 
   ShaderProgramPtr m_shaderProgram;
-  Vector3T<float> m_position;
-  Vector2T<float> m_size;
+  glm::vec3 m_position;
+  glm::vec2 m_size;
   DrawData m_drawData;
 };
 }
