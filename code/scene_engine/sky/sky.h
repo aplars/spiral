@@ -1,6 +1,7 @@
 #ifndef SKY_H
 #define SKY_H
 #include <memory>
+#include <glm/vec3.hpp>
 #include <renderer_engine/drawdata.h>
 #include "../renderpass.h"
 
@@ -33,10 +34,10 @@ public:
 
   Sky(float radius, int Slices, int Sides, float dampening);
 
-  Vector3T<float> getSunPosition() const;
+  glm::vec3 getSunPosition() const;
   void toGPU(const ConfigurationManager& config, RenderDevice* device, RenderContext* context);
 
-  void update(float dt, const Vector3T<float>& cameraPosition);
+  void update(float dt, const glm::vec3& cameraPosition);
 
   DrawData getDrawData(RenderPass renderPass);
 
@@ -50,7 +51,6 @@ public:
   float FogDensity = 0.0005;
   bool IsRunningSimulation = false;
 private:
-  //Vector3T<float> getSunDirection (double jday);
   float m_radius = 0;
   std::vector<Vertex> m_vertices;
   std::vector<unsigned int> m_indices;

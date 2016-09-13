@@ -226,6 +226,7 @@ std::deque<sa::MaterialModel*> AssimpToSAModels::processMaterials(const aiScene*
     GetMaterialProperty(material, AI_MATKEY_MAPPINGMODE_V_DIFFUSE(0), aiTextureMapMode_Wrap, mappingModeVDiffuse);
     GetMaterialProperty(material, AI_MATKEY_MAPPINGMODE_V_SPECULAR(0), aiTextureMapMode_Wrap, mappingModeVSpecular);
 
+
     int twoSided;
     GetMaterialProperty(material, AI_MATKEY_TWOSIDED, 1, twoSided);
 
@@ -650,11 +651,11 @@ sa::AABBModel AssimpToSAModels::calculateBoundingBoxAtSKAnimationStep(std::deque
           bool firstpoint = true;
           for(sa::JointModel::VertexWeight weight : joint.Weights) {
             if(firstpoint) {
-              jointAABB = sa::AABBModel(subMesh->getVertices()[weight.VertexIndex].position(), sa::Vector3T<float>(0,0,0));
+              jointAABB = sa::AABBModel(glm::make_vec3(subMesh->getVertices()[weight.VertexIndex].position().GetConstPtr()), glm::vec3(0,0,0));
               firstpoint = false;
             }
             sa::SubMeshModel::Vertex vertex = subMesh->getVertices()[weight.VertexIndex];
-            jointAABB.expand(vertex.position());
+            jointAABB.expand(glm::make_vec3(vertex.position().GetConstPtr()));
           }
           if(firstpoint == false) {
             jointAABB.transform(meshNode->transformation() * joint.Transformation);

@@ -7,6 +7,8 @@
 #include "RectangleT.h"
 #include <iostream>
 #include <array>
+#include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
 
 namespace sa
 {
@@ -73,7 +75,12 @@ namespace sa
 		static Matrix44T GetRotateZ(const T& amountRad) { Matrix44T m; m.LoadRotateZ(amountRad); return m; }
 		///Creates a rotation about the axis.
 		void LoadRotate(const T& amountRad, const Vector3T<T>& axis);
-		///Returns a rotation about the axis.
+
+    void LoadRotate(const T& amountRad, const glm::vec3& axis) {
+      LoadRotate(amountRad, Vector3T<float>(axis.x, axis.y, axis.z));
+    }
+
+    ///Returns a rotation about the axis.
 		static Matrix44T GetRotate(const T& amountRad, const Vector3T<T>& axis) { Matrix44T m; m.LoadRotate(amountRad, axis); return m; }
 		///Creates a translation.
 		void LoadTranslate(const Vector3T<T>& t);
@@ -157,10 +164,24 @@ namespace sa
 			return Mult(Vector4T<T>(in[0], in[1], in[2], 1.0));
 		}
 
+    glm::vec4 Vec3Transform(const glm::vec3& in) const {
+      Vector4T<float> v = Mult(Vector4T<T>(in[0], in[1], in[2], 1.0));
+      return glm::vec4(v[0], v[1], v[2], v[3]);
+    }
+
+
 		Vector4T<T> Vec3Transform(const T& x, const T& y, const T& z) const
 		{
 			return Mult(Vector4T<T>(x, y, z, 1.0));
 		}
+
+    glm::vec3 Vec3TransformH(const glm::vec3& in) const {
+      Vector4T<float> v = Mult(Vector4T<T>(in[0], in[1], in[2], 1.0));
+      return glm::vec3(v[0]/v[3], v[1]/v[3], v[2]/v[3]);
+    }
+
+
+
 
 		const Matrix44T& InverseTranspose()
 		{ 

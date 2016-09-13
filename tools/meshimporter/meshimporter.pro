@@ -16,6 +16,7 @@ QMAKE_CXXFLAGS += -isystem $$(SPAR_ROOT)/thirdparty/boost/
 INCLUDEPATH += "$(SPAR_ROOT)/code/"
 INCLUDEPATH += "$$(SPAR_ROOT)/thirdparty/assimp/include/"
 INCLUDEPATH += "$$(SPAR_ROOT)/thirdparty/boost/"
+INCLUDEPATH += "$$(SPAR_ROOT)/thirdparty/glm/"
 
 LIBS += "-L$$(SPAR_ROOT)/thirdparty/lib/"
 LIBS += -lassimp -lzlibstatic -lboost_serialization -lboost_system

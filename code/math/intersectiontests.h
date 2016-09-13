@@ -1,6 +1,8 @@
 #pragma once
 #include <array>
 #include "PlaneT.h"
+#include <glm/vec3.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 namespace sa {
 class IntersectionTests {
@@ -17,6 +19,19 @@ public:
         -p1.d() * (p2.normal().CrossProduct(p3.normal()))
         -p2.d() * (p3.normal().CrossProduct(p1.normal()))
         -p3.d() * (p1.normal().CrossProduct(p2.normal()));
+    T b =
+        p1.normal().DotProduct(p2.normal().CrossProduct(p3.normal()));
+
+    return a/b;
+  }
+
+  template <typename T>
+  static glm::vec3 ThreePlanesIntersectVec3(const PlaneT<T>& p1, const PlaneT<T>& p2, const PlaneT<T>& p3) {
+    glm::vec3 a =
+        glm::make_vec3((
+                         -p1.d() * (p2.normal().CrossProduct(p3.normal()))
+                         -p2.d() * (p3.normal().CrossProduct(p1.normal()))
+                         -p3.d() * (p1.normal().CrossProduct(p2.normal()))).GetConstPtr());
     T b =
         p1.normal().DotProduct(p2.normal().CrossProduct(p3.normal()));
 
@@ -66,6 +81,12 @@ public:
 
     }
     return ret;
+  }
+
+
+  template <typename T>
+  static Side FrustumAABBIntersect(const std::array<PlaneT<T>, 6>& planes, const glm::vec3& mins, const glm::vec3& maxs) {
+    return FrustumAABBIntersect(planes, Vector3T<float>(mins.x, mins.y, mins.z), Vector3T<float>(maxs.x, maxs.y, maxs.z));
   }
 };
 }

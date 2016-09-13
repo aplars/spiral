@@ -1,10 +1,9 @@
 #ifndef SPHERE_H
 #define SPHERE_H
-#include "Vector3T.h"
 #include <array>
 #include <limits>
 #include "ScalarT.h"
-
+#include <glm/vec3.hpp>
 namespace sa
 {
 template <typename T>
@@ -15,40 +14,38 @@ public:
 
   }
 
-  Sphere(const Vector3T<T>& position, T radius)
+  Sphere(const glm::vec3& position, T radius)
     : m_positon(position)
     , m_radius(radius)
   { }
 
-
   template <std::size_t N>
-  static Sphere<T> createFromPoints(std::array<Vector3T<T>, N>& points) {
-    Vector3T<T> min(
+  static Sphere<T> createFromPoints(std::array<glm::vec3, N>& points) {
+    glm::vec3 min(
           std::numeric_limits<T>::max(),
           std::numeric_limits<T>::max(),
           std::numeric_limits<T>::max());
-    Vector3T<T> max(
+    glm::vec3 max(
           -std::numeric_limits<T>::max(),
           -std::numeric_limits<T>::max(),
           -std::numeric_limits<T>::max());
 
-    for(const Vector3T<T>& point : points) {
+    for(const glm::vec3& point : points) {
       for(int i = 0; i < 3; ++i) {
         max[i] = Max(max[i], point[i]);
         min[i] = Min(min[i], point[i]);
       }
     }
-    Vector3T<T> mm = (max-min);
-    Vector3T<T> centrum = mm*0.5 + min;
-    return Sphere<T>(centrum, (max-centrum).GetNorm());
+    glm::vec3 mm = (max-min);
+    glm::vec3 centrum = 0.5f * mm + min;
+    return Sphere<T>(centrum, (max-centrum).length());
   }
-
-  const Vector3T<T>& getPosition() const { return m_positon; }
+  const glm::vec3& getPosition() const { return m_positon; }
 
   T getRadius() const { return m_radius; }
 
 private:
-  Vector3T<T> m_positon;
+  glm::vec3 m_positon;
   T m_radius = 0;
 
 };

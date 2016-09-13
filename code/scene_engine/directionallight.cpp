@@ -1,22 +1,24 @@
 #include "directionallight.h"
+#include <glm/geometric.hpp>
+
 namespace sa {
 DirectionalLight::~DirectionalLight()
 { }
 
-DirectionalLight::DirectionalLight(const Vector3T<float>& direction,
+DirectionalLight::DirectionalLight(const glm::vec3& direction,
                                    const Vector4T<float>& diffuse,
                                    const Vector4T<float>& ambient)
-  : m_direction(direction.GetNormalized())
+  : m_direction(glm::normalize(direction))
   , m_diffuse(diffuse)
   , m_ambient(ambient)
 { }
 
-const Vector3T<float>& DirectionalLight::direction() const
+const glm::vec3& DirectionalLight::direction() const
 {
   return m_direction;
 }
 
-void DirectionalLight::setDirection(const Vector3T<float> &direction)
+void DirectionalLight::setDirection(const glm::vec3 &direction)
 {
   m_direction = direction;
 }

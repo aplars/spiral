@@ -1,6 +1,5 @@
 #include "streamedmeshentity.h"
 
-
 namespace sa {
 StreamedMeshEntity::~StreamedMeshEntity()
 {
@@ -24,20 +23,28 @@ StreamedMeshEntity::StreamedMeshEntity(MeshRenderablePtr mesh, bool castShadow)
   m_boundingBox = m_mesh->getBoundingBox();
 }
 
-void StreamedMeshEntity::setPosition(const Vector3T<float>& position) {
+void StreamedMeshEntity::setPosition(const glm::bvec3& position) {
   m_position = position;
 }
 
 void StreamedMeshEntity::setPosition(float x, float y, float z) {
-  m_position.Set(x, y, z);
+  if(m_position!=glm::vec3(x, y, z)) {
+    m_position = glm::vec3(x, y, z);
+    PropertyChangedEvent evt("position", this);
+    m_propertyChanged.notify(evt);
+  }
 }
 
-const Vector3T<float>& StreamedMeshEntity::getPosition() const {
+const glm::vec3& StreamedMeshEntity::getPosition() const {
   return m_position;
 }
 
 void StreamedMeshEntity::setHeading(float headingInRad) {
-  m_heading = headingInRad;
+  if(m_heading != headingInRad) {
+    m_heading = headingInRad;
+    PropertyChangedEvent evt("heading", this);
+    m_propertyChanged.notify(evt);
+  }
 }
 
 float StreamedMeshEntity::getHeading() const {
@@ -46,7 +53,7 @@ float StreamedMeshEntity::getHeading() const {
 
 AABBModel StreamedMeshEntity::getBoundingBox() const {
   AABBModel transformedBox = m_boundingBox;
-  transformedBox.transform(Matrix44T<float>::GetTranslate(m_position));
+  transformedBox.transform(Matrix44T<float>::GetTranslate(m_position.x, m_position.y, m_position.z));
   return transformedBox;
 }
 
@@ -137,7 +144,7 @@ DrawDataList StreamedMeshEntity::getDrawData(RenderPass pass) {
 
     }
     else {
-      Matrix44T<float> movementTransformation = Matrix44T<float>::GetTranslate(m_position) * Matrix44T<float>::GetRotateY(m_heading);
+      Matrix44T<float> movementTransformation = Matrix44T<float>::GetTranslate(m_position.x, m_position.y, m_position.z) * Matrix44T<float>::GetRotateY(m_heading);
       for(DrawData dd : m_drawData) {
         dd.Uniforms.Matrix4Uniforms["u_modelMatrix"] = movementTransformation * dd.Uniforms.Matrix4Uniforms["u_modelMatrix"];
         toDraw.push_back(dd);
@@ -146,6 +153,11 @@ DrawDataList StreamedMeshEntity::getDrawData(RenderPass pass) {
     return toDraw;
   }
   return toDraw;
+}
+
+void StreamedMeshEntity::addPropertyChangedListener(const std::function<void (const StreamedMeshEntity::PropertyChangedEvent &)> &f)
+{
+  m_propertyChanged.registerObserver(f);
 }
 
 bool StreamedMeshEntity::getCastShadow() const

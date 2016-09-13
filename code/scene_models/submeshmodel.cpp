@@ -20,11 +20,11 @@ std::vector<unsigned int> SubMeshModel::getIndices() const {
 void SubMeshModel::addVertex(const SubMeshModel::Vertex &vertex)
 {
 
-  Vector3T<float> mmin;
-  Vector3T<float> mmax;
+  glm::vec3 mmin;
+  glm::vec3 mmax;
 
   if(m_vertices.size() <= 0) {
-    mmin.Set(vertex.x, vertex.y, vertex.z);
+    mmin = glm::vec3(vertex.x, vertex.y, vertex.z);
     mmax = mmin;
   }
   else {

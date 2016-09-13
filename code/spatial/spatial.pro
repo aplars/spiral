@@ -15,6 +15,7 @@ SOURCES += kdtree.cpp
 HEADERS += kdtree.h
 
 INCLUDEPATH += "$$(SPAR_ROOT)/code/"
+INCLUDEPATH += "$$(SPAR_ROOT)/thirdparty/glm/"
 
 unix {
     target.path = /usr/lib

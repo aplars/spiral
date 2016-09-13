@@ -272,11 +272,20 @@ void MeshRenderable::toGPU(const ConfigurationManager& /*config*/, unsigned int 
       textureCache.insert(material->texDirDiffuse(), speculaTex);
     }
 
+
     sa::VertexBufferPtr vb = device->createVertexBuffer(&sm->getVertices().front(), sm->getVertices().size() * sizeof(SubMeshModel::Vertex));
     sa::VertexArrayPtr vao = context->createVertexArray(vertexDesc, vb);
     sa::IndexBufferPtr ib = device->createIndexBuffer(sm->getIndices());
 
-    subMeshDrawData.BlendingFunction = Blending::None;
+    switch(material->blendMode()) {
+    case MaterialModel::BlendMode::Default:
+      subMeshDrawData.BlendingFunction = Blending::Normal;
+      break;
+    case MaterialModel::BlendMode::Additive:
+      subMeshDrawData.BlendingFunction = Blending::Addative;
+      break;
+
+    }
     subMeshDrawData.PolygonDrawMode = PolygonMode::Fill;
     subMeshDrawData.IsTwoSided = material->isTwoSided();
     subMeshDrawData.VAO = vao;

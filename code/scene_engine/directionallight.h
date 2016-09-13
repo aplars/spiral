@@ -1,20 +1,19 @@
 #ifndef DIRECTIONALLIGHT_H
 #define DIRECTIONALLIGHT_H
-#include <math/Vector3T.h>
 #include <math/Vector4T.h>
-
+#include <glm/vec3.hpp>
 namespace sa {
 class DirectionalLight
 {
 public:
   ~DirectionalLight();
   DirectionalLight(
-      const Vector3T<float>& direction,
+      const glm::vec3& direction,
       const Vector4T<float>& diffuse,
       const Vector4T<float>& ambient);
 
-  const Vector3T<float>& direction() const;
-  void setDirection(const Vector3T<float> &direction);
+  const glm::vec3& direction() const;
+  void setDirection(const glm::vec3 &direction);
 
 
   const Vector4T<float>& diffuse() const;
@@ -24,7 +23,7 @@ public:
   void setAmbient(const Vector4T<float> &ambient);
 
 private:
-  Vector3T<float> m_direction;
+  glm::vec3 m_direction;
   Vector4T<float> m_diffuse;
   Vector4T<float> m_ambient;
 

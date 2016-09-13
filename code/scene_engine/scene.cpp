@@ -87,13 +87,20 @@ void Scene::setSunPosition(float phi, float theta) {
   float x = cos(phi) * sin(theta);
   float y = sin(phi) * sin(theta);
   float z = cos(theta);
-  m_sun.setDirection(Vector3T<float>() - Vector3T<float>(x, y, z));
+  m_sun.setDirection(glm::vec3() - glm::vec3(x, y, z));
 }
 
 void Scene::addMeshEntity(const std::string& name, MeshRenderablePtr mesh, bool castShadow) {
-  m_meshes[name] = new StreamedMeshEntity(mesh, castShadow);
-//  addDebugBox(name+"db", mesh->getBoundingBox().getCenter()[0], mesh->getBoundingBox().getCenter()[1], mesh->getBoundingBox().getCenter()[1],
-//      mesh->getBoundingBox().getHalfSize()[0], mesh->getBoundingBox().getHalfSize()[1], mesh->getBoundingBox().getHalfSize()[2]);
+  StreamedMeshEntity* streamedEntity = new StreamedMeshEntity(mesh, castShadow);
+  AABBModel aabbmodel = streamedEntity->getBoundingBox();
+//  addDebugBox(name+"db", aabbmodel.getCenter()[0], aabbmodel.getCenter()[1], aabbmodel.getCenter()[2],
+//      aabbmodel.getHalfSize()[0], aabbmodel.getHalfSize()[1], aabbmodel.getHalfSize()[2]);
+  m_meshes[name] = streamedEntity;
+
+  streamedEntity->addPropertyChangedListener([&name, this](const StreamedMeshEntity::PropertyChangedEvent& evt) {
+//    DebugEntityBox* box = getDebugBoxEntety(name+"db");
+//    box->setPosition(evt.m_object->getBoundingBox().getCenter());
+  });
 }
 
 void Scene::removeMeshEntity(const std::string& name) {
@@ -112,9 +119,9 @@ void Scene::toCPU() {
 
   for(Entities::value_type e : m_meshes) {
     AABBModel bbox = e.second->getBoundingBox();
-    IntersectionTests::Side side = IntersectionTests::FrustumAABBIntersect(frustum, bbox.getMin()-Vector3T<float>(2, 2, 2), bbox.getMax()+Vector3T<float>(2, 2, 2));
+    IntersectionTests::Side side = IntersectionTests::FrustumAABBIntersect(frustum, bbox.getMin()-glm::vec3(2, 2, 2), bbox.getMax()+glm::vec3(2, 2, 2));
     bool isInFrustums = (side == IntersectionTests::Inside || side == IntersectionTests::Intersect);
-    isInFrustums = isInFrustums | m_shadowMapping.isAABBVisibleFromSun(m_sunCamera, bbox.getMin()-Vector3T<float>(2, 2, 2), bbox.getMax()+Vector3T<float>(2, 2, 2));
+    isInFrustums = isInFrustums | m_shadowMapping.isAABBVisibleFromSun(m_sunCamera, bbox.getMin()-glm::vec3(2, 2, 2), bbox.getMax()+glm::vec3(2, 2, 2));
 
     if(isInFrustums) {
       if(e.second->currentDataStorage() == DataStorage::Disk)
@@ -142,10 +149,10 @@ void Scene::toCPU() {
     }
   }
 
-  //Vector3T<float> centerpoint = m_camera.getFrusumCenterPoint(m_projection);
+  //glm::vec3 centerpoint = m_camera.getFrusumCenterPoint(m_projection);
 
-  //m_sunCamera.setLookAt(centerpoint + m_sun.direction(), centerpoint, Vector3T<float>(0, 1, 0));
-  m_sunCamera.setLookAt(m_sun.direction(), Vector3T<float>(0, 0, 0), Vector3T<float>(0, 1, 0));
+  //m_sunCamera.setLookAt(centerpoint + m_sun.direction(), centerpoint, glm::vec3(0, 1, 0));
+  m_sunCamera.setLookAt(m_sun.direction(), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
 }
 
 void Scene::toGPUOnce(RenderDevice* device, RenderContext* context) {
@@ -231,14 +238,14 @@ void Scene::update(float dt) {
 //      e->applyTransformations();
 //  }
 
-  m_sky.update(dt, m_camera.eye());
+  m_sky.update(dt, glm::vec3(m_camera.eye()));
 
-  m_sun.setDirection(m_sky.getSunPosition().GetNormalized());
+  m_sun.setDirection(glm::vec3(glm::normalize(m_sky.getSunPosition())));
 
   //m_debugBoxes["thesun"]->setPosition(m_sky.getSunPosition());
 
-  //m_camera.setLookAt(m_sky.getSunPosition(), Vector3T<float>(0,0,0), Vector3T<float>(0,1,0));
-  //m_camera.setLookAt(m_camera.eye(), m_sky.getSunPosition(), Vector3T<float>(0,1,0));
+  //m_camera.setLookAt(m_sky.getSunPosition(), glm::vec3(0,0,0), glm::vec3(0,1,0));
+  //m_camera.setLookAt(m_camera.eye(), m_sky.getSunPosition(), glm::vec3(0,1,0));
   for(DebugBoxEntities::value_type db : m_debugBoxes)
   {
     db.second->update(dt);
@@ -261,7 +268,7 @@ void Scene::drawShadowPass(RenderContext* context) {
 
   m_sceneSpecificShaderUniforms.Matrix4Uniforms["u_sunViewMatrix"] = m_sunCamera.viewMatrix();
   m_sceneSpecificShaderUniforms.Matrix4Uniforms["u_sunViewMatrix"] = m_sunCamera.viewMatrix();
-  m_sceneSpecificShaderUniforms.Vec3Uniforms["u_directionalLight.direction"] = m_sun.direction();
+  m_sceneSpecificShaderUniforms.Vec3Uniforms["u_directionalLight.direction"] = Vector3T<float>(m_sun.direction().x, m_sun.direction().y, m_sun.direction().z);
   m_sceneSpecificShaderUniforms.Vec4Uniforms["u_directionalLight.diffuse"] = m_sun.diffuse();
   m_sceneSpecificShaderUniforms.Vec4Uniforms["u_directionalLight.ambient"] = m_sun.ambient();
   m_sceneSpecificShaderUniforms.FloatUniforms["u_fogDensity"] = m_sky.FogDensity;
@@ -278,8 +285,6 @@ void Scene::drawShadowPass(RenderContext* context) {
     context->draw(allToDraw, m_sceneSpecificShaderUniforms);
     m_shadowBufferTarget[shadowPass]->release();
   }
-
-
 }
 
 
@@ -300,6 +305,7 @@ void Scene::drawUberPass(RenderContext* context)
   }
 
   for(const DebugBoxEntities::value_type e : m_debugBoxes) {
+
     allToDraw.push_back(e.second->getDrawData());
   }
 
@@ -321,13 +327,13 @@ void Scene::drawUberPass(RenderContext* context)
   m_sceneSpecificShaderUniforms.Matrix4Uniforms["u_viewMatrix"] = m_camera.viewMatrix();
   m_sceneSpecificShaderUniforms.Matrix4Uniforms["u_projectionMatrix"] = m_projection;
   m_sceneSpecificShaderUniforms.Matrix4ArrayUniforms["u_depthBiasMVPMatrix"] = m_shadowMapping.getDepthBiasMVPMatrix();
-  m_sceneSpecificShaderUniforms.Vec3Uniforms["u_directionalLight.direction"] = m_sun.direction();
+  m_sceneSpecificShaderUniforms.Vec3Uniforms["u_directionalLight.direction"] = Vector3T<float>(m_sun.direction().x, m_sun.direction().y, m_sun.direction().z);
   m_sceneSpecificShaderUniforms.Vec4Uniforms["u_directionalLight.diffuse"] = m_sun.diffuse();
   m_sceneSpecificShaderUniforms.Vec4Uniforms["u_ambientColor"] = m_ambientColor;
 
-  m_sceneSpecificShaderUniforms.Vec3Uniforms["u_eyePosition"] = m_camera.eye();
+  m_sceneSpecificShaderUniforms.Vec3Uniforms["u_eyePosition"] = Vector3T<float>(m_camera.eye().x, m_camera.eye().y, m_camera.eye().z);
   m_sceneSpecificShaderUniforms.FloatArrayUniforms["u_shadowMapCascadeDistance"] = m_shadowMapping.getShadowMapCascadeDistance();
-  m_sceneSpecificShaderUniforms.Vec3Uniforms["u_sunPosition"] = m_sky.getSunPosition();
+  m_sceneSpecificShaderUniforms.Vec3Uniforms["u_sunPosition"] = Vector3T<float>(m_sky.getSunPosition().x, m_sky.getSunPosition().y, m_sky.getSunPosition().z);
 
   context->draw(allToDraw, m_sceneSpecificShaderUniforms);
 }
@@ -353,7 +359,7 @@ void Scene::createLightShaftsPass(RenderContext *context)
 
   m_sceneSpecificShaderUniforms.Matrix4Uniforms["u_viewMatrix"] = m_camera.viewMatrix();
   m_sceneSpecificShaderUniforms.Matrix4Uniforms["u_projectionMatrix"] = m_projection;
-  m_sceneSpecificShaderUniforms.Vec3Uniforms["u_sunPosition"] = m_sky.getSunPosition();
+  m_sceneSpecificShaderUniforms.Vec3Uniforms["u_sunPosition"] = Vector3T<float>(m_sky.getSunPosition().x, m_sky.getSunPosition().y, m_sky.getSunPosition().z);
 
   context->draw(allToDraw, m_sceneSpecificShaderUniforms);
   m_sunLightShaftsTarget->release();
@@ -363,7 +369,7 @@ void Scene::createLightShaftsPass(RenderContext *context)
 void Scene::drawLightShaftsPass(RenderContext *context)
 {
   glm::vec3 sunPositionInScreenCoords = glm::project(
-        glm::make_vec3(m_sky.getSunPosition().GetConstPtr()) + glm::vec3(m_camera.eye().X(), m_camera.eye().Y(), m_camera.eye().Z()),
+        m_sky.getSunPosition() + m_camera.eye(),
         glm::make_mat4(m_camera.viewMatrix().GetConstPtr()),
         glm::make_mat4(m_projection.GetConstPtr()),
         glm::vec4(0, 0, m_sunLightShaftsTarget->getWidth(), m_sunLightShaftsTarget->getHeight()));

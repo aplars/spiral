@@ -15,6 +15,7 @@ QMAKE_CXXFLAGS += -isystem $$(SPAR_ROOT)/thirdparty/boost/
 
 INCLUDEPATH += "$$(SPAR_ROOT)/code"
 INCLUDEPATH += "$$(SPAR_ROOT)/thirdparty/boost"
+INCLUDEPATH += "$$(SPAR_ROOT)/thirdparty/glm/"
 
 warning ($$(SPAR_ROOT))
 

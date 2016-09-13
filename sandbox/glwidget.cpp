@@ -95,65 +95,24 @@ void GLWidget::initializeGL() {
 
 
 
-//  scene->addMeshEntity("silenthill", silenthill);
   scene->addMeshEntity("landscape", landscapeMesh, false);
- // scene->addMeshEntity("desert_city", "desert_city.xml");
-
-//  scene->addMeshEntity("fortezza", fortezza);
-  //scene->addMeshEntity("groundplane100x100", groundMesh);
 
 
   scene->addMeshEntity("bob0", bobMesh, true);
-  scene->getMeshEntity("bob0")->playSkeletalAnimation("");
+  //scene->getMeshEntity("bob0")->playSkeletalAnimation("");
 
-//  scene->addMeshEntity("bob1", bobMesh);
-//  scene->getMeshEntity("bob1")->setPosition(120,0,40);
 
   scene->addMeshEntity("motioncaptureLeft", motioncaptureMesh, true);
   scene->getMeshEntity("motioncaptureLeft")->playNodeAnimation("");
   scene->getMeshEntity("motioncaptureLeft")->setPosition(-120,0,40);
 
-  //scene->addMeshEntity("motioncaptureRight", motioncaptureMesh);
-  //scene->getMeshEntity("motioncapture1")->playNodeAnimation("");
-  //scene->getMeshEntity("motioncaptureRight")->setPosition(120,0,40);
-//  float LO = -200.0f;
-//  float HI = 200.0f;
-
-
-//  float LO_H = 0.0f;
-//  float HI_H = 3.1415*2;
-
-//  for(int i = 0; i < 20; i++) {
-//    std::string meshName = "bob" + std::to_string(i);
-//    scene->addMeshEntity(meshName, "bob.xml");
-
-//    float x = LO + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(HI-LO)));
-//    float y = 0;//LO + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(HI-LO)));
-//    float z = LO + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(HI-LO)));
-//    //float h = LO_H + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(HI_H-LO_H)));
-
-//    scene->getMeshEntity(meshName)->setPosition(sa::Vector3T<float>(x, y, z));
-//    //scene->getMeshEntity(meshName)->setHeading(h);
-//    scene->getMeshEntity(meshName)->playSkeletalAnimation("");
-//  }
-
-
-//  for(int i = 0; i < 20; i++) {
-//    std::string meshName = "motioncapture" + std::to_string(i);
-//    scene->addMeshEntity(meshName, "motioncapture.xml");
-
-//    float x = LO + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(HI-LO)));
-//    float y = 0;//LO + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(HI-LO)));
-//    float z = LO + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(HI-LO)));
-
-//    scene->getMeshEntity(meshName)->setPosition(sa::Vector3T<float>(x, y, z));
-//    scene->getMeshEntity(meshName)->playNodeAnimation("");
-//  }
 
 
   QTimer *timer = new QTimer(this);
   connect(timer, SIGNAL(timeout()), this, SLOT(update()));
   timer->start(16);
+
+
 }
 
 void GLWidget::resizeGL(int w, int h) {

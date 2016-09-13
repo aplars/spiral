@@ -56,46 +56,47 @@ Sky::Sky(float radius, int slices, int sides, float dampening) {
 
 }
 
-Vector3T<float> makeDirection (
-        double azimuth, double altitude)
-{
-    Vector3T<float> res;
-    res[2] = -Cos(azimuth) * Cos(altitude);  // North
-    res[0] =  Sin(azimuth) * Cos(altitude);  // East
-    res[1] = -Sin(altitude); // Zenith
-    return res;
-}
+//glm::vec3 makeDirection (
+//    double azimuth, double altitude)
+//{
+//  glm::vec3 res;
+//  res[2] = -Cos(azimuth) * Cos(altitude);  // North
+//  res[0] =  Sin(azimuth) * Cos(altitude);  // East
+//  res[1] = -Sin(altitude); // Zenith
+//  return res;
+//}
 
 
 
 
-Vector3T<float> Sky::getSunPosition() const {
-  Vector3T<float> SunPos(
-        sin(SunTheta) * cos(SunPhi) * m_radius,
+glm::vec3 Sky::getSunPosition() const {
+  glm::vec3 SunPos(
+        sin(SunTheta) * sin(SunPhi) * m_radius,
         cos(SunTheta) * m_radius,
-        sin(SunTheta) * sin(SunPhi) * m_radius);
+        sin(SunTheta) * cos(SunPhi) * m_radius
+        );
   return SunPos;
 }
 
-void Sky::update(float /*dt*/, const Vector3T<float>& cameraPosition) {
+void Sky::update(float /*dt*/, const glm::vec3 &cameraPosition) {
 
-//  if(IsRunningSimulation)
-//    TimeOfDay += dt*TimeScale;
-//  //TimeOfDay += dt;
-//  if (TimeOfDay > 3600 * 24) //next day?
-//  {
-//    JulianDay += 1.0f;
-//    TimeOfDay -= 3600 * 24;
-//  }
+  //  if(IsRunningSimulation)
+  //    TimeOfDay += dt*TimeScale;
+  //  //TimeOfDay += dt;
+  //  if (TimeOfDay > 3600 * 24) //next day?
+  //  {
+  //    JulianDay += 1.0f;
+  //    TimeOfDay -= 3600 * 24;
+  //  }
 
   float hour = TimeOfDay / 3600.0f;
   float solarTime = hour + 0.170 * sin( 4 * Pi<float>() * (JulianDay - 80) / 373 ) - 0.129 * sin( 2 * Pi<float>() * (JulianDay - 8) / 355) + 12 * (Latitude - Longitude) / Pi<float>();
   float declination = 0.4093 * sin( 2 * Pi<float>() * (JulianDay - 81) / 368 );
 
-  SunTheta = Pi<float>() / 2 - asin(sin(Latitude) * sin(declination) - cos(Latitude) * cos(declination) * cos(Pi<float>() * solarTime / 12));
-  SunPhi   = atan( -cos(declination) * sin(Pi<float>() * solarTime / 12) / ((cos(Latitude) * cos(declination) - sin(Latitude) * sin(declination) * sin(Pi<float>() * solarTime / 12))));
+  SunTheta = Pi<float>()/2.5;//Pi<float>() / 2 - asin(sin(Latitude) * sin(declination) - cos(Latitude) * cos(declination) * cos(Pi<float>() * solarTime / 12));
+  SunPhi   = Pi<float>();//atan( -cos(declination) * sin(Pi<float>() * solarTime / 12) / ((cos(Latitude) * cos(declination) - sin(Latitude) * sin(declination) * sin(Pi<float>() * solarTime / 12))));
 
-  m_drawData.Uniforms.Vec3Uniforms["u_cameraPosition"] = cameraPosition;
+  m_drawData.Uniforms.Vec3Uniforms["u_cameraPosition"] = Vector3T<float>(cameraPosition.x, cameraPosition.y, cameraPosition.z);
 
   //m_drawData.Uniforms.Vec3Uniforms["u_sunPosition"] = getSunPosition();
 
@@ -197,12 +198,5 @@ DrawData Sky::getDrawData(RenderPass renderPass)
   }
   return outData;
 }
-
-//Vector3T<float> Sky::getSunDirection (double jday)
-//{
-//  Vector3T<float> res;
-//  return res;
-//}
-
 }
 }

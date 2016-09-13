@@ -1,9 +1,10 @@
 #pragma once
 #include <memory>
-#include <math/Vector3T.h>
 #include <deque>
+#include <functional>
 #include <renderer_engine/drawdata.h>
 #include <scene_models/aabbmodel.h>
+#include <adt/subject.h>
 #include "datastorage.h"
 #include <mutex>
 #include "adt/lru.h"
@@ -21,6 +22,17 @@ typedef std::shared_ptr<MeshRenderable> MeshRenderablePtr;
 class StreamedMeshEntity
 {
 public:
+  class PropertyChangedEvent {
+  public:
+    PropertyChangedEvent(const std::string& name, StreamedMeshEntity* object) {
+      m_object = object;
+      m_name = name;
+    }
+
+    StreamedMeshEntity* m_object;
+    std::string m_name;
+  };
+
   ~StreamedMeshEntity();
   StreamedMeshEntity() {}
   StreamedMeshEntity(const std::string& resourcePath, const std::string& resourceName, bool castShadow);
@@ -28,9 +40,9 @@ public:
 
   std::string getName() const { return m_mesh->getName(); }
 
-  void setPosition(const Vector3T<float>& position);
+  void setPosition(const glm::bvec3 &position);
   void setPosition(float x, float y, float z);
-  const Vector3T<float>& getPosition() const;
+  const glm::vec3 &getPosition() const;
 
   void setHeading(float headingInRad);
   float getHeading() const;
@@ -62,7 +74,9 @@ public:
   DrawDataList getDrawData(RenderPass pass);
 
 
+  void addPropertyChangedListener(const std::function<void(const PropertyChangedEvent&)>& f);
 private:
+  Subject<const PropertyChangedEvent&> m_propertyChanged;
   MeshRenderablePtr m_mesh;
   bool m_castShadow = false;
   DataStorage m_currentStorage;
@@ -77,7 +91,7 @@ private:
 
   DrawDataList m_drawData;
 
-  Vector3T<float> m_position;
+  glm::vec3 m_position;
   float m_heading = 0.0f;
   mutable std::mutex m_mutex;
 };

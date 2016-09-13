@@ -3,7 +3,7 @@
 #include <deque>
 #include <vector>
 #include <math/Matrix44T.h>
-
+#include <glm/vec3.hpp>
 
 namespace sa {
 class FPSCamera;
@@ -20,7 +20,7 @@ public:
 
   void updateShadowPass(const FPSCamera& camera, const FPSCamera& sunCamera);
 
-  bool isAABBVisibleFromSun(FPSCamera& sunCamera, const sa::Vector3T<float>& mins, const sa::Vector3T<float>& maxs) const;
+  bool isAABBVisibleFromSun(FPSCamera& sunCamera, const glm::vec3& mins, const glm::vec3& maxs) const;
 
   const std::vector<Matrix44T<float> >& getShadowMapProjections() const;
 

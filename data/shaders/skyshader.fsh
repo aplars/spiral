@@ -3,7 +3,6 @@ varying vec4 v_fragmentPosition;
 varying vec3 v_sunPosition;
 
 uniform sampler2D u_texture;
-uniform sampler2D u_fogColor;
 
 void main(void)
 {

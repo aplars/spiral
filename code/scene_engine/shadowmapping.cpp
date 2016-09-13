@@ -31,26 +31,26 @@ void ShadowMapping::updateShadowPass(const FPSCamera& camera, const FPSCamera& s
   for(unsigned int shadowPass = 0; shadowPass < getNumberOfPasses(); shadowPass++)
   {
 
-    std::array<Vector3T<float>, 8> frustumpoints = camera.getFrusumPoints(m_cascadedProjections[shadowPass]);
+    std::array<glm::vec3, 8> frustumpoints = camera.getFrusumPoints(m_cascadedProjections[shadowPass]);
     //Sphere<float> tb = Sphere<float>::createFromPoints<8>(frustumpoints);
 
 
     Matrix44T<float> sunCameraViewMatrix = sunCamera.viewMatrix();
 
-    Vector3T<float> min(std::numeric_limits<float>::max(), std::numeric_limits<float>::max(), std::numeric_limits<float>::max());
-    Vector3T<float> max(-std::numeric_limits<float>::max(), -std::numeric_limits<float>::max(), -std::numeric_limits<float>::max());
+    glm::vec3 min(std::numeric_limits<float>::max(), std::numeric_limits<float>::max(), std::numeric_limits<float>::max());
+    glm::vec3 max(-std::numeric_limits<float>::max(), -std::numeric_limits<float>::max(), -std::numeric_limits<float>::max());
 
 
     for(int i = 0; i < 8; ++i) {
-      Vector4T<float> vv = sunCameraViewMatrix.Vec3Transform(frustumpoints[i]);
-      min = Vector3T<float>::MinVec3(vv.XYZ(), min);
-      max = Vector3T<float>::MaxVec3(vv.XYZ(), max);
+      glm::vec4 vv = sunCameraViewMatrix.Vec3Transform(frustumpoints[i]);
+      min = Vector3T<float>::MinVec3(glm::vec3(vv.x, vv.y, vv.z), min);
+      max = Vector3T<float>::MaxVec3(glm::vec3(vv.x, vv.y, vv.z), max);
     }
 
     Matrix44T<float> ortho;
 
     if(m_stable) {
-      std::array<Vector3T<float>, 2> minmax = std::array<Vector3T<float>, 2>({min, max});
+      std::array<glm::vec3, 2> minmax = std::array<glm::vec3, 2>({min, max});
       Sphere<float> sphere = Sphere<float>::createFromPoints<2>(minmax);
 
 
@@ -60,9 +60,9 @@ void ShadowMapping::updateShadowPass(const FPSCamera& camera, const FPSCamera& s
       // Calculate the view space extents of the frustum points.
       float f = (m_sphereradius[shadowPass] * 2.0f) / float(m_shadowMapWidth);
 
-      Vector3T<float> thePos(floor(sphere.getPosition()[0]/f)*f, floor(sphere.getPosition()[1]/f)*f, floor(sphere.getPosition()[2]/f)*f);
-      Vector3T<float> smin = thePos-m_sphereradius[shadowPass];
-      Vector3T<float> smax = thePos+m_sphereradius[shadowPass];
+      glm::vec3 thePos(floor(sphere.getPosition()[0]/f)*f, floor(sphere.getPosition()[1]/f)*f, floor(sphere.getPosition()[2]/f)*f);
+      glm::vec3 smin = thePos-m_sphereradius[shadowPass];
+      glm::vec3 smax = thePos+m_sphereradius[shadowPass];
 
 
       float viewportExtent = floor((m_sphereradius[shadowPass] * 2.0f) / f) * f;    // Ensure view point extents are a texel multiple.
@@ -72,12 +72,12 @@ void ShadowMapping::updateShadowPass(const FPSCamera& camera, const FPSCamera& s
       smax[2] = smin[2] + viewportExtent;
 
       ortho = Matrix44T<float>::GetOrthographicProjection(
-            smin.X(), smax.X(), smin.Y(), smax.Y(), -smax.Z(), -smin.Z()
+            smin.x, smax.x, smin.y, smax.y, -smax.z, -smin.z
             );
     }
     else {
       ortho = Matrix44T<float>::GetOrthographicProjection(
-            min.X(), max.X(), min.Y(), max.Y(), -max.Z(), -min.Z()
+            min.x, max.x, min.y, max.y, -max.z, -min.z
             );
     }
     static Matrix44T<float> biasMatrix(
@@ -93,7 +93,7 @@ void ShadowMapping::updateShadowPass(const FPSCamera& camera, const FPSCamera& s
   }
 }
 
-bool ShadowMapping::isAABBVisibleFromSun(FPSCamera &sunCamera, const sa::Vector3T<float> &mins, const sa::Vector3T<float> &maxs) const
+bool ShadowMapping::isAABBVisibleFromSun(FPSCamera &sunCamera, const glm::vec3 &mins, const glm::vec3 &maxs) const
 {
   for(const Matrix44T<float>& shadowMapProjection : m_shadowMapProjections) {
      std::array<PlaneT<float>, 6> frustum = sunCamera.getFrustum(shadowMapProjection);

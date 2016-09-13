@@ -12,6 +12,7 @@ CONFIG += staticlib
 CONFIG += c++14
 
 INCLUDEPATH += $$(BOOST_ROOT)/
+INCLUDEPATH += "$$(SPAR_ROOT)/thirdparty/glm/"
 
 
 HEADERS += PlaneT.h \ 
