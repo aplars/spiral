@@ -1,5 +1,4 @@
 #pragma once
-#include "Vector3T.h"
 #include "Vector4T.h"
 #include "ScalarT.h"
 #include "Matrix33T.h"
@@ -74,25 +73,18 @@ namespace sa
 		///Returns a rotation about the Z axis.
 		static Matrix44T GetRotateZ(const T& amountRad) { Matrix44T m; m.LoadRotateZ(amountRad); return m; }
 		///Creates a rotation about the axis.
-		void LoadRotate(const T& amountRad, const Vector3T<T>& axis);
+    void LoadRotate(const T& amountRad, const glm::vec3& axis);
 
-    void LoadRotate(const T& amountRad, const glm::vec3& axis) {
-      LoadRotate(amountRad, Vector3T<float>(axis.x, axis.y, axis.z));
-    }
 
-    ///Returns a rotation about the axis.
-		static Matrix44T GetRotate(const T& amountRad, const Vector3T<T>& axis) { Matrix44T m; m.LoadRotate(amountRad, axis); return m; }
 		///Creates a translation.
-		void LoadTranslate(const Vector3T<T>& t);
-		///Returns a translation.
-		static Matrix44T GetTranslate(const Vector3T<T>& t) { Matrix44T m; m.LoadTranslate(t); return m; }
+    void LoadTranslate(const glm::vec3& t);
 
 		///Returns a translation.
-		static Matrix44T GetTranslate(const T& x, const T& y, const T& z) { Matrix44T m; m.LoadTranslate(Vector3T<T>(x, y, z)); return m; }
+    static Matrix44T GetTranslate(const T& x, const T& y, const T& z) { Matrix44T m; m.LoadTranslate(glm::vec3(x, y, z)); return m; }
 		///
-		void LoadScale(const Vector3T<T>& s);
+    void LoadScale(const glm::vec3& s);
 		///
-		static Matrix44T GetScale(const Vector3T<T>& s);
+    static Matrix44T GetScale(const glm::vec3& s);
 		
 
 		///Creates a perspectiv projection.
@@ -159,15 +151,16 @@ namespace sa
 
 		Vector4T<T> Mult(const Vector4T<T>& v) const;
 
-		Vector4T<T> Vec3Transform(const Vector3T<T>& in) const
+    glm::vec4 Vec3Transform(const glm::vec3& in) const
 		{
-			return Mult(Vector4T<T>(in[0], in[1], in[2], 1.0));
-		}
-
-    glm::vec4 Vec3Transform(const glm::vec3& in) const {
-      Vector4T<float> v = Mult(Vector4T<T>(in[0], in[1], in[2], 1.0));
+      Vector4T<T> v = Mult(Vector4T<T>(in[0], in[1], in[2], 1.0));
       return glm::vec4(v[0], v[1], v[2], v[3]);
     }
+
+//    glm::vec4 Vec3Transform(const glm::vec3& in) const {
+//      Vector4T<float> v = Mult(Vector4T<T>(in[0], in[1], in[2], 1.0));
+//      return glm::vec4(v[0], v[1], v[2], v[3]);
+//    }
 
 
 		Vector4T<T> Vec3Transform(const T& x, const T& y, const T& z) const

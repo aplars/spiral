@@ -1,6 +1,4 @@
 #include "sky.h"
-#include <math/Vector3T.h>
-#include <math/Vector2T.h>
 #include <math/ScalarT.h>
 #include <renderer_engine/renderdevice.h>
 #include <renderer_engine/rendercontext.h>
@@ -96,7 +94,7 @@ void Sky::update(float /*dt*/, const glm::vec3 &cameraPosition) {
   SunTheta = Pi<float>()/2.5;//Pi<float>() / 2 - asin(sin(Latitude) * sin(declination) - cos(Latitude) * cos(declination) * cos(Pi<float>() * solarTime / 12));
   SunPhi   = Pi<float>();//atan( -cos(declination) * sin(Pi<float>() * solarTime / 12) / ((cos(Latitude) * cos(declination) - sin(Latitude) * sin(declination) * sin(Pi<float>() * solarTime / 12))));
 
-  m_drawData.Uniforms.Vec3Uniforms["u_cameraPosition"] = Vector3T<float>(cameraPosition.x, cameraPosition.y, cameraPosition.z);
+  m_drawData.Uniforms.Vec3Uniforms["u_cameraPosition"] = cameraPosition;
 
   //m_drawData.Uniforms.Vec3Uniforms["u_sunPosition"] = getSunPosition();
 

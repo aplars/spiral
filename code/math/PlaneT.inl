@@ -1,6 +1,6 @@
 
 template <typename T>
-typename PlaneT<T>::Side PlaneT<T>::GetSide(Vector3T<T>& point, const double& tolerance) const
+typename PlaneT<T>::Side PlaneT<T>::GetSide(glm::vec3& point, const double& tolerance) const
 {
 	T dist = GetDistance(point);
 	if(IsZero(dist, tolerance))

@@ -1,6 +1,5 @@
 #pragma once
 
-#include <math/Vector3T.h>
 #include "serialization.h"
 #include <glm/gtc/type_ptr.hpp>
 

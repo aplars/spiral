@@ -10,6 +10,7 @@
 #pragma GCC diagnostic pop
 #include <string>
 #include <map>
+#include <glm/gtx/compatibility.hpp>
 
 namespace sa {
 template <typename ChannelKey>
@@ -57,13 +58,13 @@ bool AnimationModel<ChannelKey>::getTransformation(const float time, const Chann
     i++;
   }
 
-  Vector3T<float> translate = channel.Translation[i].T;
+  glm::vec3 translate = channel.Translation[i].T;
 
   if(i > 0)
   {
     //Interpolate between last and current key frame.
     float t = (time-(channel.Translation[i-1].Time))/(channel.Translation[i].Time-channel.Translation[i-1].Time);
-    translate = sa::Vector3T<float>::Lerp(t, channel.Translation[i-1].T, channel.Translation[i].T);
+    translate = glm::lerp(channel.Translation[i-1].T, channel.Translation[i].T, t);
   }
 
   //Find the frame at the current time.

@@ -80,9 +80,8 @@ private:
     }
   }
 
-  static sa::Vector3T<float> getSaVector3FromAi(const aiVector3D& v) {
-    sa::Vector3T<float> ai;
-    ai.Set(v.x, v.y, v.z);
+  static glm::vec3 getGlmVector3FromAi(const aiVector3D& v) {
+    glm::vec3 ai(v.x, v.y, v.z);
     return ai;
   }
 

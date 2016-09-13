@@ -18,12 +18,6 @@ void serialize(Archive & ar, sa::Vector4T<T> & vector, const unsigned int )
   ar & BOOST_SERIALIZATION_NVP(vector.E);
 }
 
-template<class Archive, typename T>
-void serialize(Archive & ar, sa::Vector3T<T> & vector, const unsigned int )
-{
-  ar & BOOST_SERIALIZATION_NVP(vector.xyz);
-}
-
 template<class Archive>
 void serialize(Archive & ar, glm::vec3 & vector, const unsigned int )
 {

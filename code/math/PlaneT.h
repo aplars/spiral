@@ -1,5 +1,8 @@
 #pragma once
-#include "Vector3T.h"
+#include <glm/vec3.hpp>
+#include <glm/geometric.hpp>
+
+
 #include "ScalarT.h"
 
 namespace sa
@@ -18,29 +21,29 @@ namespace sa
 		PlaneT(const T& a, const T& b, const T& c, const T& d)
 			: m_normal(a, b, c)
 			, m_d(d) {} 
-		PlaneT(const Vector3T<T>& n, const T& d)
+    PlaneT(const glm::vec3& n, const T& d)
 			: m_normal(n)
 			, m_d(d) {} 
-		PlaneT(const Vector3T<T>& n, const Vector3T<T>& pnt)
+    PlaneT(const glm::vec3& n, const glm::vec3& pnt)
 			: m_normal(n)
-			, m_d(-n.DotProduct(pnt)) {} 
+      , m_d(-glm::dot(n, pnt)) {}
 		//TODO: ad constructor with three points.
 
 
 
-		const Vector3T<T>& GetNormal() const { return m_normal; }
-    const Vector3T<T>& normal() const { return m_normal; }
+    const glm::vec3& GetNormal() const { return m_normal; }
+    const glm::vec3& normal() const { return m_normal; }
     const T& GetD() const { return m_d; }
     const T& d() const { return m_d; }
 
-		T GetDistance(Vector3T<T>& point) const { return m_normal.DotProduct(point) + m_d; }
-		Side GetSide(Vector3T<T>& point, const double& tolerance = 0.0) const;
+    T GetDistance(glm::vec3& point) const { return glm::dot(m_normal, point) + m_d; }
+    Side GetSide(glm::vec3& point, const double& tolerance = 0.0) const;
 
 		T& operator[](unsigned int i);
 		const T& operator[](unsigned int i) const;
 
 	private:
-		Vector3T<T> m_normal;
+    glm::vec3 m_normal;
 		T m_d;
 	};
 #include "PlaneT.inl"

@@ -1,5 +1,4 @@
 #pragma once
-#include <math/Vector3T.h>
 #include <math/Matrix44T.h>
 #include <set>
 #include <vector>

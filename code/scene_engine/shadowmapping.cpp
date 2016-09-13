@@ -2,6 +2,7 @@
 #include "fpscamera.h"
 #include <math/sphere.h>
 #include <math/intersectiontests.h>
+#include <math/vec3ext.h>
 #include <limits>
 #include <QDebug>
 
@@ -43,8 +44,8 @@ void ShadowMapping::updateShadowPass(const FPSCamera& camera, const FPSCamera& s
 
     for(int i = 0; i < 8; ++i) {
       glm::vec4 vv = sunCameraViewMatrix.Vec3Transform(frustumpoints[i]);
-      min = Vector3T<float>::MinVec3(glm::vec3(vv.x, vv.y, vv.z), min);
-      max = Vector3T<float>::MaxVec3(glm::vec3(vv.x, vv.y, vv.z), max);
+      min = Vec3ext::MinVec3(glm::vec3(vv.x, vv.y, vv.z), min);
+      max = Vec3ext::MaxVec3(glm::vec3(vv.x, vv.y, vv.z), max);
     }
 
     Matrix44T<float> ortho;

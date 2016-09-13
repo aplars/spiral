@@ -340,7 +340,7 @@ std::deque<sa::AnimationModel<boost::uuids::uuid> * > AssimpToSAModels::processA
       const aiNodeAnim* const nodeAnim = anim->mChannels[channelIt];
 
       for(unsigned int positionIt = 0; positionIt < nodeAnim->mNumPositionKeys; ++positionIt) {
-        saChannel.Translation.push_back(sa::AnimationChannelModel::TranslationKey(nodeAnim->mPositionKeys[positionIt].mTime/ticksPerSec, getSaVector3FromAi(nodeAnim->mPositionKeys[positionIt].mValue)));
+        saChannel.Translation.push_back(sa::AnimationChannelModel::TranslationKey(nodeAnim->mPositionKeys[positionIt].mTime/ticksPerSec, getGlmVector3FromAi(nodeAnim->mPositionKeys[positionIt].mValue)));
       }
       for(unsigned int rotationIt = 0; rotationIt < nodeAnim->mNumRotationKeys; ++rotationIt) {
         saChannel.Quaternion.push_back(sa::AnimationChannelModel::QuaternionKey(nodeAnim->mRotationKeys[rotationIt].mTime/ticksPerSec, getSaQuatFromAi(nodeAnim->mRotationKeys[rotationIt].mValue)));
@@ -502,9 +502,9 @@ void AssimpToSAModels::processSkeletalAnimations(const aiScene* scene, sa::Skele
 
           for(unsigned int k = 0; k < scene->mAnimations[i]->mChannels[j]->mNumPositionKeys; ++k)
           {
-            sa::Vector3T<float> T = sa::Vector3T<float>(	scene->mAnimations[i]->mChannels[j]->mPositionKeys[k].mValue.x,
-                              scene->mAnimations[i]->mChannels[j]->mPositionKeys[k].mValue.y,
-                              scene->mAnimations[i]->mChannels[j]->mPositionKeys[k].mValue.z);
+            glm::vec3 T(	scene->mAnimations[i]->mChannels[j]->mPositionKeys[k].mValue.x,
+                          scene->mAnimations[i]->mChannels[j]->mPositionKeys[k].mValue.y,
+                          scene->mAnimations[i]->mChannels[j]->mPositionKeys[k].mValue.z);
             double time = scene->mAnimations[i]->mChannels[j]->mPositionKeys[k].mTime;
             SAanimationsMap[i].Channels[saJoint.first].Translation.push_back(sa::AnimationChannelModel::TranslationKey((time/scene->mAnimations[i]->mTicksPerSecond), T));
           }
@@ -651,11 +651,11 @@ sa::AABBModel AssimpToSAModels::calculateBoundingBoxAtSKAnimationStep(std::deque
           bool firstpoint = true;
           for(sa::JointModel::VertexWeight weight : joint.Weights) {
             if(firstpoint) {
-              jointAABB = sa::AABBModel(glm::make_vec3(subMesh->getVertices()[weight.VertexIndex].position().GetConstPtr()), glm::vec3(0,0,0));
+              jointAABB = sa::AABBModel(subMesh->getVertices()[weight.VertexIndex].position(), glm::vec3(0,0,0));
               firstpoint = false;
             }
             sa::SubMeshModel::Vertex vertex = subMesh->getVertices()[weight.VertexIndex];
-            jointAABB.expand(glm::make_vec3(vertex.position().GetConstPtr()));
+            jointAABB.expand(vertex.position());
           }
           if(firstpoint == false) {
             jointAABB.transform(meshNode->transformation() * joint.Transformation);

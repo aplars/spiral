@@ -99,7 +99,7 @@ void GLWidget::initializeGL() {
 
 
   scene->addMeshEntity("bob0", bobMesh, true);
-  //scene->getMeshEntity("bob0")->playSkeletalAnimation("");
+  scene->getMeshEntity("bob0")->playSkeletalAnimation("");
 
 
   scene->addMeshEntity("motioncaptureLeft", motioncaptureMesh, true);

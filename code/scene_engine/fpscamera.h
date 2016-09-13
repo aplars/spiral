@@ -2,6 +2,7 @@
 #define FPSCAMERA_H
 #include <math/Matrix44T.h>
 #include <math/FrustumT.h>
+#define GLM_SWIZZLE
 #include <glm/vec3.hpp>
 
 namespace sa {

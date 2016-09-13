@@ -8,7 +8,7 @@
 #include "serialization.h"
 #include <vector>
 #include <map>
-#include <math/Vector3T.h>
+#include <glm/vec3.hpp>
 #include "aabbmodel.h"
 #include "skeletonmodel.h"
 
@@ -28,13 +28,13 @@ public:
       return z;
     }
 
-    void setPosition(const Vector3T<float>& p) {
+    void setPosition(const glm::vec3& p) {
       x = p[0];
       y = p[1];
       z = p[2];
     }
 
-    void setNormal(const Vector3T<float>& p) {
+    void setNormal(const glm::vec3& p) {
       nx = p[0];
       ny = p[1];
       nz = p[2];
@@ -50,31 +50,30 @@ public:
       }
     }
 
-    Vector3T<float> position() const {
-      return Vector3T<float>(x, y, z);
+    glm::vec3 position() const {
+      return glm::vec3(x, y, z);
     }
 
-    Vector3T<float> normal() const {
-      return Vector3T<float>(nx, ny, nz);
+    glm::vec3 normal() const {
+      return glm::vec3(nx, ny, nz);
     }
 
 
-    void incPosition(const Vector3T<float>& p) {
+    void incPosition(const glm::vec3& p) {
       x += p[0];
       y += p[1];
       z += p[2];
     }
 
-    void incNormal(const Vector3T<float>& p) {
+    void incNormal(const glm::vec3& p) {
       nx += p[0];
       ny += p[1];
       nz += p[2];
     }
 
     void normalizeNormal() {
-      Vector3T<float> n(nx, ny, nz);
-      n.Normalize();
-      setNormal(n);
+      glm::vec3 n(nx, ny, nz);
+      setNormal(glm::normalize(n));
     }
 
     friend class boost::serialization::access;

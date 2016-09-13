@@ -268,7 +268,7 @@ void Scene::drawShadowPass(RenderContext* context) {
 
   m_sceneSpecificShaderUniforms.Matrix4Uniforms["u_sunViewMatrix"] = m_sunCamera.viewMatrix();
   m_sceneSpecificShaderUniforms.Matrix4Uniforms["u_sunViewMatrix"] = m_sunCamera.viewMatrix();
-  m_sceneSpecificShaderUniforms.Vec3Uniforms["u_directionalLight.direction"] = Vector3T<float>(m_sun.direction().x, m_sun.direction().y, m_sun.direction().z);
+  m_sceneSpecificShaderUniforms.Vec3Uniforms["u_directionalLight.direction"] = m_sun.direction();
   m_sceneSpecificShaderUniforms.Vec4Uniforms["u_directionalLight.diffuse"] = m_sun.diffuse();
   m_sceneSpecificShaderUniforms.Vec4Uniforms["u_directionalLight.ambient"] = m_sun.ambient();
   m_sceneSpecificShaderUniforms.FloatUniforms["u_fogDensity"] = m_sky.FogDensity;
@@ -327,13 +327,13 @@ void Scene::drawUberPass(RenderContext* context)
   m_sceneSpecificShaderUniforms.Matrix4Uniforms["u_viewMatrix"] = m_camera.viewMatrix();
   m_sceneSpecificShaderUniforms.Matrix4Uniforms["u_projectionMatrix"] = m_projection;
   m_sceneSpecificShaderUniforms.Matrix4ArrayUniforms["u_depthBiasMVPMatrix"] = m_shadowMapping.getDepthBiasMVPMatrix();
-  m_sceneSpecificShaderUniforms.Vec3Uniforms["u_directionalLight.direction"] = Vector3T<float>(m_sun.direction().x, m_sun.direction().y, m_sun.direction().z);
+  m_sceneSpecificShaderUniforms.Vec3Uniforms["u_directionalLight.direction"] = m_sun.direction();
   m_sceneSpecificShaderUniforms.Vec4Uniforms["u_directionalLight.diffuse"] = m_sun.diffuse();
   m_sceneSpecificShaderUniforms.Vec4Uniforms["u_ambientColor"] = m_ambientColor;
 
-  m_sceneSpecificShaderUniforms.Vec3Uniforms["u_eyePosition"] = Vector3T<float>(m_camera.eye().x, m_camera.eye().y, m_camera.eye().z);
+  m_sceneSpecificShaderUniforms.Vec3Uniforms["u_eyePosition"] = m_camera.eye();
   m_sceneSpecificShaderUniforms.FloatArrayUniforms["u_shadowMapCascadeDistance"] = m_shadowMapping.getShadowMapCascadeDistance();
-  m_sceneSpecificShaderUniforms.Vec3Uniforms["u_sunPosition"] = Vector3T<float>(m_sky.getSunPosition().x, m_sky.getSunPosition().y, m_sky.getSunPosition().z);
+  m_sceneSpecificShaderUniforms.Vec3Uniforms["u_sunPosition"] = m_sky.getSunPosition();
 
   context->draw(allToDraw, m_sceneSpecificShaderUniforms);
 }
@@ -359,7 +359,7 @@ void Scene::createLightShaftsPass(RenderContext *context)
 
   m_sceneSpecificShaderUniforms.Matrix4Uniforms["u_viewMatrix"] = m_camera.viewMatrix();
   m_sceneSpecificShaderUniforms.Matrix4Uniforms["u_projectionMatrix"] = m_projection;
-  m_sceneSpecificShaderUniforms.Vec3Uniforms["u_sunPosition"] = Vector3T<float>(m_sky.getSunPosition().x, m_sky.getSunPosition().y, m_sky.getSunPosition().z);
+  m_sceneSpecificShaderUniforms.Vec3Uniforms["u_sunPosition"] = m_sky.getSunPosition();
 
   context->draw(allToDraw, m_sceneSpecificShaderUniforms);
   m_sunLightShaftsTarget->release();
@@ -391,8 +391,7 @@ void Scene::drawLightShaftsPass(RenderContext *context)
   dds.push_back(lightShaftsDD);
 
   m_sceneSpecificShaderUniforms.Sampler2DUniforms["u_texture"] = 0;
-  m_sceneSpecificShaderUniforms.Vec2Uniforms["u_sunPositionOnScreen"] =
-      Vector2T<float>(sunPositionInScreenCoords.x, sunPositionInScreenCoords.y);
+  m_sceneSpecificShaderUniforms.Vec2Uniforms["u_sunPositionOnScreen"] = glm::vec2(sunPositionInScreenCoords.x, sunPositionInScreenCoords.y);
   context->draw(dds, m_sceneSpecificShaderUniforms);
 
 }

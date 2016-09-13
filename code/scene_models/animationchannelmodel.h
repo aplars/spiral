@@ -1,8 +1,9 @@
 #pragma once
 #include <deque>
 #include "serialization.h"
-#include <math/Vector3T.h>
 #include <math/QuaternionT.h>
+#include <glm/vec3.hpp>
+
 namespace sa {
 class AnimationChannelModel
 {
@@ -11,12 +12,12 @@ public:
   {
   public:
     TranslationKey() {}
-    TranslationKey(float time, const Vector3T<float>& t)
+    TranslationKey(float time, const glm::vec3& t)
       : Time(time)
       , T(t){}
 
     float Time;
-    Vector3T<float> T;
+    glm::vec3 T;
 
   private:
     friend class boost::serialization::access;

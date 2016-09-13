@@ -70,10 +70,10 @@ void FPSCamera::rotate(const float& heading, const float& pitch, const float& ro
     rotMtx.LoadRotate(heading, glm::vec3(0,1,0));
 
     result = rotMtx.Vec3Transform(m_xAxis);
-    m_xAxis = glm::vec3(result);
+    m_xAxis = glm::vec3(result.x, result.y, result.z);
 
     result = rotMtx.Vec3Transform(m_zAxis);
-    m_zAxis = glm::vec3(result);
+    m_zAxis = glm::vec3(result.x, result.y, result.z);
   }
 
   // Rotate camera's existing y and z axes about its existing x axis.

@@ -14,59 +14,47 @@ public:
   };
 
   template <typename T>
-  static Vector3T<T> ThreePlanesIntersect(const PlaneT<T>& p1, const PlaneT<T>& p2, const PlaneT<T>& p3) {
-    Vector3T<T> a =
-        -p1.d() * (p2.normal().CrossProduct(p3.normal()))
-        -p2.d() * (p3.normal().CrossProduct(p1.normal()))
-        -p3.d() * (p1.normal().CrossProduct(p2.normal()));
-    T b =
-        p1.normal().DotProduct(p2.normal().CrossProduct(p3.normal()));
-
-    return a/b;
-  }
-
-  template <typename T>
   static glm::vec3 ThreePlanesIntersectVec3(const PlaneT<T>& p1, const PlaneT<T>& p2, const PlaneT<T>& p3) {
     glm::vec3 a =
-        glm::make_vec3((
-                         -p1.d() * (p2.normal().CrossProduct(p3.normal()))
-                         -p2.d() * (p3.normal().CrossProduct(p1.normal()))
-                         -p3.d() * (p1.normal().CrossProduct(p2.normal()))).GetConstPtr());
+        -p1.d() * glm::cross(p2.normal(), p3.normal())
+        -p2.d() * glm::cross(p3.normal(), p1.normal())
+        -p3.d() * glm::cross(p1.normal(), p2.normal());
+
     T b =
-        p1.normal().DotProduct(p2.normal().CrossProduct(p3.normal()));
+        glm::dot(p1.normal(), glm::cross(p2.normal(), p3.normal()));
 
     return a/b;
   }
 
   template <typename T>
-  static Side FrustumAABBIntersect(const std::array<PlaneT<T>, 6>& planes, const Vector3T<T>& mins, const Vector3T<T>& maxs) {
+  static Side FrustumAABBIntersect(const std::array<PlaneT<T>, 6>& planes, const glm::vec3& mins, const glm::vec3& maxs) {
     Side    ret = Inside;
-    Vector3T<T> vmin, vmax;
+    glm::vec3 vmin, vmax;
 
     for(int i = 0; i < 6; ++i) {
        // X axis
-       if(planes[i].normal().X() > 0) {
-          vmin.X(mins.X());
-          vmax.X(maxs.X());
+       if(planes[i].normal().x > 0) {
+          vmin.x = (mins.x);
+          vmax.y = (maxs.x);
        } else {
-          vmin.X(maxs.X());
-          vmax.X(mins.X());
+          vmin.x = (maxs.x);
+          vmax.x = (mins.x);
        }
        // Y axis
-       if(planes[i].normal().Y() > 0) {
-          vmin.Y(mins.Y());
-          vmax.Y(maxs.Y());
+       if(planes[i].normal().y > 0) {
+          vmin.y = (mins.y);
+          vmax.y = (maxs.y);
        } else {
-          vmin.Y(maxs.Y());
-          vmax.Y(mins.Y());
+          vmin.y = (maxs.y);
+          vmax.y = (mins.y);
        }
        // Z axis
-       if(planes[i].normal().Z() > 0) {
-          vmin.Z(mins.Z());
-          vmax.Z(maxs.Z());
+       if(planes[i].normal().z > 0) {
+          vmin.z = (mins.z);
+          vmax.z = (maxs.z);
        } else {
-          vmin.Z(maxs.Z());
-          vmax.Z(mins.Z());
+          vmin.z = (maxs.z);
+          vmax.z = (mins.z);
        }
 
 
@@ -84,9 +72,5 @@ public:
   }
 
 
-  template <typename T>
-  static Side FrustumAABBIntersect(const std::array<PlaneT<T>, 6>& planes, const glm::vec3& mins, const glm::vec3& maxs) {
-    return FrustumAABBIntersect(planes, Vector3T<float>(mins.x, mins.y, mins.z), Vector3T<float>(maxs.x, maxs.y, maxs.z));
-  }
 };
 }

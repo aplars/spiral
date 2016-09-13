@@ -1,6 +1,5 @@
 #pragma once
-#include "Vector2T.h"
-
+#include <glm/vec2.hpp>
 namespace sa
 {
 	template<typename T> 
@@ -9,7 +8,7 @@ namespace sa
 	public:
 		RectangleT() {}
 
-		RectangleT(const Vector2T<T>& pos, const Vector2T<T>& size)
+    RectangleT(const glm::vec2& pos, const glm::vec2& size)
 			: m_position(pos), m_size(size) {}
 		
 		RectangleT(const T& posX, const T& posY, const T& sizeX, const T& sizeY)
@@ -17,12 +16,12 @@ namespace sa
 
 		void Set(const T& posX, const T& posY, const T& sizeX, const T& sizeY) 
 		{
-			m_position.Set(posX, posY);
-			m_size.Set(sizeX, sizeY);
+      m_position = glm::vec2(posX, posY);
+      m_size = glm::vec2(sizeX, sizeY);
 		}
 
-		const Vector2T<T>& GetSize() const { return m_size; }
-		const Vector2T<T>& GetPosition() const { return m_position; }
+    const glm::vec2& GetSize() const { return m_size; }
+    const glm::vec2& GetPosition() const { return m_position; }
 
 		T GetLeft() const { return m_position[0]; }
 		T GetRight() const { return m_position[0] + m_size[0]; }
@@ -30,10 +29,10 @@ namespace sa
 		T GetBottom() const { return m_position[1]; }
 		T GetTop() const { return m_position[1] + m_size[1]; }
 
-		Vector2T<T> GetHalfSize() const { return m_size/2; }
+    glm::vec2 GetHalfSize() const { return m_size/2.0f; }
 
 	private:
-		Vector2T<T> m_position;
-		Vector2T<T> m_size;
+    glm::vec2 m_position;
+    glm::vec2 m_size;
 	};
 }

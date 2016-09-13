@@ -102,7 +102,7 @@
 	}
 
 	template <typename T>
-	void Matrix44T<T>::LoadRotate(const T& amountRad, const Vector3T<T>& axis)
+  void Matrix44T<T>::LoadRotate(const T& amountRad, const glm::vec3& axis)
 	{
 		T c = Cos(amountRad);
 		T s = Sin(amountRad);
@@ -118,7 +118,7 @@
 	}
 
 	template <typename T>
-	void Matrix44T<T>::LoadTranslate(const Vector3T<T>& t)
+  void Matrix44T<T>::LoadTranslate(const glm::vec3& t)
 	{
 		m_E[ 0] = (T)1.0;	m_E[ 4] = (T)0.0;	m_E[ 8] = (T)0.0;	m_E[12] = t[0]; 
 		m_E[ 1] = (T)0.0;	m_E[ 5] = (T)1.0;	m_E[ 9] = (T)0.0;	m_E[13] = t[1]; 
@@ -127,7 +127,7 @@
 	}
 
 	template <typename T>
-	void Matrix44T<T>::LoadScale(const Vector3T<T>& s)
+  void Matrix44T<T>::LoadScale(const glm::vec3& s)
 	{
 		m_E[ 0] = s[0];	m_E[ 4] = (T)0.0;	m_E[ 8] = (T)0.0;	m_E[12] = (T)0.0; 
 		m_E[ 1] = (T)0.0;	m_E[ 5] = s[1];	m_E[ 9] = (T)0.0;	m_E[13] = (T)0.0; 
@@ -136,7 +136,7 @@
 	}
 
 	template <typename T>
-	Matrix44T<T> Matrix44T<T>::GetScale(const Vector3T<T>& s)
+  Matrix44T<T> Matrix44T<T>::GetScale(const glm::vec3& s)
 	{
 		Matrix44T<T> m;
 		m.LoadScale(s);
@@ -246,7 +246,7 @@
 		//Normalize the plane.
 		T t = sqrt(a*a+b*b+c*c);
 
-		return PlaneT<T>(Vector3T<T>(a, b, c)/t, d/t);
+    return PlaneT<T>(a/t, b/t, c/t, d/t);
 	}
 
 
