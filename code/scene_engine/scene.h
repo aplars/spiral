@@ -79,7 +79,7 @@ private:
 
   bool m_firstTimeInToGPU = true;
 
-  Matrix44T<float> m_projection;
+  glm::mat4 m_projection;
 
   ShadowMapping m_shadowMapping;
 

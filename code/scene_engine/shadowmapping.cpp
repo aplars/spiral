@@ -5,6 +5,7 @@
 #include <math/vec3ext.h>
 #include <limits>
 #include <QDebug>
+#include <math/mat4ext.h>
 
 namespace sa {
 void ShadowMapping::create(const std::vector<float> &shadowMapCascadeDist, float aspect, unsigned int shadowMapWidth, unsigned int shadowMapHeight)
@@ -32,11 +33,11 @@ void ShadowMapping::updateShadowPass(const FPSCamera& camera, const FPSCamera& s
   for(unsigned int shadowPass = 0; shadowPass < getNumberOfPasses(); shadowPass++)
   {
 
-    std::array<glm::vec3, 8> frustumpoints = camera.getFrusumPoints(m_cascadedProjections[shadowPass]);
+    std::array<glm::vec3, 8> frustumpoints = camera.getFrusumPoints(Mat4ext::toMat4(m_cascadedProjections[shadowPass]));
     //Sphere<float> tb = Sphere<float>::createFromPoints<8>(frustumpoints);
 
 
-    Matrix44T<float> sunCameraViewMatrix = sunCamera.viewMatrix();
+    Matrix44T<float> sunCameraViewMatrix = Mat4ext::fromMat4(sunCamera.viewMatrix());
 
     glm::vec3 min(std::numeric_limits<float>::max(), std::numeric_limits<float>::max(), std::numeric_limits<float>::max());
     glm::vec3 max(-std::numeric_limits<float>::max(), -std::numeric_limits<float>::max(), -std::numeric_limits<float>::max());
@@ -88,7 +89,7 @@ void ShadowMapping::updateShadowPass(const FPSCamera& camera, const FPSCamera& s
           0.0, 0.0, 0.0, 1.0);
 
 
-    m_depthBiasMVPMatrix.push_back(biasMatrix * ortho * sunCamera.viewMatrix());
+    m_depthBiasMVPMatrix.push_back(biasMatrix * ortho * Mat4ext::fromMat4(sunCamera.viewMatrix()));
     m_shadowMapProjections.push_back(ortho);
 
   }
@@ -97,7 +98,7 @@ void ShadowMapping::updateShadowPass(const FPSCamera& camera, const FPSCamera& s
 bool ShadowMapping::isAABBVisibleFromSun(FPSCamera &sunCamera, const glm::vec3 &mins, const glm::vec3 &maxs) const
 {
   for(const Matrix44T<float>& shadowMapProjection : m_shadowMapProjections) {
-     std::array<PlaneT<float>, 6> frustum = sunCamera.getFrustum(shadowMapProjection);
+     std::array<PlaneT<float>, 6> frustum = sunCamera.getFrustum(Mat4ext::toMat4(shadowMapProjection));
      sa::IntersectionTests::Side side = sa::IntersectionTests::FrustumAABBIntersect(frustum, mins, maxs);
      if(side == sa::IntersectionTests::Side::Inside || side == sa::IntersectionTests::Side::Intersect) {
        return true;

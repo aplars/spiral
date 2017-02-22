@@ -6,6 +6,7 @@
 #include <renderer_engine/renderdevice.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include "math/mat4ext.h"
 
 namespace sa {
 Scene::~Scene()
@@ -44,7 +45,8 @@ Scene::Scene(unsigned int width, unsigned int height, ConfigurationManager confi
 
   m_shadowMapping.create(shadowMapCascadeDistance, aspect, 1024, 1024);
 
-  m_projection = sa::Matrix44T<float>::GetPerspectiveProjection(sa::DegToRad(60.0f), aspect, 0.1, m_shadowMapping.getShadowMapCascadeDistance().back());
+
+  m_projection = glm::perspective(sa::DegToRad(60.0f), aspect, 0.1f, m_shadowMapping.getShadowMapCascadeDistance().back());
 
 
 }
@@ -266,8 +268,8 @@ void Scene::drawShadowPass(RenderContext* context) {
   }
 
 
-  m_sceneSpecificShaderUniforms.Matrix4Uniforms["u_sunViewMatrix"] = m_sunCamera.viewMatrix();
-  m_sceneSpecificShaderUniforms.Matrix4Uniforms["u_sunViewMatrix"] = m_sunCamera.viewMatrix();
+  m_sceneSpecificShaderUniforms.Matrix4Uniforms["u_sunViewMatrix"] = Mat4ext::fromMat4(m_sunCamera.viewMatrix());
+  m_sceneSpecificShaderUniforms.Matrix4Uniforms["u_sunViewMatrix"] = Mat4ext::fromMat4(m_sunCamera.viewMatrix());
   m_sceneSpecificShaderUniforms.Vec3Uniforms["u_directionalLight.direction"] = m_sun.direction();
   m_sceneSpecificShaderUniforms.Vec4Uniforms["u_directionalLight.diffuse"] = m_sun.diffuse();
   m_sceneSpecificShaderUniforms.Vec4Uniforms["u_directionalLight.ambient"] = m_sun.ambient();
@@ -324,8 +326,8 @@ void Scene::drawUberPass(RenderContext* context)
 
 
   m_sceneSpecificShaderUniforms.Sampler2DArrayUniforms["u_shadowMap"] = shadowMap;
-  m_sceneSpecificShaderUniforms.Matrix4Uniforms["u_viewMatrix"] = m_camera.viewMatrix();
-  m_sceneSpecificShaderUniforms.Matrix4Uniforms["u_projectionMatrix"] = m_projection;
+  m_sceneSpecificShaderUniforms.Matrix4Uniforms["u_viewMatrix"] = Mat4ext::fromMat4(m_camera.viewMatrix());
+  m_sceneSpecificShaderUniforms.Matrix4Uniforms["u_projectionMatrix"] = Mat4ext::fromMat4(m_projection);
   m_sceneSpecificShaderUniforms.Matrix4ArrayUniforms["u_depthBiasMVPMatrix"] = m_shadowMapping.getDepthBiasMVPMatrix();
   m_sceneSpecificShaderUniforms.Vec3Uniforms["u_directionalLight.direction"] = m_sun.direction();
   m_sceneSpecificShaderUniforms.Vec4Uniforms["u_directionalLight.diffuse"] = m_sun.diffuse();
@@ -357,8 +359,8 @@ void Scene::createLightShaftsPass(RenderContext *context)
   allToDraw.push_back(skyDd);
 
 
-  m_sceneSpecificShaderUniforms.Matrix4Uniforms["u_viewMatrix"] = m_camera.viewMatrix();
-  m_sceneSpecificShaderUniforms.Matrix4Uniforms["u_projectionMatrix"] = m_projection;
+  m_sceneSpecificShaderUniforms.Matrix4Uniforms["u_viewMatrix"] = Mat4ext::fromMat4(m_camera.viewMatrix());
+  m_sceneSpecificShaderUniforms.Matrix4Uniforms["u_projectionMatrix"] = Mat4ext::fromMat4(m_projection);
   m_sceneSpecificShaderUniforms.Vec3Uniforms["u_sunPosition"] = m_sky.getSunPosition();
 
   context->draw(allToDraw, m_sceneSpecificShaderUniforms);
@@ -370,8 +372,8 @@ void Scene::drawLightShaftsPass(RenderContext *context)
 {
   glm::vec3 sunPositionInScreenCoords = glm::project(
         m_sky.getSunPosition() + m_camera.eye(),
-        glm::make_mat4(m_camera.viewMatrix().GetConstPtr()),
-        glm::make_mat4(m_projection.GetConstPtr()),
+        m_camera.viewMatrix(),
+        m_projection,
         glm::vec4(0, 0, m_sunLightShaftsTarget->getWidth(), m_sunLightShaftsTarget->getHeight()));
 
   //qDebug() << sunPositionInScreenCoords.x << ", " << sunPositionInScreenCoords.y;

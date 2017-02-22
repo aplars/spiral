@@ -8,7 +8,7 @@
 #include <array>
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
-
+#include <cstring>
 namespace sa
 {
 	template <typename T>

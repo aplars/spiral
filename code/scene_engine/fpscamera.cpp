@@ -3,7 +3,7 @@
 #include <math/intersectiontests.h>
 #include <limits>
 #include <algorithm>
-
+#include <math/mat4ext.h>
 namespace  sa {
 FPSCamera::~FPSCamera()
 {
@@ -38,14 +38,14 @@ void FPSCamera::setEye(const glm::vec3& eye)
   m_eye = eye;
   update(false);
 }
-Matrix44T<float> FPSCamera::viewMatrix() const
+glm::mat4 FPSCamera::viewMatrix() const
 {
   return m_viewMatrix;
 }
 
 void FPSCamera::setViewMatrix(const Matrix44T<float> &viewMatrix)
 {
-  m_viewMatrix = viewMatrix;
+  m_viewMatrix = Mat4ext::toMat4(viewMatrix);
 }
 
 void FPSCamera::moveForward(float amount) {
@@ -58,6 +58,11 @@ void FPSCamera::moveRight(float amount) {
   update(false);
 }
 
+void FPSCamera::moveUp(float amount) {
+  m_eye = m_eye - m_yAxis*amount;
+  update(false);
+}
+
 void FPSCamera::rotate(const float& heading, const float& pitch, const float& roll)
 {
   Matrix44T<float> rotMtx;
@@ -66,8 +71,8 @@ void FPSCamera::rotate(const float& heading, const float& pitch, const float& ro
   // Rotate camera's existing x and z axes about its existing y axis.
   if (heading != 0.0)
   {
-    //rotMtx.LoadRotate(heading, m_yAxis);
     rotMtx.LoadRotate(heading, glm::vec3(0,1,0));
+    //rotMtx = Matrix44T<float>::fromPtr(glm::value_ptr(mat4ext::make_rotate(heading, glm::vec3(0,1,0))));
 
     result = rotMtx.Vec3Transform(m_xAxis);
     m_xAxis = glm::vec3(result.x, result.y, result.z);
@@ -80,6 +85,7 @@ void FPSCamera::rotate(const float& heading, const float& pitch, const float& ro
   if (pitch != 0.0)
   {
     rotMtx.LoadRotate(pitch, m_xAxis);
+    //rotMtx = Matrix44T<float>::fromPtr(glm::value_ptr(mat4ext::make_rotate(pitch, m_xAxis)));
 
     result = rotMtx.Vec3Transform(m_yAxis);
     m_yAxis = glm::vec3(result[0], result[1], result[2]);
@@ -92,6 +98,7 @@ void FPSCamera::rotate(const float& heading, const float& pitch, const float& ro
   if (roll != 0.0f)
   {
     rotMtx.LoadRotate(roll, m_zAxis);
+    //rotMtx = Matrix44T<float>::fromPtr(glm::value_ptr(mat4ext::make_rotate(roll, m_zAxis)));
 
     result = rotMtx.Vec3Transform(m_xAxis);
     m_xAxis = glm::vec3(result[0], result[1], result[2]);
@@ -103,12 +110,12 @@ void FPSCamera::rotate(const float& heading, const float& pitch, const float& ro
   update(true);
 }
 
-std::array<PlaneT<float>, 6> FPSCamera::getFrustum(const Matrix44T<float>& projection) const {
-  return (projection*viewMatrix()).GetFrustum();
+std::array<PlaneT<float>, 6> FPSCamera::getFrustum(const glm::mat4 &projection) const {
+  return Mat4ext::fromMat4(projection*viewMatrix()).GetFrustum();
 }
 
-std::array<glm::vec3, 8> FPSCamera::getFrusumPoints(const Matrix44T<float>& projection) const {
-  Matrix44T<float> viewProj = projection*viewMatrix();
+std::array<glm::vec3, 8> FPSCamera::getFrusumPoints(const glm::mat4& projection) const {
+  Matrix44T<float> viewProj = Mat4ext::fromMat4(projection*viewMatrix());
 
   PlaneT<float> left = viewProj.GetClipPlane(Matrix44T<float>::ClipPlane::Left);
   PlaneT<float> right = viewProj.GetClipPlane(Matrix44T<float>::ClipPlane::Right);
@@ -140,7 +147,7 @@ std::array<glm::vec3, 8> FPSCamera::getFrusumPoints(const Matrix44T<float>& proj
 }
 
 glm::vec3 FPSCamera::getFrusumCenterPoint(const Matrix44T<float>& projection) const {
-  std::array<glm::vec3, 8> points = getFrusumPoints(projection);
+  std::array<glm::vec3, 8> points = getFrusumPoints(Mat4ext::toMat4(projection));
   glm::vec3 fmin(std::numeric_limits<float>::max(), std::numeric_limits<float>::max(), std::numeric_limits<float>::max());
   glm::vec3 fmax(-std::numeric_limits<float>::max(), -std::numeric_limits<float>::max(), -std::numeric_limits<float>::max());
 
