@@ -1,6 +1,5 @@
 #ifndef FPSCAMERA_H
 #define FPSCAMERA_H
-#include <math/Matrix44T.h>
 #include <math/FrustumT.h>
 #define GLM_SWIZZLE
 #include <glm/vec3.hpp>
@@ -20,14 +19,14 @@ public:
   void setEye(const glm::vec3 &eye);
 
   glm::mat4 viewMatrix() const;
-  void setViewMatrix(const Matrix44T<float> &viewMatrix);
+  void setViewMatrix(const glm::mat4 &viewMatrix);
   void moveForward(float amount);
   void moveRight(float amount);
   void moveUp(float amount);
   void rotate(const float& heading, const float& pitch, const float& roll);
   std::array<PlaneT<float>, 6> getFrustum(const glm::mat4& projection) const;
   std::array<glm::vec3, 8> getFrusumPoints(const glm::mat4& projection) const;
-  glm::vec3 getFrusumCenterPoint(const Matrix44T<float>& projection) const;
+  glm::vec3 getFrusumCenterPoint(const glm::mat4& projection) const;
 private:
   void update(bool orthogonalizeAxes);
 

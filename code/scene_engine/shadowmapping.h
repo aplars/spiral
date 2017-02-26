@@ -4,7 +4,7 @@
 #include <vector>
 #include <math/Matrix44T.h>
 #include <glm/vec3.hpp>
-
+#include <glm/mat4x4.hpp>
 namespace sa {
 class FPSCamera;
 
@@ -22,9 +22,9 @@ public:
 
   bool isAABBVisibleFromSun(FPSCamera& sunCamera, const glm::vec3& mins, const glm::vec3& maxs) const;
 
-  const std::vector<Matrix44T<float> >& getShadowMapProjections() const;
+  const std::vector<glm::mat4>& getShadowMapProjections() const;
 
-  const std::vector<Matrix44T<float> >& getDepthBiasMVPMatrix() const;
+  const std::vector<glm::mat4>& getDepthBiasMVPMatrix() const;
 
   unsigned int getShadowMapWidth() const;
 
@@ -39,9 +39,9 @@ private:
   std::vector<float> m_shadowMapCascadeDistance;
   unsigned int m_shadowMapWidth = 0;
   unsigned int m_shadowMapheight = 0;
-  std::vector<Matrix44T<float>> m_cascadedProjections;
-  std::vector<Matrix44T<float>> m_shadowMapProjections;
-  std::vector<Matrix44T<float>> m_depthBiasMVPMatrix;
+  std::vector<glm::mat4> m_cascadedProjections;
+  std::vector<glm::mat4> m_shadowMapProjections;
+  std::vector<glm::mat4> m_depthBiasMVPMatrix;
 };
 }
 #endif // SHADOWMAPPING_H

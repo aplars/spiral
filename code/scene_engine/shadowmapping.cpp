@@ -6,6 +6,7 @@
 #include <limits>
 #include <QDebug>
 #include <math/mat4ext.h>
+#include <glm/gtc/matrix_transform.hpp>
 
 namespace sa {
 void ShadowMapping::create(const std::vector<float> &shadowMapCascadeDist, float aspect, unsigned int shadowMapWidth, unsigned int shadowMapHeight)
@@ -14,7 +15,7 @@ void ShadowMapping::create(const std::vector<float> &shadowMapCascadeDist, float
   m_shadowMapCascadeDistance = shadowMapCascadeDist;
   for(float dist : m_shadowMapCascadeDistance)
   {
-    m_cascadedProjections.push_back(sa::Matrix44T<float>::GetPerspectiveProjection(sa::DegToRad(60.0f), aspect, lastDist, dist));
+    m_cascadedProjections.push_back(glm::perspective(sa::DegToRad(60.0f), aspect, lastDist, dist));
     lastDist = dist;
   }
   m_shadowMapWidth = shadowMapWidth;
@@ -33,7 +34,7 @@ void ShadowMapping::updateShadowPass(const FPSCamera& camera, const FPSCamera& s
   for(unsigned int shadowPass = 0; shadowPass < getNumberOfPasses(); shadowPass++)
   {
 
-    std::array<glm::vec3, 8> frustumpoints = camera.getFrusumPoints(Mat4ext::toMat4(m_cascadedProjections[shadowPass]));
+    std::array<glm::vec3, 8> frustumpoints = camera.getFrusumPoints(m_cascadedProjections[shadowPass]);
     //Sphere<float> tb = Sphere<float>::createFromPoints<8>(frustumpoints);
 
 
@@ -49,7 +50,7 @@ void ShadowMapping::updateShadowPass(const FPSCamera& camera, const FPSCamera& s
       max = Vec3ext::MaxVec3(glm::vec3(vv.x, vv.y, vv.z), max);
     }
 
-    Matrix44T<float> ortho;
+    glm::mat4 ortho;
 
     if(m_stable) {
       std::array<glm::vec3, 2> minmax = std::array<glm::vec3, 2>({min, max});
@@ -73,23 +74,26 @@ void ShadowMapping::updateShadowPass(const FPSCamera& camera, const FPSCamera& s
       smax[1] = smin[1] + viewportExtent;
       smax[2] = smin[2] + viewportExtent;
 
-      ortho = Matrix44T<float>::GetOrthographicProjection(
-            smin.x, smax.x, smin.y, smax.y, -smax.z, -smin.z
-            );
+      ortho = glm::ortho(smin.x, smax.x, smin.y, smax.y, -smax.z, -smin.z);
+//      ortho = Matrix44T<float>::GetOrthographicProjection(
+//            smin.x, smax.x, smin.y, smax.y, -smax.z, -smin.z
+//            );
     }
     else {
-      ortho = Matrix44T<float>::GetOrthographicProjection(
-            min.x, max.x, min.y, max.y, -max.z, -min.z
-            );
+      ortho = glm::ortho(min.x, max.x, min.y, max.y, -max.z, -min.z);
+//      ortho = Matrix44T<float>::GetOrthographicProjection(
+//            min.x, max.x, min.y, max.y, -max.z, -min.z
+//            );
     }
-    static Matrix44T<float> biasMatrix(
-          0.5, 0.0, 0.0, 0.5,
-          0.0, 0.5, 0.0, 0.5,
-          0.0, 0.0, 0.5, 0.5,
-          0.0, 0.0, 0.0, 1.0);
+
+    static float biasMatrix[16] = {
+          0.5, 0.0, 0.0, 0.0,
+          0.0, 0.5, 0.0, 0.0,
+          0.0, 0.0, 0.5, 0.0,
+          0.5, 0.5, 0.5, 1.0 };
 
 
-    m_depthBiasMVPMatrix.push_back(biasMatrix * ortho * Mat4ext::fromMat4(sunCamera.viewMatrix()));
+    m_depthBiasMVPMatrix.push_back(glm::make_mat4(biasMatrix) * ortho * sunCamera.viewMatrix());
     m_shadowMapProjections.push_back(ortho);
 
   }
@@ -97,8 +101,8 @@ void ShadowMapping::updateShadowPass(const FPSCamera& camera, const FPSCamera& s
 
 bool ShadowMapping::isAABBVisibleFromSun(FPSCamera &sunCamera, const glm::vec3 &mins, const glm::vec3 &maxs) const
 {
-  for(const Matrix44T<float>& shadowMapProjection : m_shadowMapProjections) {
-     std::array<PlaneT<float>, 6> frustum = sunCamera.getFrustum(Mat4ext::toMat4(shadowMapProjection));
+  for(const glm::mat4& shadowMapProjection : m_shadowMapProjections) {
+     std::array<PlaneT<float>, 6> frustum = sunCamera.getFrustum(shadowMapProjection);
      sa::IntersectionTests::Side side = sa::IntersectionTests::FrustumAABBIntersect(frustum, mins, maxs);
      if(side == sa::IntersectionTests::Side::Inside || side == sa::IntersectionTests::Side::Intersect) {
        return true;
@@ -107,12 +111,12 @@ bool ShadowMapping::isAABBVisibleFromSun(FPSCamera &sunCamera, const glm::vec3 &
   return false;
 }
 
-const std::vector<Matrix44T<float> >& ShadowMapping::getShadowMapProjections() const
+const std::vector<glm::mat4> &ShadowMapping::getShadowMapProjections() const
 {
   return m_shadowMapProjections;
 }
 
-const std::vector<Matrix44T<float> >& ShadowMapping::getDepthBiasMVPMatrix() const
+const std::vector<glm::mat4>& ShadowMapping::getDepthBiasMVPMatrix() const
 {
   return m_depthBiasMVPMatrix;
 }
