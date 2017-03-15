@@ -6,6 +6,7 @@
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/export.hpp>
 #include <boost/serialization/string.hpp>
+#include <glm/mat4x4.hpp>
 #include "serialization.h"
 
 namespace sa {
@@ -18,8 +19,8 @@ public:
 
   virtual std::string getName() const { return "MeshNodeModel"; }
   void accept(Visitor* visitor) { visitor->visit(this); }
-  const sa::Matrix44T<float>& transformation() const;
-  void setTransformation(const sa::Matrix44T<float> &transformation);
+  const glm::mat4& transformation() const;
+  void setTransformation(const glm::mat4& transformation);
 
   unsigned int mesh() const;
 
@@ -32,6 +33,6 @@ private:
   }
 
   unsigned int m_mesh;
-  sa::Matrix44T<float> m_transformation;
+  glm::mat4 m_transformation;
 };
 }

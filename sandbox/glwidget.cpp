@@ -75,36 +75,36 @@ void GLWidget::initializeGL() {
 
 
 
-  sa::MeshRenderablePtr fortezza;
-  fortezza.reset(new sa::MeshRenderable(config.getParam("DATA_DIR") + "/meshes/", "Fortezza.xml"));
+//  sa::MeshRenderablePtr fortezza;
+//  fortezza.reset(new sa::MeshRenderable(config.getParam("DATA_DIR") + "/meshes/", "Fortezza.xml"));
 
-  sa::MeshRenderablePtr silenthill;
-  silenthill.reset(new sa::MeshRenderable(config.getParam("DATA_DIR") + "/meshes/", "silenthill.xml"));
+//  sa::MeshRenderablePtr silenthill;
+//  silenthill.reset(new sa::MeshRenderable(config.getParam("DATA_DIR") + "/meshes/", "silenthill.xml"));
 
   sa::MeshRenderablePtr bobMesh;
   bobMesh.reset(new sa::MeshRenderable(config.getParam("DATA_DIR") + "/meshes/", "bob.xml"));
 
-  sa::MeshRenderablePtr groundMesh;
-  groundMesh.reset(new sa::MeshRenderable(config.getParam("DATA_DIR") + "/meshes/", "groundplane100x100.xml"));
+//  sa::MeshRenderablePtr groundMesh;
+//  groundMesh.reset(new sa::MeshRenderable(config.getParam("DATA_DIR") + "/meshes/", "groundplane100x100.xml"));
 
-  sa::MeshRenderablePtr motioncaptureMesh;
-  motioncaptureMesh.reset(new sa::MeshRenderable(config.getParam("DATA_DIR") + "/meshes/", "motioncapture.xml"));
+//  sa::MeshRenderablePtr motioncaptureMesh;
+//  motioncaptureMesh.reset(new sa::MeshRenderable(config.getParam("DATA_DIR") + "/meshes/", "motioncapture.xml"));
 
-  sa::MeshRenderablePtr landscapeMesh;
-  landscapeMesh.reset(new sa::MeshRenderable(config.getParam("DATA_DIR") + "/meshes/", "landscape.xml"));
+//  sa::MeshRenderablePtr landscapeMesh;
+//  landscapeMesh.reset(new sa::MeshRenderable(config.getParam("DATA_DIR") + "/meshes/", "landscape.xml"));
 
 
 
-  scene->addMeshEntity("landscape", landscapeMesh, false);
+//  scene->addMeshEntity("landscape", landscapeMesh, false);
 
 
   scene->addMeshEntity("bob0", bobMesh, true);
   scene->getMeshEntity("bob0")->playSkeletalAnimation("");
 
 
-  scene->addMeshEntity("motioncaptureLeft", motioncaptureMesh, true);
-  scene->getMeshEntity("motioncaptureLeft")->playNodeAnimation("");
-  scene->getMeshEntity("motioncaptureLeft")->setPosition(-120,0,40);
+//  scene->addMeshEntity("motioncaptureLeft", motioncaptureMesh, true);
+//  scene->getMeshEntity("motioncaptureLeft")->playNodeAnimation("");
+//  scene->getMeshEntity("motioncaptureLeft")->setPosition(-120,0,40);
 
 
 

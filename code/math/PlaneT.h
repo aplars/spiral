@@ -19,14 +19,14 @@ namespace sa
 		};
     PlaneT() {}
 		PlaneT(const T& a, const T& b, const T& c, const T& d)
-			: m_normal(a, b, c)
+      : m_normal(glm::normalize(glm::vec3(a, b, c)))
 			, m_d(d) {} 
     PlaneT(const glm::vec3& n, const T& d)
-			: m_normal(n)
+      : m_normal(glm::normalize(n))
 			, m_d(d) {} 
     PlaneT(const glm::vec3& n, const glm::vec3& pnt)
-			: m_normal(n)
-      , m_d(-glm::dot(n, pnt)) {}
+      : m_normal(glm::normalize(n))
+      , m_d(-glm::dot(m_normal, pnt)) {}
 		//TODO: ad constructor with three points.
 
 

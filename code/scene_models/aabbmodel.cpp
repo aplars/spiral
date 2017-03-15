@@ -40,7 +40,7 @@ void AABBModel::transform(const Matrix44T<float>& xform) {
 }
 
 /*static*/ AABBModel AABBModel::createFromMinMax(const glm::vec3& min, const glm::vec3& max) {
-  glm::vec3 halfSize((max-min)/2.0f);
+  glm::vec3 halfSize((max - min)/2.0f);
   glm::vec3 center(min+halfSize);
   return AABBModel(center, halfSize);
 }

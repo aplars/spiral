@@ -335,7 +335,7 @@ void MeshRenderable::toGPU(const ConfigurationManager& /*config*/, unsigned int 
   {
     const std::set<MeshNodeModel*>& meshNodes = m_meshModel.getMeshNodes();
     for(MeshNodeModel* mesh : meshNodes) {
-      m_drawData[mesh->mesh()].Uniforms.Matrix4Uniforms["u_modelMatrix"] =  mesh->transformation();
+      m_drawData[mesh->mesh()].Uniforms.Matrix4Uniforms["u_modelMatrix"] =  Mat4ext::fromMat4(mesh->transformation());
       m_drawDataDeque.push_back(m_drawData[mesh->mesh()]);
     }
   }
@@ -451,7 +451,7 @@ void MeshRenderable::applyTransformations() {
     int i = 0;
 
     for(MeshNodeModel* mesh : meshNodes) {
-      m_drawData[mesh->mesh()].Uniforms.Matrix4Uniforms["u_modelMatrix"] =  mesh->transformation();
+      m_drawData[mesh->mesh()].Uniforms.Matrix4Uniforms["u_modelMatrix"] =  Mat4ext::fromMat4(mesh->transformation());
       m_drawDataDeque.push_back(m_drawData[mesh->mesh()]);
       i++;
     }

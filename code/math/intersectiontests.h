@@ -3,6 +3,7 @@
 #include "PlaneT.h"
 #include <glm/vec3.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <QDebug>
 
 namespace sa {
 class IntersectionTests {
@@ -31,11 +32,13 @@ public:
     Side    ret = Inside;
     glm::vec3 vmin, vmax;
 
+    vmin = mins;
+    vmax = maxs;
     for(int i = 0; i < 6; ++i) {
        // X axis
        if(planes[i].normal().x > 0) {
           vmin.x = (mins.x);
-          vmax.y = (maxs.x);
+          vmax.x = (maxs.x);
        } else {
           vmin.x = (maxs.x);
           vmax.x = (mins.x);
@@ -50,23 +53,17 @@ public:
        }
        // Z axis
        if(planes[i].normal().z > 0) {
-          vmin.z = (mins.z);
-          vmax.z = (maxs.z);
+         vmin.z = (mins.z);
+         vmax.z = (maxs.z);
        } else {
-          vmin.z = (maxs.z);
-          vmax.z = (mins.z);
+         vmin.z = (maxs.z);
+         vmax.z = (mins.z);
        }
 
-
-       typename PlaneT<T>::Side sideA = planes[i].GetSide(vmin);
-       typename PlaneT<T>::Side sideB = planes[i].GetSide(vmax);
-
-       if(sideA != sideB)
-         return Intersect;
-       if(sideA == PlaneT<T>::Side::Back_Side && sideB == PlaneT<T>::Side::Back_Side) {
-         return Outside;
-       }
-
+       if(glm::dot(planes[i].normal(), vmax) + planes[i].d() < 0)
+          return Outside;
+       if(glm::dot(planes[i].normal(), vmin) + planes[i].d() <= 0)
+          ret = Intersect;
     }
     return ret;
   }

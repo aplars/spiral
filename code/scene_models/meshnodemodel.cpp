@@ -10,12 +10,12 @@ MeshNodeModel::MeshNodeModel(unsigned int mesh)
 {
 }
 
-const sa::Matrix44T<float>& MeshNodeModel::transformation() const
+const glm::mat4& MeshNodeModel::transformation() const
 {
   return m_transformation;
 }
 
-void MeshNodeModel::setTransformation(const sa::Matrix44T<float> &transformation)
+void MeshNodeModel::setTransformation(const glm::mat4& transformation)
 {
   m_transformation = transformation;
 }

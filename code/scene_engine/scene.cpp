@@ -95,13 +95,13 @@ void Scene::setSunPosition(float phi, float theta) {
 void Scene::addMeshEntity(const std::string& name, MeshRenderablePtr mesh, bool castShadow) {
   StreamedMeshEntity* streamedEntity = new StreamedMeshEntity(mesh, castShadow);
   AABBModel aabbmodel = streamedEntity->getBoundingBox();
-//  addDebugBox(name+"db", aabbmodel.getCenter()[0], aabbmodel.getCenter()[1], aabbmodel.getCenter()[2],
-//      aabbmodel.getHalfSize()[0], aabbmodel.getHalfSize()[1], aabbmodel.getHalfSize()[2]);
+  addDebugBox(name+"db", aabbmodel.getCenter()[0], aabbmodel.getCenter()[1], aabbmodel.getCenter()[2],
+      aabbmodel.getHalfSize()[0], aabbmodel.getHalfSize()[1], aabbmodel.getHalfSize()[2]);
   m_meshes[name] = streamedEntity;
 
   streamedEntity->addPropertyChangedListener([&name, this](const StreamedMeshEntity::PropertyChangedEvent& evt) {
-//    DebugEntityBox* box = getDebugBoxEntety(name+"db");
-//    box->setPosition(evt.m_object->getBoundingBox().getCenter());
+    DebugEntityBox* box = getDebugBoxEntety(name+"db");
+    box->setPosition(evt.m_object->getBoundingBox().getCenter());
   });
 }
 
@@ -121,9 +121,9 @@ void Scene::toCPU() {
 
   for(Entities::value_type e : m_meshes) {
     AABBModel bbox = e.second->getBoundingBox();
-    IntersectionTests::Side side = IntersectionTests::FrustumAABBIntersect(frustum, bbox.getMin()-glm::vec3(2, 2, 2), bbox.getMax()+glm::vec3(2, 2, 2));
+    IntersectionTests::Side side = IntersectionTests::FrustumAABBIntersect(frustum, bbox.getMin(), bbox.getMax());
     bool isInFrustums = (side == IntersectionTests::Inside || side == IntersectionTests::Intersect);
-    isInFrustums = isInFrustums | m_shadowMapping.isAABBVisibleFromSun(m_sunCamera, bbox.getMin()-glm::vec3(2, 2, 2), bbox.getMax()+glm::vec3(2, 2, 2));
+    //isInFrustums = isInFrustums | m_shadowMapping.isAABBVisibleFromSun(m_sunCamera, bbox.getMin()-glm::vec3(2, 2, 2), bbox.getMax()+glm::vec3(2, 2, 2));
 
     if(isInFrustums) {
       if(e.second->currentDataStorage() == DataStorage::Disk)

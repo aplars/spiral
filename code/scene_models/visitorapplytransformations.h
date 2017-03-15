@@ -2,7 +2,7 @@
 #include "visitor.h"
 #include "transformationnodemodel.h"
 #include "meshnodemodel.h"
-
+#include <math/mat4ext.h>
 namespace sa {
 class VisitorApplyTransformations : public Visitor
 {
@@ -18,7 +18,7 @@ public:
   }
 
   void visit(MeshNodeModel* meshNode) {
-    meshNode->setTransformation(m_current);
+    meshNode->setTransformation(sa::Mat4ext::toMat4(m_current));
   }
 
 private:
