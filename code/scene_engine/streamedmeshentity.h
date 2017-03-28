@@ -87,8 +87,6 @@ private:
   std::string m_nodeAnimation = "NO_FUCKING_ANIMATION";
   std::string m_skeletonAnimation = "NO_FUCKING_ANIMATION";
 
-  std::deque<MeshTransform> m_transforms;
-
   DrawDataList m_drawData;
 
   glm::vec3 m_position;

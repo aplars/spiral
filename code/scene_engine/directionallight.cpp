@@ -6,8 +6,8 @@ DirectionalLight::~DirectionalLight()
 { }
 
 DirectionalLight::DirectionalLight(const glm::vec3& direction,
-                                   const Vector4T<float>& diffuse,
-                                   const Vector4T<float>& ambient)
+                                   const glm::vec4 &diffuse,
+                                   const glm::vec4 &ambient)
   : m_direction(glm::normalize(direction))
   , m_diffuse(diffuse)
   , m_ambient(ambient)
@@ -23,22 +23,22 @@ void DirectionalLight::setDirection(const glm::vec3 &direction)
   m_direction = direction;
 }
 
-const Vector4T<float>& DirectionalLight::diffuse() const
+const glm::vec4 &DirectionalLight::diffuse() const
 {
   return m_diffuse;
 }
 
-void DirectionalLight::setDiffuse(const Vector4T<float> &diffuse)
+void DirectionalLight::setDiffuse(const glm::vec4 &diffuse)
 {
   m_diffuse = diffuse;
 }
 
-const Vector4T<float>& DirectionalLight::ambient() const
+const glm::vec4 &DirectionalLight::ambient() const
 {
   return m_ambient;
 }
 
-void DirectionalLight::setAmbient(const Vector4T<float> &ambient)
+void DirectionalLight::setAmbient(const glm::vec4 &ambient)
 {
   m_ambient = ambient;
 }

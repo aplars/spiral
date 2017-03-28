@@ -4,12 +4,13 @@
 #include <scene_models/meshmodel.h>
 #include <renderer_engine/drawdata.h>
 #include <renderer_engine/image.h>
-#include <string>
 #include "adt/lru.h"
 #include "imagecache.h"
 #include "texturecache.h"
 #include "shadercache.h"
 #include "renderpass.h"
+#include <string>
+#include <glm/mat4x4.hpp>
 
 namespace sa {
 class RenderDevice;
@@ -17,20 +18,6 @@ class RenderContext;
 class VertexBuffer;
 class ConfigurationManager;
 typedef std::shared_ptr<VertexBuffer> VertexBufferPtr;
-
-class MeshTransform {
-public:
-  MeshTransform(unsigned int mesh, const std::string& uniform, const Matrix44T<float>& transform)
-    : Mesh(mesh)
-    , Uniform(uniform)
-    , Transform(transform)
-
-  { }
-
-  unsigned int Mesh = 0;
-  std::string Uniform = "";
-  Matrix44T<float> Transform;
-};
 
 class MeshRenderable {
 public:

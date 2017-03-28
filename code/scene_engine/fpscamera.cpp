@@ -1,5 +1,4 @@
 #include "fpscamera.h"
-//#include <math/Matrix44T.h>
 #include <math/intersectiontests.h>
 #include <limits>
 #include <algorithm>

@@ -98,8 +98,8 @@ private:
     return sam;
   }
 
-  static sa::Vector4T<float> getSaColorFromAi(const aiColor4D& aic) {
-    sa::Vector4T<float> sac;
+  static glm::vec4 getSaColorFromAi(const aiColor4D& aic) {
+    glm::vec4 sac;
     sac[0] = aic.r;
     sac[1] = aic.g;
     sac[2] = aic.b;

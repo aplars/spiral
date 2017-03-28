@@ -69,9 +69,9 @@ Sky::Sky(float radius, int slices, int sides, float dampening) {
 
 glm::vec3 Sky::getSunPosition() const {
   glm::vec3 SunPos(
-        sin(SunTheta) * sin(SunPhi) * m_radius,
+        sin(SunTheta) * cos(SunPhi) * m_radius,
         cos(SunTheta) * m_radius,
-        sin(SunTheta) * cos(SunPhi) * m_radius
+        sin(SunTheta) * sin(SunPhi) * m_radius
         );
   return SunPos;
 }
@@ -91,9 +91,9 @@ void Sky::update(float /*dt*/, const glm::vec3 &cameraPosition) {
   float solarTime = hour + 0.170 * sin( 4 * Pi<float>() * (JulianDay - 80) / 373 ) - 0.129 * sin( 2 * Pi<float>() * (JulianDay - 8) / 355) + 12 * (Latitude - Longitude) / Pi<float>();
   float declination = 0.4093 * sin( 2 * Pi<float>() * (JulianDay - 81) / 368 );
 
-  SunTheta = Pi<float>()/2.5;//Pi<float>() / 2 - asin(sin(Latitude) * sin(declination) - cos(Latitude) * cos(declination) * cos(Pi<float>() * solarTime / 12));
-  SunPhi   = Pi<float>();//atan( -cos(declination) * sin(Pi<float>() * solarTime / 12) / ((cos(Latitude) * cos(declination) - sin(Latitude) * sin(declination) * sin(Pi<float>() * solarTime / 12))));
-
+  SunTheta = Pi<float>() / 2 - asin(sin(Latitude) * sin(declination) - cos(Latitude) * cos(declination) * cos(Pi<float>() * solarTime / 12));
+  SunPhi   = atan( -cos(declination) * sin(Pi<float>() * solarTime / 12) / ((cos(Latitude) * cos(declination) - sin(Latitude) * sin(declination) * sin(Pi<float>() * solarTime / 12))));
+  if (SunPhi < 0) SunPhi = 2 * Pi<float>() + SunPhi;
   m_drawData.Uniforms.Vec3Uniforms["u_cameraPosition"] = cameraPosition;
 
   //m_drawData.Uniforms.Vec3Uniforms["u_sunPosition"] = getSunPosition();
@@ -180,7 +180,7 @@ void Sky::toGPU(const ConfigurationManager& config, RenderDevice* device, Render
   m_drawData.Uniforms.Matrix4Uniforms["u_skyProjectionMatrix"] = Matrix44T<float>::GetPerspectiveProjection(sa::DegToRad(60.0), aspect, 0.01f, m_radius*2.0f);
   m_drawData.Uniforms.Matrix4Uniforms["u_modelMatrix"] = Matrix44T<float>::GetIdentity();
   m_drawData.Uniforms.FloatUniforms["u_time"] = 0.5;
-  m_drawData.Uniforms.Vec4Uniforms["u_color"] = Vector4T<float>(1,0,0,0.5);
+  m_drawData.Uniforms.Vec4Uniforms["u_color"] = glm::vec4(1,0,0,0.5);
   m_drawData.Uniforms.Sampler2DUniforms["u_texture"] = 0;
   m_drawData.Uniforms.Sampler2DUniforms["u_fogColor"] = 1;
   context->resetCurrentState();

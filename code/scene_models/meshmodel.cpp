@@ -16,9 +16,9 @@ MeshModel MeshModel::createGroundPlane(int width, int depth) {
         MaterialModel::TextureMappingMode::Repeat,
         MaterialModel::TextureMappingMode::Repeat,
         MaterialModel::TextureMappingMode::Repeat,
-        Vector4T<float>(1,1,1,1),
-        Vector4T<float>(1,1,1,1),
-        Vector4T<float>(1,1,1,1),
+        glm::vec4(1.0f,1.0f,1.0f,1.0f),
+        glm::vec4(1.0f,1.0f,1.0f,1.0f),
+        glm::vec4(1.0f,1.0f,1.0f,1.0f),
       1,
       10);
 

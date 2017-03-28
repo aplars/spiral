@@ -24,7 +24,7 @@ public:
   void setUniformValue(const std::string& location, float value);
   void setUniformValue(const std::string& location, const glm::vec2 &value);
   void setUniformValue(const std::string& location, const glm::vec3 &value);
-  void setUniformValue(const std::string& location, const Vector4T<float> &value);
+  void setUniformValue(const std::string& location, const glm::vec4 &value);
   void setUniformValue(const std::string& location, const Matrix44T<float>& value);
   void setUniformValue(const std::string& location, const float value[4][4]);
   void setUniformValue(const std::string& location, unsigned int value);

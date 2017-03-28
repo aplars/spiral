@@ -318,7 +318,7 @@ void MeshRenderable::toGPU(const ConfigurationManager& /*config*/, unsigned int 
     subMeshDrawData.Uniforms.FloatUniforms["u_shininess"] = material->shininess();
     subMeshDrawData.Uniforms.FloatUniforms["u_shininessStrength"] = material->shininessStrength();
 
-    subMeshDrawData.Uniforms.Matrix4Uniforms["u_modelMatrix"] = sa::Matrix44T<float>::GetIdentity();
+    subMeshDrawData.Uniforms.Matrix4Uniforms["u_modelMatrix"] = Mat4ext::fromMat4(glm::mat4(1.0f));
     m_drawData[meshIndex] = subMeshDrawData;
     ++meshIndex;
   }

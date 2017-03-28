@@ -5,7 +5,7 @@
 #include <boost/uuid/uuid_io.hpp>
 #include <boost/uuid/uuid_serialize.hpp>
 #include <boost/serialization/string.hpp>
-#include <math/Vector4T.h>
+#include <glm/vec4.hpp>
 
 namespace sa {
 class MaterialModel
@@ -35,9 +35,9 @@ public:
       TextureMappingMode mappingModeAmbient,
       TextureMappingMode mappingModeDiffuse,
       TextureMappingMode mappingModeSpecular,
-      const Vector4T<float> ambient,
-      const Vector4T<float> diffuse,
-      const Vector4T<float> specular,
+      const glm::vec4& ambient,
+      const glm::vec4& diffuse,
+      const glm::vec4& specular,
       float shininess,
       float shininessStrength
       );
@@ -55,9 +55,9 @@ public:
   TextureMappingMode mappingModeDiffuse() const;
   TextureMappingMode mappingModeSpecular() const;
 
-  const Vector4T<float> ambient() const { return m_ambient; }
-  const Vector4T<float> diffuse() const { return m_diffuse; }
-  const Vector4T<float> specular() const { return m_specular; }
+  const glm::vec4 ambient() const { return m_ambient; }
+  const glm::vec4 diffuse() const { return m_diffuse; }
+  const glm::vec4 specular() const { return m_specular; }
   float shininess() const { return m_shininess; }
   float shininessStrength() const { return m_shininessStrength; }
 
@@ -94,9 +94,9 @@ private:
   TextureMappingMode m_mappingModeAmbient = TextureMappingMode::Repeat;
   TextureMappingMode m_mappingModeDiffuse = TextureMappingMode::Repeat;
   TextureMappingMode m_mappingModeSpecular = TextureMappingMode::Repeat;
-  Vector4T<float> m_ambient = {0.0f,0.0f,0.0f,1.0f};
-  Vector4T<float> m_diffuse = {0.0f,0.0f,0.0f,1.0f};
-  Vector4T<float> m_specular = {0.0f,0.0f,0.0f,1.0f};
+  glm::vec4 m_ambient;// = {0.0f,0.0f,0.0f,1.0f};
+  glm::vec4 m_diffuse;// = {0.0f,0.0f,0.0f,1.0f};
+  glm::vec4 m_specular;// = {0.0f,0.0f,0.0f,1.0f};
   float m_shininess = 0.0f;
   float m_shininessStrength = 0.0f;
 };

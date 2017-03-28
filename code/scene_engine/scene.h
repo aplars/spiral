@@ -86,7 +86,7 @@ private:
   FPSCamera m_camera;
   FPSCamera m_sunCamera;
   DirectionalLight m_sun;
-  sa::Vector4T<float> m_ambientColor = {0.5, 0.5, 0.5, 1.0};
+  glm::vec4 m_ambientColor = {0.5, 0.5, 0.5, 1.0};
   Entities m_meshes;
   std::deque<std::string> m_meshesToDelete;
   DebugBoxEntities m_debugBoxes;

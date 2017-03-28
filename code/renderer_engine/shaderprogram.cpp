@@ -108,7 +108,7 @@ void sa::ShaderProgram::setUniformValue(const std::string &location, const glm::
   m_glObject.setUniformValue(location.c_str(), value[0], value[1], value[2]);
 }
 
-void sa::ShaderProgram::setUniformValue(const std::__cxx11::string &location, const Vector4T<float> &value) {
+void sa::ShaderProgram::setUniformValue(const std::__cxx11::string &location, const glm::vec4 &value) {
   m_glObject.setUniformValue(location.c_str(), value[0], value[1], value[2], value[3]);
 }
 
