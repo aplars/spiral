@@ -108,7 +108,7 @@ void FPSCamera::rotate(const float& heading, const float& pitch, const float& ro
 }
 
 std::array<PlaneT<float>, 6> FPSCamera::getFrustum(const glm::mat4 &projection) const {
-  return Mat4ext::fromMat4(projection*viewMatrix()).GetFrustum();
+  return Mat4ext::GetFrustum(projection*viewMatrix());
 }
 
 std::array<glm::vec3, 8> FPSCamera::getFrusumPoints(const glm::mat4& projection) const {

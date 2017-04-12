@@ -1,7 +1,6 @@
 #pragma once
 
-#include "Matrix44T.h"
-
+#include <glm/mat4x4.hpp>
 #include <glm/geometric.hpp>
 
 namespace sa
@@ -153,7 +152,8 @@ namespace sa
       return QuaternionT<T>(m_v+q.m_v, m_s+q.m_s);
     }
 
-    Matrix44T<T> GetMatrix() const
+
+    glm::mat4 GetMat4() const
     {
       T x2 = m_v[0] * m_v[0];
       T y2 = m_v[1] * m_v[1];
@@ -171,10 +171,27 @@ namespace sa
       T zero = static_cast<T>(0.0);
       T one = static_cast<T>(1.0);
       T two = static_cast<T>(2.0);
-      return Matrix44T<T>( one - two * (y2 + z2), two * (xy - wz), two * (xz + wy), zero,
-          two * (xy + wz), one - two * (x2 + z2), two * (yz - wx), zero,
-          two * (xz - wy), two * (yz + wx), one - two * (x2 + y2), zero,
-          zero, zero, zero, one);
+
+      return glm::mat4(
+              one - two * (y2 + z2),
+              two * (xy + wz),
+              two * (xz - wy),
+              zero,
+
+              two * (xy - wz),
+              one - two * (x2 + z2),
+              two * (yz + wx),
+              zero,
+
+              two * (xz + wy),
+              two * (yz - wx),
+              one - two * (x2 + y2),
+              zero,
+
+              zero,
+              zero,
+              zero,
+              one);
     }
 
   /*	Vector4T<T> Mult(const math::Vector4T<T>& v) const

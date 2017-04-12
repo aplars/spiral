@@ -77,19 +77,18 @@ bool AnimationModel<ChannelKey>::getTransformation(const float time, const Chann
     i++;
   }
 
-  sa::Matrix44T<float> Qm;
-  //glm::mat4 Qm;
+  glm::mat4 Qm;
 
   if(i > 0)
   {
     //Interpolate between last and current key frame.
     float t = (time-channel.Quaternion[i-1].Time)/(channel.Quaternion[i].Time-channel.Quaternion[i-1].Time);
     sa::QuaternionT<float> Q = sa::QuaternionT<float>::SLerp(t, channel.Quaternion[i-1].Q, channel.Quaternion[i].Q);
-    Qm =(Q.GetMatrix());
+    Qm =(Q.GetMat4());
   }
   else
   {
-    Qm = (channel.Quaternion[i].Q.GetMatrix());
+    Qm = (channel.Quaternion[i].Q.GetMat4());
   }
 
 
@@ -98,7 +97,8 @@ bool AnimationModel<ChannelKey>::getTransformation(const float time, const Chann
   Qm[3][2] = translate[2];
 
 
-  outMatrix = Mat4ext::toMat4(Qm);
+  //outMatrix = Mat4ext::toMat4(Qm);
+  outMatrix = (Qm);
   return true;
 }
 
