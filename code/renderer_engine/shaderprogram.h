@@ -1,11 +1,10 @@
 #pragma once
 
-#include <math/Matrix44T.h>
 #include <QOpenGLShaderProgram>
 #include <memory>
 #include <set>
 #include <QOpenGLFunctions>
-
+#include <glm/mat4x4.hpp>
 namespace sa {
 class ShaderProgram : QOpenGLFunctions
 {
@@ -25,13 +24,13 @@ public:
   void setUniformValue(const std::string& location, const glm::vec2 &value);
   void setUniformValue(const std::string& location, const glm::vec3 &value);
   void setUniformValue(const std::string& location, const glm::vec4 &value);
-  void setUniformValue(const std::string& location, const Matrix44T<float>& value);
+  void setUniformValue(const std::string& location, const glm::mat4 &value);
   void setUniformValue(const std::string& location, const float value[4][4]);
   void setUniformValue(const std::string& location, unsigned int value);
 
   void setUniformValueArray(const std::string& location, const std::vector<float>& values);
   void setUniformValueArray(const std::string& location, const std::vector<unsigned int>& values);
-  void setUniformValueArray(const std::string& location, const std::vector<Matrix44T<float>>& values);
+  void setUniformValueArray(const std::string& location, const std::vector<glm::mat4>& values);
 private:
   void cacheUniforms();
   std::string m_vsName;

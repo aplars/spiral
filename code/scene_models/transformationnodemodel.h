@@ -1,7 +1,6 @@
 #pragma once
 #include "groupnodemodel.h"
 #include "visitor.h"
-#include <math/Matrix44T.h>
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
 #include<boost/uuid/uuid.hpp>
@@ -15,20 +14,22 @@
 #include "serialization.h"
 #pragma GCC diagnostic pop
 #include <deque>
+#include <glm/mat4x4.hpp>
+
 namespace sa {
 class TransformationNodeModel : public GroupNodeModel
 {
 public:
   ~TransformationNodeModel();
   TransformationNodeModel();
-  TransformationNodeModel(const std::string& name, const sa::Matrix44T<float>& transformation);
+  TransformationNodeModel(const std::string& name, const glm::mat4 &transformation);
 
   const boost::uuids::uuid& getKey() const { return m_key; }
 
   virtual std::string getName() const { return m_name; }
 
-  const sa::Matrix44T<float>& transformation() const {return m_transformation; }
-  void setTransformation(const Matrix44T<float>& t) {
+  const glm::mat4& transformation() const {return m_transformation; }
+  void setTransformation(const glm::mat4& t) {
     m_transformation = t;
   }
 
@@ -45,7 +46,7 @@ private:
   }
   boost::uuids::uuid m_key;
   std::string m_name;
-  sa::Matrix44T<float> m_transformation;
+  glm::mat4 m_transformation;
 
 };
 }

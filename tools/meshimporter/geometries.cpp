@@ -49,4 +49,5 @@ bool Geometries::groundPlaneToXML(bool toXML, unsigned int width, unsigned int h
       isOk = false;
     }
   }
+  return isOk;
 }

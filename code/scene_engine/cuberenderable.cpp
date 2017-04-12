@@ -84,14 +84,14 @@ void CubeRenderable::toGPU(const ConfigurationManager& config, RenderDevice *dev
   m_drawData.VAO = vao;
   m_drawData.IB = ib;
   glm::mat4 modelMatrix;
-  m_drawData.Uniforms.Matrix4Uniforms["u_modelMatrix"] = Mat4ext::fromMat4(glm::translate(modelMatrix, m_position));
+  m_drawData.Uniforms.Matrix4Uniforms["u_modelMatrix"] = glm::translate(modelMatrix, m_position);
   m_drawData.Uniforms.Vec4Uniforms["u_color"] = glm::vec4(1,0,0,0.5);
   context->resetCurrentState();
 }
 
 void CubeRenderable::update(float /*dt*/) {
   glm::mat4 modelMatrix;
-  m_drawData.Uniforms.Matrix4Uniforms["u_modelMatrix"] = Mat4ext::fromMat4(glm::translate(modelMatrix, m_position));
+  m_drawData.Uniforms.Matrix4Uniforms["u_modelMatrix"] = glm::translate(modelMatrix, m_position);
 }
 
 const DrawData& CubeRenderable::getDrawData() const

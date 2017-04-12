@@ -1,8 +1,8 @@
 #pragma once
-#include <math/Matrix44T.h>
 #include <set>
 #include <vector>
 #include <string>
+#include <glm/mat4x4.hpp>
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/set.hpp>
 
@@ -32,15 +32,15 @@ namespace sa
 			}
 		};
     JointModel() {}
-    JointModel(const std::string& name, const Matrix44T<float>& invBindPose, const Matrix44T<float>& localTransformation, const std::vector<VertexWeight>& weights, std::string parentIndex = "-1");
+    JointModel(const std::string& name, const glm::mat4& invBindPose, const glm::mat4& localTransformation, const std::vector<VertexWeight>& weights, std::string parentIndex = "-1");
 				
     std::string Name;
 
-    Matrix44T<float> InvBindPose;
+    glm::mat4 InvBindPose;
 
-    Matrix44T<float> LocalTransformation;
+    glm::mat4 LocalTransformation;
 
-    Matrix44T<float> Transformation;
+    glm::mat4 Transformation;
 
     typedef std::vector<VertexWeight> VertexWeights;
     VertexWeights Weights;

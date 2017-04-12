@@ -17,7 +17,7 @@ void VisitorApplyAnimation::visit(TransformationNodeModel* transformationNode) {
   float durationTime = m_animation->Duration;
   float currentTimeRepeated = fmod(m_currentTime, durationTime);
 
-  Matrix44T<float> transformation;
+  glm::mat4 transformation;
   if(m_animation->getTransformation(currentTimeRepeated, transformationNode->getKey(), transformation)) {
     transformationNode->setTransformation(transformation);
   }

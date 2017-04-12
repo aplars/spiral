@@ -35,7 +35,7 @@ public:
 
   void expand(const AABBModel& other);
   void expand(const glm::vec3& e);
-  void transform(const Matrix44T<float>& xform);
+  void transform(const glm::mat4 &xform);
   /**
    * @brief createFromMinMax
    * @param min

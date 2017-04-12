@@ -11,17 +11,17 @@ public:
   ~VisitorApplyTransformations();
 
   void visit(TransformationNodeModel* transformationNode) {
-    sa::Matrix44T<float> old = m_current;
+    glm::mat4 old = m_current;
     m_current *= transformationNode->transformation();
     traverse(transformationNode);
     m_current = old;
   }
 
   void visit(MeshNodeModel* meshNode) {
-    meshNode->setTransformation(sa::Mat4ext::toMat4(m_current));
+    meshNode->setTransformation(m_current);
   }
 
 private:
-  sa::Matrix44T<float> m_current;
+  glm::mat4 m_current;
 };
 }

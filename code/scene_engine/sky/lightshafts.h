@@ -1,6 +1,7 @@
 #ifndef LIGHTSHAFTS_H
 #define LIGHTSHAFTS_H
 #include <renderer_engine/drawdata.h>
+#include <glm/mat4x4.hpp>
 #include "../rectanglerenderable.h"
 
 namespace sa {
@@ -14,10 +15,10 @@ public:
 
   LightShafts(const ConfigurationManager &config);
   void toGPU(const ConfigurationManager& config, RenderDevice* device, RenderContext* context);
-  const Matrix44T<float>& getProjection() const;
+  const glm::mat4 &getProjection() const;
   DrawData getDrawData();
 private:
-  Matrix44T<float> m_projection;
+  glm::mat4 m_projection;
   RectangleRenderable m_rectangleRenderable;
 };
 }

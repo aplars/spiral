@@ -4,6 +4,7 @@
 #include <renderer_engine/rendercontext.h>
 #include <renderer_engine/image.h>
 #include <config/config.h>
+#include <glm/gtc/matrix_transform.hpp>
 
 namespace sa {
 namespace sky {
@@ -177,8 +178,9 @@ void Sky::toGPU(const ConfigurationManager& config, RenderDevice* device, Render
   if(context->height() > context->width())
     aspect = context->height()/static_cast<float>(context->width());
 
-  m_drawData.Uniforms.Matrix4Uniforms["u_skyProjectionMatrix"] = Matrix44T<float>::GetPerspectiveProjection(sa::DegToRad(60.0), aspect, 0.01f, m_radius*2.0f);
-  m_drawData.Uniforms.Matrix4Uniforms["u_modelMatrix"] = Matrix44T<float>::GetIdentity();
+
+  m_drawData.Uniforms.Matrix4Uniforms["u_skyProjectionMatrix"] = glm::perspective(sa::DegToRad(60.0f), aspect, 0.01f, m_radius*2.0f);
+  m_drawData.Uniforms.Matrix4Uniforms["u_modelMatrix"] = glm::mat4(1.0f);
   m_drawData.Uniforms.FloatUniforms["u_time"] = 0.5;
   m_drawData.Uniforms.Vec4Uniforms["u_color"] = glm::vec4(1,0,0,0.5);
   m_drawData.Uniforms.Sampler2DUniforms["u_texture"] = 0;

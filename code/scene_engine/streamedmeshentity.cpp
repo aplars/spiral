@@ -1,4 +1,6 @@
 #include "streamedmeshentity.h"
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/euler_angles.hpp>
 
 namespace sa {
 StreamedMeshEntity::~StreamedMeshEntity()
@@ -53,7 +55,8 @@ float StreamedMeshEntity::getHeading() const {
 
 AABBModel StreamedMeshEntity::getBoundingBox() const {
   AABBModel transformedBox = m_boundingBox;
-  transformedBox.transform(Matrix44T<float>::GetTranslate(m_position.x, m_position.y, m_position.z));
+  glm::mat4 translate;
+  transformedBox.transform(glm::translate(translate, m_position));
   return transformedBox;
 }
 
@@ -144,7 +147,9 @@ DrawDataList StreamedMeshEntity::getDrawData(RenderPass pass) {
 
     }
     else {
-      Matrix44T<float> movementTransformation = Matrix44T<float>::GetTranslate(m_position.x, m_position.y, m_position.z) * Matrix44T<float>::GetRotateY(m_heading);
+      glm::mat4 translate;
+
+      glm::mat4 movementTransformation = glm::translate(translate, m_position) * glm::eulerAngleY(m_heading);
       for(DrawData dd : m_drawData) {
         dd.Uniforms.Matrix4Uniforms["u_modelMatrix"] = movementTransformation * dd.Uniforms.Matrix4Uniforms["u_modelMatrix"];
         toDraw.push_back(dd);

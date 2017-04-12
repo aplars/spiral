@@ -9,7 +9,7 @@ TransformationNodeModel::~TransformationNodeModel()
 TransformationNodeModel::TransformationNodeModel()
 {}
 
-TransformationNodeModel::TransformationNodeModel(const std::string& name, const sa::Matrix44T<float>& transformation)
+TransformationNodeModel::TransformationNodeModel(const std::string& name, const glm::mat4& transformation)
   : m_key(boost::uuids::random_generator()())
   , m_name(name)
   , m_transformation(transformation)

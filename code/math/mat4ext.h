@@ -87,6 +87,11 @@ public:
     return frustPlanes;
   }
 
+  static glm::vec3 Vec3TransformH(const glm::mat4& mat, const glm::vec3& in) {
+    glm::vec4 v =  mat * glm::vec4(in[0], in[1], in[2], 1.0f);
+    return glm::vec3(v[0]/v[3], v[1]/v[3], v[2]/v[3]);
+  }
+
 };
 }
 #endif // MAT4EXT_H

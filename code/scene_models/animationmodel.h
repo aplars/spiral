@@ -11,6 +11,7 @@
 #include <string>
 #include <map>
 #include <glm/gtx/compatibility.hpp>
+#include "math/mat4ext.h"
 
 namespace sa {
 template <typename ChannelKey>
@@ -26,7 +27,7 @@ public:
   ~AnimationModel() {}
 
   ///Returns the transformation at time on joint.
-  bool getTransformation(const float time, const ChannelKey& joint, Matrix44T<float>& outMatrix) const;
+  bool getTransformation(const float time, const ChannelKey& joint, glm::mat4& outMatrix) const;
 
   std::string Name;
   float Duration;
@@ -42,7 +43,7 @@ private:
 };
 
 template <typename ChannelKey>
-bool AnimationModel<ChannelKey>::getTransformation(const float time, const ChannelKey& joint, Matrix44T<float>& outMatrix) const {
+bool AnimationModel<ChannelKey>::getTransformation(const float time, const ChannelKey& joint, glm::mat4& outMatrix) const {
   //Get the channel used for updating the joint.
   typename AnimationChannels::const_iterator it = Channels.find(joint);
   if(it == Channels.end())
@@ -77,13 +78,14 @@ bool AnimationModel<ChannelKey>::getTransformation(const float time, const Chann
   }
 
   sa::Matrix44T<float> Qm;
+  //glm::mat4 Qm;
 
   if(i > 0)
   {
     //Interpolate between last and current key frame.
     float t = (time-channel.Quaternion[i-1].Time)/(channel.Quaternion[i].Time-channel.Quaternion[i-1].Time);
     sa::QuaternionT<float> Q = sa::QuaternionT<float>::SLerp(t, channel.Quaternion[i-1].Q, channel.Quaternion[i].Q);
-    Qm = Q.GetMatrix();
+    Qm =(Q.GetMatrix());
   }
   else
   {
@@ -94,7 +96,9 @@ bool AnimationModel<ChannelKey>::getTransformation(const float time, const Chann
   Qm[3][0] = translate[0];
   Qm[3][1] = translate[1];
   Qm[3][2] = translate[2];
-  outMatrix = Qm;
+
+
+  outMatrix = Mat4ext::toMat4(Qm);
   return true;
 }
 

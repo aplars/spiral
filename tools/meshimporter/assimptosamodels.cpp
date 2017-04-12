@@ -421,7 +421,7 @@ std::deque<sa::Skeleton*> AssimpToSAModels::processSkeletonsForMeshNode(const ai
       {
         std::vector<sa::JointModel::VertexWeight> weights;
 
-        skeleton->Joints[b.first->mName.data] = (sa::JointModel(b.first->mName.data, sa::Matrix44T<float>(), getSaMatrixFromAi(b.first->mTransformation), weights));
+        skeleton->Joints[b.first->mName.data] = (sa::JointModel(b.first->mName.data, glm::mat4(1.0f), getSaMatrixFromAi(b.first->mTransformation), weights));
         NodeToSAJointIndex[b.first] = b.first->mName.data;
       }
     }
@@ -578,7 +578,7 @@ sa::AABBModel AssimpToSAModels::calculateBoundingBoxAtSGTransformStep(std::deque
   for(sa::MeshNodeModel* node : getVisitor.m_meshes) {
     sa::SubMeshModel* subMesh = saMeshes[node->mesh()];
     sa::AABBModel subMeshBBox = subMesh->getBoundingBox();
-    subMeshBBox.transform(sa::Mat4ext::fromMat4(node->transformation()));
+    subMeshBBox.transform(node->transformation());
     if(firstTime) {
       totalBBox = subMeshBBox;
       firstTime = false;
@@ -608,7 +608,7 @@ sa::AABBModel AssimpToSAModels::calculateBoundingBoxAtSGAnimationStep(std::deque
   for(sa::MeshNodeModel* node : getVisitor.m_meshes) {
     sa::SubMeshModel* subMesh = saMeshes[node->mesh()];
     sa::AABBModel subMeshBBox = subMesh->getBoundingBox();
-    subMeshBBox.transform(sa::Mat4ext::fromMat4(node->transformation()));
+    subMeshBBox.transform(node->transformation());
 
     if(firstTime) {
       totalBBox = subMeshBBox;
@@ -658,7 +658,7 @@ sa::AABBModel AssimpToSAModels::calculateBoundingBoxAtSKAnimationStep(std::deque
             jointAABB.expand(vertex.position());
           }
           if(firstpoint == false) {
-            jointAABB.transform(sa::Mat4ext::fromMat4(meshNode->transformation()) * joint.Transformation);
+            jointAABB.transform(meshNode->transformation() * joint.Transformation);
             if(firstTime) {
               totalAABB = jointAABB;
               firstTime = false;

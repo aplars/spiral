@@ -90,8 +90,8 @@ private:
     return ai;
   }
 
-  static sa::Matrix44T<float> getSaMatrixFromAi(const aiMatrix4x4& aim) {
-    sa::Matrix44T<float> sam;
+  static glm::mat4 getSaMatrixFromAi(const aiMatrix4x4& aim) {
+    glm::mat4 sam;
     for(int i = 0; i < 4; ++i)
       for(int j = 0; j < 4; ++j)
         sam[i][j] = aim[j][i];

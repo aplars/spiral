@@ -1,5 +1,6 @@
 #include "aabbmodel.h"
 #include <algorithm>
+#include <math/mat4ext.h>
 
 namespace sa {
 AABBModel::AABBModel(const glm::vec3& center, const glm::vec3& halfSize)
@@ -23,19 +24,19 @@ void AABBModel::expand(const glm::vec3 &e) {
   *this = createFromMinMax(_min, _max);
 }
 
-void AABBModel::transform(const Matrix44T<float>& xform) {
+void AABBModel::transform(const glm::mat4& xform) {
   glm::vec3 _min = getMin();
   glm::vec3 _max = getMax();
 
-  *this = createFromMinMax(xform.Vec3TransformH(_min), xform.Vec3TransformH(_max));
+  *this = createFromMinMax(Mat4ext::Vec3TransformH(xform, _min), Mat4ext::Vec3TransformH(xform, _max));
 
-  expand(          xform.Vec3TransformH(glm::vec3(_min[0], _min[1], _max[2])));
-  expand(          xform.Vec3TransformH(glm::vec3(_min[0], _max[1], _min[2])));
-  expand(          xform.Vec3TransformH(glm::vec3(_min[0], _max[1], _max[2])));
-  expand(          xform.Vec3TransformH(glm::vec3(_max[0], _min[1], _min[2])));
-  expand(          xform.Vec3TransformH(glm::vec3(_max[0], _min[1], _max[2])));
-  expand(          xform.Vec3TransformH(glm::vec3(_max[0], _max[1], _min[2])));
-  expand(          xform.Vec3TransformH(glm::vec3(_max[0], _max[1], _max[2])));
+  expand(          Mat4ext::Vec3TransformH(xform, glm::vec3(_min[0], _min[1], _max[2])));
+  expand(          Mat4ext::Vec3TransformH(xform, glm::vec3(_min[0], _max[1], _min[2])));
+  expand(          Mat4ext::Vec3TransformH(xform, glm::vec3(_min[0], _max[1], _max[2])));
+  expand(          Mat4ext::Vec3TransformH(xform, glm::vec3(_max[0], _min[1], _min[2])));
+  expand(          Mat4ext::Vec3TransformH(xform, glm::vec3(_max[0], _min[1], _max[2])));
+  expand(          Mat4ext::Vec3TransformH(xform, glm::vec3(_max[0], _max[1], _min[2])));
+  expand(          Mat4ext::Vec3TransformH(xform, glm::vec3(_max[0], _max[1], _max[2])));
 
 }
 

@@ -94,7 +94,7 @@ void Scene::setSunPosition(float phi, float theta) {
 
 void Scene::addMeshEntity(const std::string& name, MeshRenderablePtr mesh, bool castShadow) {
   StreamedMeshEntity* streamedEntity = new StreamedMeshEntity(mesh, castShadow);
-  AABBModel aabbmodel = streamedEntity->getBoundingBox();
+//  AABBModel aabbmodel = streamedEntity->getBoundingBox();
 //  addDebugBox(name+"db", aabbmodel.getCenter()[0], aabbmodel.getCenter()[1], aabbmodel.getCenter()[2],
 //      aabbmodel.getHalfSize()[0], aabbmodel.getHalfSize()[1], aabbmodel.getHalfSize()[2]);
   m_meshes[name] = streamedEntity;
@@ -268,8 +268,8 @@ void Scene::drawShadowPass(RenderContext* context) {
   }
 
 
-  m_sceneSpecificShaderUniforms.Matrix4Uniforms["u_sunViewMatrix"] = Mat4ext::fromMat4(m_sunCamera.viewMatrix());
-  m_sceneSpecificShaderUniforms.Matrix4Uniforms["u_sunViewMatrix"] = Mat4ext::fromMat4(m_sunCamera.viewMatrix());
+  m_sceneSpecificShaderUniforms.Matrix4Uniforms["u_sunViewMatrix"] = m_sunCamera.viewMatrix();
+  m_sceneSpecificShaderUniforms.Matrix4Uniforms["u_sunViewMatrix"] = m_sunCamera.viewMatrix();
   m_sceneSpecificShaderUniforms.Vec3Uniforms["u_directionalLight.direction"] = m_sun.direction();
   m_sceneSpecificShaderUniforms.Vec4Uniforms["u_directionalLight.diffuse"] = m_sun.diffuse();
   m_sceneSpecificShaderUniforms.Vec4Uniforms["u_directionalLight.ambient"] = m_sun.ambient();
@@ -282,7 +282,7 @@ void Scene::drawShadowPass(RenderContext* context) {
     context->setCullFace(RenderContext::CullFace::Front);
     context->clear();
 
-    m_sceneSpecificShaderUniforms.Matrix4Uniforms["u_shadowProjectionMatrix"] = Mat4ext::fromMat4(m_shadowMapping.getShadowMapProjections()[shadowPass]);
+    m_sceneSpecificShaderUniforms.Matrix4Uniforms["u_shadowProjectionMatrix"] = m_shadowMapping.getShadowMapProjections()[shadowPass];
 
     context->draw(allToDraw, m_sceneSpecificShaderUniforms);
     m_shadowBufferTarget[shadowPass]->release();
@@ -324,11 +324,10 @@ void Scene::drawUberPass(RenderContext* context)
     }
   }
 
-
   m_sceneSpecificShaderUniforms.Sampler2DArrayUniforms["u_shadowMap"] = shadowMap;
-  m_sceneSpecificShaderUniforms.Matrix4Uniforms["u_viewMatrix"] = Mat4ext::fromMat4(m_camera.viewMatrix());
-  m_sceneSpecificShaderUniforms.Matrix4Uniforms["u_projectionMatrix"] = Mat4ext::fromMat4(m_projection);
-  m_sceneSpecificShaderUniforms.Matrix4ArrayUniforms["u_depthBiasMVPMatrix"] = Mat4ext::fromMat4(m_shadowMapping.getDepthBiasMVPMatrix());
+  m_sceneSpecificShaderUniforms.Matrix4Uniforms["u_viewMatrix"] = m_camera.viewMatrix();
+  m_sceneSpecificShaderUniforms.Matrix4Uniforms["u_projectionMatrix"] = m_projection;
+  m_sceneSpecificShaderUniforms.Matrix4ArrayUniforms["u_depthBiasMVPMatrix"] = m_shadowMapping.getDepthBiasMVPMatrix();
   m_sceneSpecificShaderUniforms.Vec3Uniforms["u_directionalLight.direction"] = m_sun.direction();
   m_sceneSpecificShaderUniforms.Vec4Uniforms["u_directionalLight.diffuse"] = m_sun.diffuse();
   m_sceneSpecificShaderUniforms.Vec4Uniforms["u_ambientColor"] = m_ambientColor;
@@ -359,8 +358,8 @@ void Scene::createLightShaftsPass(RenderContext *context)
   allToDraw.push_back(skyDd);
 
 
-  m_sceneSpecificShaderUniforms.Matrix4Uniforms["u_viewMatrix"] = Mat4ext::fromMat4(m_camera.viewMatrix());
-  m_sceneSpecificShaderUniforms.Matrix4Uniforms["u_projectionMatrix"] = Mat4ext::fromMat4(m_projection);
+  m_sceneSpecificShaderUniforms.Matrix4Uniforms["u_viewMatrix"] = m_camera.viewMatrix();
+  m_sceneSpecificShaderUniforms.Matrix4Uniforms["u_projectionMatrix"] = m_projection;
   m_sceneSpecificShaderUniforms.Vec3Uniforms["u_sunPosition"] = m_sky.getSunPosition();
 
   context->draw(allToDraw, m_sceneSpecificShaderUniforms);

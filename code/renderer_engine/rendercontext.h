@@ -6,7 +6,7 @@
 #include "vertexdescription.h"
 #include <QOpenGLFunctions>
 #include <memory>
-
+#include <glm/vec2.hpp>
 namespace sa {
 
 class RenderContext : protected QOpenGLFunctions

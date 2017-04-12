@@ -2,7 +2,6 @@
 #define SHADOWMAPPING_H
 #include <deque>
 #include <vector>
-#include <math/Matrix44T.h>
 #include <glm/vec3.hpp>
 #include <glm/mat4x4.hpp>
 namespace sa {

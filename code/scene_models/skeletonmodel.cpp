@@ -32,7 +32,7 @@ namespace sa
 
     std::list<std::string> parentStack;
     std::list<std::string> traverser;
-    std::map<std::string, Matrix44T<float> > absoluteTransforms;
+    std::map<std::string, glm::mat4> absoluteTransforms;
     traverser.push_back(Root);
     //Traverse the joint hierarchy and store the absolute transforms.
     while(!traverser.empty())

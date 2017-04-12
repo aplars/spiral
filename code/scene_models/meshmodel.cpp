@@ -35,7 +35,7 @@ MeshModel MeshModel::createGroundPlane(int width, int depth) {
   subMesh->setMaterialKey(0);
   model.setMeshes({subMesh});
 
-  TransformationNodeModel* root = new TransformationNodeModel("root", Matrix44T<float>::GetIdentity());
+  TransformationNodeModel* root = new TransformationNodeModel("root", glm::mat4(1.0f));
   MeshNodeModel* meshNode = new MeshNodeModel(0);
   root->addChild(meshNode);
   model.setTransformationTree(root);

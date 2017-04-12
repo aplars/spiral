@@ -2,7 +2,7 @@
 
 namespace sa
 {
-  JointModel::JointModel(const std::string& name, const Matrix44T<float>& invBindPose, const Matrix44T<float>& localTransformation, const std::vector<VertexWeight>& weights, std::string parentIndex)
+  JointModel::JointModel(const std::string& name, const glm::mat4& invBindPose, const glm::mat4& localTransformation, const std::vector<VertexWeight>& weights, std::string parentIndex)
 		: Name(name)
 		, InvBindPose(invBindPose)
 		, LocalTransformation(localTransformation)

@@ -318,7 +318,7 @@ void MeshRenderable::toGPU(const ConfigurationManager& /*config*/, unsigned int 
     subMeshDrawData.Uniforms.FloatUniforms["u_shininess"] = material->shininess();
     subMeshDrawData.Uniforms.FloatUniforms["u_shininessStrength"] = material->shininessStrength();
 
-    subMeshDrawData.Uniforms.Matrix4Uniforms["u_modelMatrix"] = Mat4ext::fromMat4(glm::mat4(1.0f));
+    subMeshDrawData.Uniforms.Matrix4Uniforms["u_modelMatrix"] = glm::mat4(1.0f);
     m_drawData[meshIndex] = subMeshDrawData;
     ++meshIndex;
   }
@@ -335,7 +335,7 @@ void MeshRenderable::toGPU(const ConfigurationManager& /*config*/, unsigned int 
   {
     const std::set<MeshNodeModel*>& meshNodes = m_meshModel.getMeshNodes();
     for(MeshNodeModel* mesh : meshNodes) {
-      m_drawData[mesh->mesh()].Uniforms.Matrix4Uniforms["u_modelMatrix"] =  Mat4ext::fromMat4(mesh->transformation());
+      m_drawData[mesh->mesh()].Uniforms.Matrix4Uniforms["u_modelMatrix"] = mesh->transformation();
       m_drawDataDeque.push_back(m_drawData[mesh->mesh()]);
     }
   }
@@ -451,7 +451,7 @@ void MeshRenderable::applyTransformations() {
     int i = 0;
 
     for(MeshNodeModel* mesh : meshNodes) {
-      m_drawData[mesh->mesh()].Uniforms.Matrix4Uniforms["u_modelMatrix"] =  Mat4ext::fromMat4(mesh->transformation());
+      m_drawData[mesh->mesh()].Uniforms.Matrix4Uniforms["u_modelMatrix"] =  mesh->transformation();
       m_drawDataDeque.push_back(m_drawData[mesh->mesh()]);
       i++;
     }
@@ -461,7 +461,6 @@ void MeshRenderable::applyTransformations() {
 std::deque<std::string> MeshRenderable::getSkeletalAnimations() const {
   return m_meshModel.m_header.skeletalAnimations;
 }
-
 
 std::deque<std::string> MeshRenderable::getNodeAnimations() const {
   return m_meshModel.m_header.nodeAnimations;

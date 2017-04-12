@@ -3,19 +3,21 @@
 #include <renderer_engine/renderdevice.h>
 #include <renderer_engine/texture.h>
 #include <config/config.h>
+#include <glm/gtc/matrix_transform.hpp>
+
 namespace sa {
 
 LightShafts::LightShafts(const ConfigurationManager& config)
   : m_rectangleRenderable(0, 0, 0, 100, 100, (config.getParam("DATA_DIR") + "/shaders/lightshafts.vsh").c_str(), (config.getParam("DATA_DIR") + "/shaders/lightshafts.fsh").c_str())
 {
-  m_projection = sa::Matrix44T<float>::GetOrthographicProjection(-100, 100, -100, 100, 0.0, 0.01f);
+  m_projection = glm::ortho(-100.0f, 100.0f, -100.0f, 100.0f, 0.0f, 0.01f);
 }
 
 void LightShafts::toGPU(const ConfigurationManager& config, RenderDevice* device, RenderContext* context) {
   m_rectangleRenderable.toGPU(config, device, context);
 }
 
-const Matrix44T<float> &LightShafts::getProjection() const
+const glm::mat4 &LightShafts::getProjection() const
 {
   return m_projection;
 }
@@ -31,7 +33,7 @@ DrawData LightShafts::getDrawData() {
   */
   drawData.BlendingFunction = Blending::SRC_ALPHA_ONE;
   drawData.Uniforms.Matrix4Uniforms["u_projectionMatrix"] = m_projection;
-  drawData.Uniforms.Matrix4Uniforms["u_viewMatrix"] = Matrix44T<float>::GetIdentity();
+  drawData.Uniforms.Matrix4Uniforms["u_viewMatrix"] = glm::mat4(1.0f);
   drawData.Uniforms.FloatUniforms["u_exposure"] = 0.0034;
   drawData.Uniforms.FloatUniforms["u_decay"] = 1.0f;
   drawData.Uniforms.FloatUniforms["u_density"] = 0.84f;

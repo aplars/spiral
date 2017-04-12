@@ -38,14 +38,14 @@ void ShadowMapping::updateShadowPass(const FPSCamera& camera, const FPSCamera& s
     //Sphere<float> tb = Sphere<float>::createFromPoints<8>(frustumpoints);
 
 
-    Matrix44T<float> sunCameraViewMatrix = Mat4ext::fromMat4(sunCamera.viewMatrix());
+    glm::mat4 sunCameraViewMatrix = sunCamera.viewMatrix();
 
     glm::vec3 min(std::numeric_limits<float>::max(), std::numeric_limits<float>::max(), std::numeric_limits<float>::max());
     glm::vec3 max(-std::numeric_limits<float>::max(), -std::numeric_limits<float>::max(), -std::numeric_limits<float>::max());
 
 
     for(int i = 0; i < 8; ++i) {
-      glm::vec4 vv = sunCameraViewMatrix.Vec3Transform(frustumpoints[i]);
+      glm::vec3 vv = Mat4ext::Vec3TransformH(sunCameraViewMatrix, frustumpoints[i]);
       min = Vec3ext::MinVec3(glm::vec3(vv.x, vv.y, vv.z), min);
       max = Vec3ext::MaxVec3(glm::vec3(vv.x, vv.y, vv.z), max);
     }
@@ -75,15 +75,9 @@ void ShadowMapping::updateShadowPass(const FPSCamera& camera, const FPSCamera& s
       smax[2] = smin[2] + viewportExtent;
 
       ortho = glm::ortho(smin.x, smax.x, smin.y, smax.y, -smax.z, -smin.z);
-//      ortho = Matrix44T<float>::GetOrthographicProjection(
-//            smin.x, smax.x, smin.y, smax.y, -smax.z, -smin.z
-//            );
     }
     else {
       ortho = glm::ortho(min.x, max.x, min.y, max.y, -max.z, -min.z);
-//      ortho = Matrix44T<float>::GetOrthographicProjection(
-//            min.x, max.x, min.y, max.y, -max.z, -min.z
-//            );
     }
 
     static float biasMatrix[16] = {
