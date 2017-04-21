@@ -284,6 +284,9 @@ void MeshRenderable::toGPU(const ConfigurationManager& /*config*/, unsigned int 
     case MaterialModel::BlendMode::Additive:
       subMeshDrawData.BlendingFunction = Blending::Addative;
       break;
+    case MaterialModel::BlendMode::None:
+      subMeshDrawData.BlendingFunction = Blending::None;
+      break;
 
     }
     subMeshDrawData.PolygonDrawMode = PolygonMode::Fill;

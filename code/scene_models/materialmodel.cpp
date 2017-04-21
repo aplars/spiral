@@ -8,19 +8,20 @@ MaterialModel::MaterialModel()
 { }
 
 MaterialModel::MaterialModel(bool isTwoSided,
-    BlendMode blendMode,
-    const char* texDirAmbient,
-    const char* texDirDiffuse,
-    const char* texDirSpecular,
-    TextureMappingMode mappingModeAmbient,
-    TextureMappingMode mappingModeDiffuse,
-    TextureMappingMode mappingModeSpecular,
-    const glm::vec4 &ambient,
-    const glm::vec4 &diffuse,
-    const glm::vec4 &specular,
-    float shininess,
-    float shininessStrength)
+                             BlendMode blendMode,
+                             const char* texDirAmbient,
+                             const char* texDirDiffuse,
+                             const char* texDirSpecular,
+                             TextureMappingMode mappingModeAmbient,
+                             TextureMappingMode mappingModeDiffuse,
+                             TextureMappingMode mappingModeSpecular,
+                             const glm::vec4 &ambient,
+                             const glm::vec4 &diffuse,
+                             const glm::vec4 &specular,
+                             float shininess,
+                             float shininessStrength)
   : m_isTwoSided(isTwoSided)
+  , m_blendMode(blendMode)
   , m_texDirAmbient(texDirAmbient)
   , m_texDirDiffuse(texDirDiffuse)
   , m_texDirSpecular(texDirSpecular)

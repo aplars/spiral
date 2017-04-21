@@ -14,8 +14,8 @@ public:
   enum BlendMode {
     None,
     Default,
-    Additive,
-    Force32Bit
+    Additive//,
+    //Force32Bit
   };
 
   enum TextureMappingMode {

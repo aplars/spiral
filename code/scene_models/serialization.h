@@ -1,7 +1,7 @@
 #pragma once
-#include <math/QuaternionT.h>
 #include <boost/serialization/nvp.hpp>
 #include <glm/mat4x4.hpp>
+#include <glm/gtc/quaternion.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
 namespace boost {
@@ -33,11 +33,13 @@ void serialize(Archive & ar, glm::vec4 & vector, const unsigned int )
   ar & BOOST_SERIALIZATION_NVP(vector[3]);
 }
 
-template<class Archive, typename T>
-void serialize(Archive & ar, sa::QuaternionT<T> & q, const unsigned int )
+template<class Archive>
+void serialize(Archive & ar, glm::quat & quat, const unsigned int )
 {
-  ar & BOOST_SERIALIZATION_NVP(q.m_v);
-  ar & BOOST_SERIALIZATION_NVP(q.m_s);
+  ar & BOOST_SERIALIZATION_NVP(quat[0]);
+  ar & BOOST_SERIALIZATION_NVP(quat[1]);
+  ar & BOOST_SERIALIZATION_NVP(quat[2]);
+  ar & BOOST_SERIALIZATION_NVP(quat[3]);
 }
 } // namespace serialization
 } // namespace boost

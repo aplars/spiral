@@ -74,10 +74,12 @@ private:
       return sa::MaterialModel::BlendMode::Additive;
       break;
     case _aiBlendMode_Force32Bit:
-      return sa::MaterialModel::BlendMode::Force32Bit;
+      //return sa::MaterialModel::BlendMode::Force32Bit;
+      return sa::MaterialModel::BlendMode::None;
       break;
 
     }
+    return sa::MaterialModel::BlendMode::None;
   }
 
   static glm::vec3 getGlmVector3FromAi(const aiVector3D& v) {
@@ -85,8 +87,8 @@ private:
     return ai;
   }
 
-  static sa::QuaternionT<float> getSaQuatFromAi(const aiQuaternion& q) {
-    sa::QuaternionT<float> ai(q.x, q.y, q.z, q.w);
+  static glm::quat getGlmQuatFromAi(const aiQuaternion& q) {
+    glm::quat ai(q.w, q.x, q.y, q.z);
     return ai;
   }
 

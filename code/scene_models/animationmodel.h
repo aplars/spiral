@@ -11,6 +11,7 @@
 #include <string>
 #include <map>
 #include <glm/gtx/compatibility.hpp>
+#include <glm/gtc/quaternion.hpp>
 #include "math/mat4ext.h"
 
 namespace sa {
@@ -83,21 +84,18 @@ bool AnimationModel<ChannelKey>::getTransformation(const float time, const Chann
   {
     //Interpolate between last and current key frame.
     float t = (time-channel.Quaternion[i-1].Time)/(channel.Quaternion[i].Time-channel.Quaternion[i-1].Time);
-    sa::QuaternionT<float> Q = sa::QuaternionT<float>::SLerp(t, channel.Quaternion[i-1].Q, channel.Quaternion[i].Q);
-    Qm =(Q.GetMat4());
+    glm::quat Q = glm::slerp(channel.Quaternion[i-1].Q, channel.Quaternion[i].Q, t);
+    Qm = glm::mat4(Q);
   }
   else
   {
-    Qm = (channel.Quaternion[i].Q.GetMat4());
+    Qm = glm::mat4(channel.Quaternion[i].Q);
   }
 
 
   Qm[3][0] = translate[0];
   Qm[3][1] = translate[1];
   Qm[3][2] = translate[2];
-
-
-  //outMatrix = Mat4ext::toMat4(Qm);
   outMatrix = (Qm);
   return true;
 }

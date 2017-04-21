@@ -99,7 +99,7 @@ void Scene::addMeshEntity(const std::string& name, MeshRenderablePtr mesh, bool 
 //      aabbmodel.getHalfSize()[0], aabbmodel.getHalfSize()[1], aabbmodel.getHalfSize()[2]);
   m_meshes[name] = streamedEntity;
 
-  streamedEntity->addPropertyChangedListener([&name, this](const StreamedMeshEntity::PropertyChangedEvent& evt) {
+  streamedEntity->addPropertyChangedListener([&name, this](const StreamedMeshEntity::PropertyChangedEvent& /*evt*/) {
     //DebugEntityBox* box = getDebugBoxEntety(name+"db");
     //box->setPosition(evt.m_object->getBoundingBox().getCenter());
   });
@@ -168,7 +168,7 @@ void Scene::toGPUOnce(RenderDevice* device, RenderContext* context) {
     m_sky.toGPU(m_config, device, context);
     m_lightShafts.toGPU(m_config, device, context);
 
-    m_sunLightShaftsTarget = context->createRenderToTexture(m_screenWidth/2, m_screenheight/2);
+    m_sunLightShaftsTarget = context->createRenderToTexture(m_screenWidth, m_screenheight);
 
     //addDebugBox("thesun", m_sky.getSunPosition()[0], m_sky.getSunPosition()[1], m_sky.getSunPosition()[2], 100, 100, 100);
     //addDebugBox("thesun", 100, 0, 0, 10, 10, 10);

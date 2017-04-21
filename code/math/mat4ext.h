@@ -4,32 +4,13 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_access.hpp>
 #include <vector>
+#include <array>
 #include "PlaneT.h"
 
 namespace sa {
 class Mat4ext
 {
 public:
-//  static glm::mat4 toMat4(const Matrix44T<float>& m) {
-//    return glm::make_mat4(m.GetConstPtr());
-//  }
-
-//  static Matrix44T<float> fromMat4(const glm::mat4& m) {
-//    float arr[16];
-//    const float *ptr = glm::value_ptr(m);
-//    for(int i = 0; i < 16; i++) {
-//      arr[i] = ptr[i];
-//    }
-//    return Matrix44T<float>(arr);
-//  }
-
-//  static std::vector<Matrix44T<float>> fromMat4(const std::vector<glm::mat4>& vm) {
-//    std::vector<Matrix44T<float>> vm44;
-//    for(auto m : vm) {
-//      vm44.push_back(fromMat4(m));
-//    }
-//    return vm44;
-//  }
 
   enum ClipPlane {
     Left = 0, Right, Top, Bottom, Near, Far

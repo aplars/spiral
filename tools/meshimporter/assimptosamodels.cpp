@@ -343,7 +343,7 @@ std::deque<sa::AnimationModel<boost::uuids::uuid> * > AssimpToSAModels::processA
         saChannel.Translation.push_back(sa::AnimationChannelModel::TranslationKey(nodeAnim->mPositionKeys[positionIt].mTime/ticksPerSec, getGlmVector3FromAi(nodeAnim->mPositionKeys[positionIt].mValue)));
       }
       for(unsigned int rotationIt = 0; rotationIt < nodeAnim->mNumRotationKeys; ++rotationIt) {
-        saChannel.Quaternion.push_back(sa::AnimationChannelModel::QuaternionKey(nodeAnim->mRotationKeys[rotationIt].mTime/ticksPerSec, getSaQuatFromAi(nodeAnim->mRotationKeys[rotationIt].mValue)));
+        saChannel.Quaternion.push_back(sa::AnimationChannelModel::QuaternionKey(nodeAnim->mRotationKeys[rotationIt].mTime/ticksPerSec, getGlmQuatFromAi(nodeAnim->mRotationKeys[rotationIt].mValue)));
       }
       std::string nodeName = std::string(nodeAnim->mNodeName.C_Str());
       std::map<std::string, boost::uuids::uuid>::const_iterator findIt = nodeKeys.find(nodeName);
@@ -510,10 +510,11 @@ void AssimpToSAModels::processSkeletalAnimations(const aiScene* scene, sa::Skele
           }
           for(unsigned int k = 0; k < scene->mAnimations[i]->mChannels[j]->mNumRotationKeys; ++k)
           {
-            sa::QuaternionT<float> Q = sa::QuaternionT<float>(	scene->mAnimations[i]->mChannels[j]->mRotationKeys[k].mValue.x,
-                                  scene->mAnimations[i]->mChannels[j]->mRotationKeys[k].mValue.y,
-                                  scene->mAnimations[i]->mChannels[j]->mRotationKeys[k].mValue.z,
-                                  scene->mAnimations[i]->mChannels[j]->mRotationKeys[k].mValue.w);
+            glm::quat Q = glm::quat(
+                  scene->mAnimations[i]->mChannels[j]->mRotationKeys[k].mValue.w,
+                  scene->mAnimations[i]->mChannels[j]->mRotationKeys[k].mValue.x,
+                  scene->mAnimations[i]->mChannels[j]->mRotationKeys[k].mValue.y,
+                  scene->mAnimations[i]->mChannels[j]->mRotationKeys[k].mValue.z);
             double time = scene->mAnimations[i]->mChannels[j]->mRotationKeys[k].mTime;
             SAanimationsMap[i].Channels[saJoint.first].Quaternion.push_back(sa::AnimationChannelModel::QuaternionKey((time/scene->mAnimations[i]->mTicksPerSecond), Q));
           }

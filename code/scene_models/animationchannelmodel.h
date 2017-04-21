@@ -1,7 +1,7 @@
 #pragma once
 #include <deque>
 #include "serialization.h"
-#include <math/QuaternionT.h>
+#include <glm/gtc/quaternion.hpp>
 #include <glm/vec3.hpp>
 
 namespace sa {
@@ -33,12 +33,12 @@ public:
   {
   public:
     QuaternionKey() {}
-    QuaternionKey(float time, const QuaternionT<float>& q)
+    QuaternionKey(float time, const glm::quat& q)
       : Time(time)
       , Q(q) {}
 
     float Time;
-    QuaternionT<float> Q;
+    glm::quat Q;
 
   private:
     friend class boost::serialization::access;
