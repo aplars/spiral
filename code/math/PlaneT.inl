@@ -1,8 +1,8 @@
 
 template <typename T>
-typename PlaneT<T>::Side PlaneT<T>::GetSide(glm::vec3& point, const double& tolerance) const
+typename PlaneT<T>::Side PlaneT<T>::side(glm::vec3& point, const double& tolerance) const
 {
-	T dist = GetDistance(point);
+  T dist = distance(point);
 	if(IsZero(dist, tolerance))
 	{
 		return No_Side;	

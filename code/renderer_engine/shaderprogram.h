@@ -32,6 +32,8 @@ public:
   void setUniformValueArray(const std::string& location, const std::vector<unsigned int>& values);
   void setUniformValueArray(const std::string& location, const std::vector<glm::mat4>& values);
 private:
+  ShaderProgram(const ShaderProgram&);
+  const ShaderProgram& operator=(const ShaderProgram&);
   void cacheUniforms();
   std::string m_vsName;
   std::string m_fsName;

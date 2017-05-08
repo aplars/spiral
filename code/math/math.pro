@@ -20,9 +20,9 @@ HEADERS += PlaneT.h \
     RectangleT.h \
     ScalarT.h \
     intersectiontests.h \
-    sphere.h \
     vec3ext.h \
-    mat4ext.h
+    mat4ext.h \
+    sphereT.h
 
 unix {
     target.path = /usr/lib

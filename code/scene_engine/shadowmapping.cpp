@@ -1,6 +1,6 @@
 #include "shadowmapping.h"
 #include "fpscamera.h"
-#include <math/sphere.h>
+#include <math/sphereT.h>
 #include <math/intersectiontests.h>
 #include <math/vec3ext.h>
 #include <limits>
@@ -95,9 +95,21 @@ void ShadowMapping::updateShadowPass(const FPSCamera& camera, const FPSCamera& s
 
 bool ShadowMapping::isAABBVisibleFromSun(FPSCamera &sunCamera, const glm::vec3 &mins, const glm::vec3 &maxs) const
 {
+  std::array<PlaneT<float>, 6> frustum;
+
   for(const glm::mat4& shadowMapProjection : m_shadowMapProjections) {
-     std::array<PlaneT<float>, 6> frustum = sunCamera.getFrustum(shadowMapProjection);
-     sa::IntersectionTests::Side side = sa::IntersectionTests::FrustumAABBIntersect(frustum, mins, maxs);
+     frustum = sunCamera.getFrustum(shadowMapProjection);
+     std::deque<PlaneT<float>> frustumdeque;
+
+     //We do not use the front plane here. Thats because it may be in fron of
+     //objects that contributes to the scene.
+     frustumdeque.push_back(frustum.at(sa::Mat4ext::ClipPlane::Left));
+     frustumdeque.push_back(frustum.at(sa::Mat4ext::ClipPlane::Right));
+     frustumdeque.push_back(frustum.at(sa::Mat4ext::ClipPlane::Bottom));
+     frustumdeque.push_back(frustum.at(sa::Mat4ext::ClipPlane::Top));
+     frustumdeque.push_back(frustum.at(sa::Mat4ext::ClipPlane::Far));
+
+     sa::IntersectionTests::Side side = sa::IntersectionTests::FrustumAABBIntersect(frustumdeque, mins, maxs);
      if(side == sa::IntersectionTests::Side::Inside || side == sa::IntersectionTests::Side::Intersect) {
        return true;
      }

@@ -149,13 +149,13 @@ glm::vec3 FPSCamera::getFrusumCenterPoint(const glm::mat4 &projection) const {
   glm::vec3 fmax(-std::numeric_limits<float>::max(), -std::numeric_limits<float>::max(), -std::numeric_limits<float>::max());
 
   for(const glm::vec3& pnt : points) {
-    fmin[0] = Min(pnt[0], fmin[0]);
-    fmin[1] = Min(pnt[1], fmin[1]);
-    fmin[2] = Min(pnt[2], fmin[2]);
+    fmin[0] = sa::min(pnt[0], fmin[0]);
+    fmin[1] = sa::min(pnt[1], fmin[1]);
+    fmin[2] = sa::min(pnt[2], fmin[2]);
 
-    fmax[0] = Max(pnt[0], fmax[0]);
-    fmax[1] = Max(pnt[1], fmax[1]);
-    fmax[2] = Max(pnt[2], fmax[2]);
+    fmax[0] = sa::max(pnt[0], fmax[0]);
+    fmax[1] = sa::max(pnt[1], fmax[1]);
+    fmax[2] = sa::max(pnt[2], fmax[2]);
   }
   glm::vec3 halfDelta = (fmax-fmin)/2.0f;
   glm::vec3 center(fmin + halfDelta);

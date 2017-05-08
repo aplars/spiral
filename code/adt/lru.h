@@ -33,7 +33,6 @@ public:
     return m_history.size();
   }
 
-
   void insert(const K& key, const V& value)
   {
     typename key_value_map_type::iterator it = m_key_value_map.find(key);

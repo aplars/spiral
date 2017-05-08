@@ -9,7 +9,7 @@ public:
   static glm::vec3 MinVec3(const glm::vec3& a, const glm::vec3& b) {
     glm::vec3 c;
     for(unsigned int i = 0; i < 3; ++i) {
-      c[i] = Min(a[i], b[i]);
+      c[i] = sa::min(a[i], b[i]);
     }
     return c;
   }
@@ -17,7 +17,7 @@ public:
   static glm::vec3 MaxVec3(const glm::vec3& a, const glm::vec3& b) {
     glm::vec3 c;
     for(unsigned int i = 0; i < 3; ++i) {
-      c[i] = Max(a[i], b[i]);
+      c[i] = sa::max(a[i], b[i]);
     }
     return c;
   }

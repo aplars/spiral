@@ -6,32 +6,32 @@
 namespace sa
 {
 	template <typename T>
-	T Abs(const T& value)
+  T abs(const T& value)
 	{
 		return static_cast<T>(fabs(value));	
 	}
 
 	template <typename T>
-	bool IsZero(const T& value, double tolerance = 0.0)
+  bool isZero(const T& value, double tolerance = 0.0)
 	{
-		return static_cast<T>(Abs(value)) <= tolerance;		
+    return static_cast<T>(abs(value)) <= tolerance;
 	}
 
 	template <typename T>
-	bool Equals(const T& a, const T& b, double tolerance = 0.0)
+  bool equals(const T& a, const T& b, double tolerance = 0.0)
 	{
-		return IsZero(Abs(a - b), tolerance);		
+    return isZero(abs(a - b), tolerance);
 	}
 
 	template <typename T>
-	T Min(const T& a, const T& b)
+  T min(const T& a, const T& b)
 	{
 		if(a < b) return a;
 		return b;
 	}
 
 	template <typename T>
-	T Max(const T& a, const T& b)
+  T max(const T& a, const T& b)
 	{
 		if(a > b) return a;
 		return b;
@@ -80,35 +80,36 @@ namespace sa
 		return a * (1.0-rnd) + b * rnd;
 	}
 	
-	template <typename T>
-	T Pi();
+//	template <typename T>
+//	T Pi();
 
-	namespace _internal
-	{
-		template <typename T>
-		class PreInitPiT
-		{
-			public:
-			PreInitPiT()
-			{
-				Pi<T>();
-			}
+//	namespace _internal
+//	{
+//		template <typename T>
+//		class PreInitPiT
+//		{
+//			public:
+//			PreInitPiT()
+//			{
+//				Pi<T>();
+//			}
 
 		
-			void DummyCall() {}
+//			void DummyCall() {}
 
-			static PreInitPiT sPreInitPi;
-		};
+//			static PreInitPiT sPreInitPi;
+//		};
 
-		template <typename T> PreInitPiT<T> PreInitPiT<T>::sPreInitPi;
-	}
+//		template <typename T> PreInitPiT<T> PreInitPiT<T>::sPreInitPi;
+//	}
 
 	template <typename T>
-	T Pi()
+  constexpr T Pi()
 	{
-		_internal::PreInitPiT<T>::sPreInitPi.DummyCall();
-		static const T pi = static_cast<T>(acos( T() ) * 2.0);
-		return pi;
+    //_internal::PreInitPiT<T>::sPreInitPi.DummyCall();
+    //static const T pi = static_cast<T>(acos( T() ) * 2.0);
+    //return pi;
+    return acos( T() ) * 2.0;
 	}
 	
 	template <typename T>

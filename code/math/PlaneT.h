@@ -27,17 +27,12 @@ namespace sa
     PlaneT(const glm::vec3& n, const glm::vec3& pnt)
       : m_normal(glm::normalize(n))
       , m_d(-glm::dot(m_normal, pnt)) {}
-		//TODO: ad constructor with three points.
 
-
-
-    const glm::vec3& GetNormal() const { return m_normal; }
     const glm::vec3& normal() const { return m_normal; }
-    const T& GetD() const { return m_d; }
     const T& d() const { return m_d; }
 
-    T GetDistance(glm::vec3& point) const { return glm::dot(m_normal, point) + m_d; }
-    Side GetSide(glm::vec3& point, const double& tolerance = 0.0) const;
+    T distance(glm::vec3& point) const { return glm::dot(m_normal, point) + m_d; }
+    Side side(glm::vec3& point, const double& tolerance = 0.0) const;
 
 		T& operator[](unsigned int i);
 		const T& operator[](unsigned int i) const;

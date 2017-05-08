@@ -17,6 +17,9 @@ public:
   T* mapT() { return static_cast<T*>(map()); }
   void unmap();
 private:
+  VertexBuffer(const VertexBuffer&);
+  const VertexBuffer& operator=(const VertexBuffer&);
+
   int m_sizeInBytes;
   QOpenGLBuffer m_glBuffer;
 };

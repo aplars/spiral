@@ -60,6 +60,9 @@ public:
   void release();
   GLuint glTexId() const { return m_glObject.textureId(); }
 private:
+  Texture(const Texture&);
+  const Texture& operator=(const Texture&);
+
   static QOpenGLTexture::MipMapGeneration convertMipMapGeneration(bool generateMipMap) {
     if(generateMipMap) return QOpenGLTexture::MipMapGeneration::GenerateMipMaps;
     return QOpenGLTexture::MipMapGeneration::DontGenerateMipMaps;

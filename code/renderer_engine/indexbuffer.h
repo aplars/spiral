@@ -14,6 +14,8 @@ public:
   unsigned int numberOfIndices() const;
 
 private:
+  IndexBuffer(const IndexBuffer&);
+  const IndexBuffer& operator=(const IndexBuffer&);
   int m_numberOfIndices;
   int m_sizeInBytes;
   QOpenGLBuffer m_glBuffer;

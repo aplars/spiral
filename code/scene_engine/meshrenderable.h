@@ -36,7 +36,7 @@ public:
   /**
    * @brief toCPU loads the resource from HD to model (main memory).
    */
-  void toCPU(ImageCache& imageCache, const std::string& texturePath, const std::__cxx11::string &shaderPath);
+  void toCPU(ImageCache& imageCache, const std::string& texturePath, const std::string &shaderPath);
 
   /**
    * @brief toGPU loads the model into the graphics memory. The model is not released when put on the graphics card.

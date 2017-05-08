@@ -16,7 +16,7 @@ namespace sa
 			: m_planes(planes) {}
 
 
-		FrustumT GetExtruded(const T& e) const 
+    FrustumT getExtruded(const T& e) const
 		{
 			std::deque<PlaneT<T> > extPlanes;
 			typename std::deque<PlaneT<T> >::const_iterator it = m_planes.begin();

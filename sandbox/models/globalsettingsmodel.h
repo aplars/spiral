@@ -25,7 +25,7 @@ public:
   bool useStableShadowMapping() const;
   void setUseStableShadowMapping(bool useStableShadowMapping);
 
-  Subject<const std::string&> PropertyChanged;
+  sa::Subject<const std::string&> PropertyChanged;
 private:
   int m_timeOfDay = 16;
   int m_julianDay = 180;

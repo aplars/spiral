@@ -123,7 +123,7 @@ void Scene::toCPU() {
     AABBModel bbox = e.second->getBoundingBox();
     IntersectionTests::Side side = IntersectionTests::FrustumAABBIntersect(frustum, bbox.getMin(), bbox.getMax());
     bool isInFrustums = (side == IntersectionTests::Inside || side == IntersectionTests::Intersect);
-    //isInFrustums = isInFrustums | m_shadowMapping.isAABBVisibleFromSun(m_sunCamera, bbox.getMin()-glm::vec3(2, 2, 2), bbox.getMax()+glm::vec3(2, 2, 2));
+    isInFrustums = isInFrustums | m_shadowMapping.isAABBVisibleFromSun(m_sunCamera, bbox.getMin(), bbox.getMax());
 
     if(isInFrustums) {
       if(e.second->currentDataStorage() == DataStorage::Disk)
@@ -269,7 +269,6 @@ void Scene::drawShadowPass(RenderContext* context) {
 
 
   m_sceneSpecificShaderUniforms.Matrix4Uniforms["u_sunViewMatrix"] = m_sunCamera.viewMatrix();
-  m_sceneSpecificShaderUniforms.Matrix4Uniforms["u_sunViewMatrix"] = m_sunCamera.viewMatrix();
   m_sceneSpecificShaderUniforms.Vec3Uniforms["u_directionalLight.direction"] = m_sun.direction();
   m_sceneSpecificShaderUniforms.Vec4Uniforms["u_directionalLight.diffuse"] = m_sun.diffuse();
   m_sceneSpecificShaderUniforms.Vec4Uniforms["u_directionalLight.ambient"] = m_sun.ambient();
@@ -370,7 +369,7 @@ void Scene::createLightShaftsPass(RenderContext *context)
 void Scene::drawLightShaftsPass(RenderContext *context)
 {
   glm::vec3 sunPositionInScreenCoords = glm::project(
-        m_sky.getSunPosition() + m_camera.eye(),
+        m_sky.getSunPosition() + glm::vec3(m_camera.eye().x, 0.0f, m_camera.eye().z),
         m_camera.viewMatrix(),
         m_projection,
         glm::vec4(0, 0, m_sunLightShaftsTarget->getWidth(), m_sunLightShaftsTarget->getHeight()));

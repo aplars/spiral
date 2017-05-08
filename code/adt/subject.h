@@ -1,5 +1,4 @@
-#ifndef SUBJECT_H
-#define SUBJECT_H
+#pragma once
 #include <map>
 #include <functional>
 #include <iostream>
@@ -7,6 +6,7 @@
 #include <shared_mutex>
 #include <thread>
 
+namespace sa {
 typedef int observer_id;
 
 template <class... Args>
@@ -15,7 +15,6 @@ public:
   typedef std::function<void(Args...)> function;
   typedef std::map<observer_id, function> function_map;
   observer_id m_currentId = 0;
-
 
   observer_id registerObserver(const function& function) {
     std::lock_guard<std::mutex> guard(m_mutex);
@@ -45,5 +44,4 @@ private:
   mutable std::mutex m_mutex;
   function_map m_functions;
 };
-
-#endif // SUBJECT_H
+}

@@ -15,10 +15,11 @@ RectangleRenderable::~RectangleRenderable()
 }
 
 RectangleRenderable::RectangleRenderable(float posx, float posy, float posz, float hw, float hh, std::string vertexShader, std::string fragmentShader)
-  : m_position(posx, posy, posz)
-  , m_size(hw, hh)
-  , m_vertexShader(vertexShader)
+  : m_vertexShader(vertexShader)
   , m_fragmentShader(fragmentShader)
+  , m_position(posx, posy, posz)
+  , m_size(hw, hh)
+
 {
 
 }
@@ -82,7 +83,7 @@ void RectangleRenderable::toGPU(const ConfigurationManager& config, RenderDevice
   context->resetCurrentState();
 }
 
-void RectangleRenderable::update(float dt) {
+void RectangleRenderable::update(float /*dt*/) {
   glm::mat4 modelMatrix;
   m_drawData.Uniforms.Matrix4Uniforms["u_modelMatrix"] = glm::translate(modelMatrix, m_position);
 }

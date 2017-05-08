@@ -94,17 +94,17 @@ void MeshRenderable::toCPU(ImageCache& imageCache, const std::string& texturePat
   m_fshSunLightShaftsCode = RenderDevice::readFromFile((shaderPath + "blackshader.fsh").c_str());
   m_spSunLightShaftsKey = m_vshSunLightShaftsCode + m_fshSunLightShaftsCode;
 
-  Image img((texturePath +  "EarthClearSky2.png").c_str());
-  unsigned char *data = new unsigned char [4 * img.getWidth()];
-  for(unsigned int x = 0; x < img.getWidth(); ++x) {
-    Image::Color c = img.getAveragedSlice(x);
-    unsigned index = 4 * x;
+//  Image img((texturePath +  "EarthClearSky2.png").c_str());
+//  unsigned char *data = new unsigned char [4 * img.getWidth()];
+//  for(unsigned int x = 0; x < img.getWidth(); ++x) {
+//    Image::Color c = img.getAveragedSlice(x);
+//    unsigned index = 4 * x;
 
-    data[index+0] = c.b*255;
-    data[index+1] = c.g*255;
-    data[index+2] = c.r*255;
-    data[index+3] = c.a*255;
-  }
+//    data[index+0] = c.b*255;
+//    data[index+1] = c.g*255;
+//    data[index+2] = c.r*255;
+//    data[index+3] = c.a*255;
+//  }
   //m_atmosphereFogImg = Image(data, img.getWidth(), 1);
   m_atmosphereFogImg = Image((texturePath +  "EarthClearSky2.png").c_str());
   m_atmosphereFogImg.save("atmosphereFogImg.png");
