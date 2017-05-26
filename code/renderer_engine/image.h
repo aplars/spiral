@@ -32,6 +32,8 @@ public:
 
   const QImage& getQObject() const { return m_qObject; }
   bool isNull() const { return m_isNull; }
+
+  bool containTransparentPixels() const;
 private:
   QImage m_qObject;
   bool m_isNull = true;

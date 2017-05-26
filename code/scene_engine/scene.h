@@ -107,9 +107,8 @@ private:
   ShaderCache m_shaderCache;
 
   ShaderUniforms m_sceneSpecificShaderUniforms;
-
-  std::map<std::string, MeshRenderablePtr> m_meshCache;
-
 };
+
+typedef std::shared_ptr<Scene> ScenePtr;
 }
 #endif // SCENE_H

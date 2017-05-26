@@ -94,20 +94,7 @@ void MeshRenderable::toCPU(ImageCache& imageCache, const std::string& texturePat
   m_fshSunLightShaftsCode = RenderDevice::readFromFile((shaderPath + "blackshader.fsh").c_str());
   m_spSunLightShaftsKey = m_vshSunLightShaftsCode + m_fshSunLightShaftsCode;
 
-//  Image img((texturePath +  "EarthClearSky2.png").c_str());
-//  unsigned char *data = new unsigned char [4 * img.getWidth()];
-//  for(unsigned int x = 0; x < img.getWidth(); ++x) {
-//    Image::Color c = img.getAveragedSlice(x);
-//    unsigned index = 4 * x;
-
-//    data[index+0] = c.b*255;
-//    data[index+1] = c.g*255;
-//    data[index+2] = c.r*255;
-//    data[index+3] = c.a*255;
-//  }
-  //m_atmosphereFogImg = Image(data, img.getWidth(), 1);
   m_atmosphereFogImg = Image((texturePath +  "EarthClearSky2.png").c_str());
-  m_atmosphereFogImg.save("atmosphereFogImg.png");
 
   m_currentDataStorage = DataStorage::CPU;
 }
@@ -256,6 +243,9 @@ void MeshRenderable::toGPU(const ConfigurationManager& /*config*/, unsigned int 
     textureCache.try_get(material->texDirDiffuse(), diffuseTex);
     textureCache.try_get(material->texDirSpecular(), speculaTex);
 
+
+    bool isTransparent = false;
+
     if(!ambientTex)
     {
       ambientTex =  device->createTextureFromImage(m_ambientImage[sm->getMaterialKey()], Converters::convertWrapMode(material->mappingModeAmbient()));
@@ -265,6 +255,7 @@ void MeshRenderable::toGPU(const ConfigurationManager& /*config*/, unsigned int 
     {
       diffuseTex =  device->createTextureFromImage(m_diffuseImage[sm->getMaterialKey()], Converters::convertWrapMode(material->mappingModeDiffuse()));
       textureCache.insert(material->texDirDiffuse(), diffuseTex);
+      isTransparent = m_diffuseImage[sm->getMaterialKey()].containTransparentPixels();
     }
     if(!speculaTex)
     {
@@ -301,6 +292,8 @@ void MeshRenderable::toGPU(const ConfigurationManager& /*config*/, unsigned int 
     subMeshDrawData.TEX[2] = speculaTex;
     subMeshDrawData.TEX[3] = device->createTextureFromImage(m_atmosphereFogImg, Texture::ClampToEdge);
 
+    subMeshDrawData.Uniforms.IntUniforms["u_isTwoSided"] = static_cast<int>(material->isTwoSided());
+    //subMeshDrawData.Uniforms.IntUniforms["u_flipNormals"] = static_cast<int>(material->isTwoSided());
     if(ambientTex) {
       subMeshDrawData.Uniforms.Sampler2DUniforms["u_ambientTexture"] = 0;
     }
@@ -323,6 +316,13 @@ void MeshRenderable::toGPU(const ConfigurationManager& /*config*/, unsigned int 
 
     subMeshDrawData.Uniforms.Matrix4Uniforms["u_modelMatrix"] = glm::mat4(1.0f);
     m_drawData[meshIndex] = subMeshDrawData;
+    if(isTransparent) {
+      m_drawData[meshIndex].AlphaFunction = Alpha::Greater;
+      m_drawData[meshIndex].AlphaValue = 0.1f;
+
+    }
+//    else
+//      m_drawData[meshIndex].IsTransparent = true;
     ++meshIndex;
   }
   //m_currentDataStorage = DataStorage::GPU;
@@ -365,7 +365,8 @@ DrawDataList MeshRenderable::getDrawData(RenderPass pass)
     DrawDataList drawData;
     for(DrawData dd : m_drawDataDeque) {
       dd.Current_SP = dd.Uber_SP;
-      drawData.push_back(dd);
+      //if(dd.IsTransparent)
+        drawData.push_back(dd);
     }
     return drawData;
   }

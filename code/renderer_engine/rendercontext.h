@@ -40,7 +40,6 @@ public:
   void clearDepthBuffer();
   void draw(DrawData drawData);
   void draw(const DrawDataList& drawDataList, ShaderUniforms shaderUniforms);
-
   void makeDirty() {
     m_currentIB = nullptr;
     m_currentVAO = nullptr;

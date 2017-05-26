@@ -230,6 +230,8 @@ std::deque<sa::MaterialModel*> AssimpToSAModels::processMaterials(const aiScene*
     int twoSided;
     GetMaterialProperty(material, AI_MATKEY_TWOSIDED, 1, twoSided);
 
+    float opacity = 1.0f;
+    GetMaterialProperty(material, AI_MATKEY_OPACITY, 1.0f, opacity);
 
     sa::MaterialModel* saMaterial = new sa::MaterialModel(
           static_cast<bool>(twoSided),

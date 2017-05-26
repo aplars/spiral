@@ -11,10 +11,10 @@ MainWindow::MainWindow(QWidget *parent) :
 {
   ui->setupUi(this);
 
-  GlobalSettingsModel* globalSettingsModel = new GlobalSettingsModel();
+  GlobalSettingsModelPtr globalSettingsModel = GlobalSettingsModelPtr(new GlobalSettingsModel());
   ui->globalSettingsForm->setModel(globalSettingsModel);
   ui->widget->setModel(globalSettingsModel);
-  delete globalSettingsModel;
+  //delete globalSettingsModel;
 }
 
 MainWindow::~MainWindow()

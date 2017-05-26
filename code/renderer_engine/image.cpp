@@ -58,4 +58,17 @@ Image::Color Image::getAveragedSlice(unsigned int x) const {
   avgPix.a/=numSamples;
   return avgPix;
 }
+
+bool Image::containTransparentPixels() const
+{
+  for(int y = 0; y < m_qObject.height(); ++y) {
+    for(int x = 0; x < m_qObject.width(); ++x) {
+      QColor color = m_qObject.pixelColor(x, y);
+      if(color.alphaF() < 1.0f) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
 }

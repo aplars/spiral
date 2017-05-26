@@ -15,7 +15,6 @@ bool RenderContext::create(GLuint defaultFB, unsigned int width, unsigned int he
   m_height = height;
   initializeOpenGLFunctions();
   glEnable(GL_DEPTH_TEST);
-  glEnable(GL_CULL_FACE);
   glEnable(GL_MULTISAMPLE);
   return true;
 }
@@ -78,15 +77,30 @@ void RenderContext::clearDepthBuffer()
 void RenderContext::draw(DrawData drawData) {
   glClearColor(0, 0, 0.0, 1);
   glViewport(0, 0, m_width, m_height);
-
   //if(static_cast<int>(drawData.IsTwoSided) != m_currentIsTwoSided)
   {
     if(drawData.IsTwoSided)
       glDisable(GL_CULL_FACE);
-    else
+    else {
       glEnable(GL_CULL_FACE);
+    }
 
     m_currentIsTwoSided = static_cast<int>(drawData.IsTwoSided);
+  }
+
+
+  if(drawData.AlphaFunction == Alpha::Greater)
+  {
+    glAlphaFunc ( GL_GREATER, drawData.AlphaValue) ;
+    glEnable ( GL_ALPHA_TEST ) ;
+  }
+  else if(drawData.AlphaFunction == Alpha::Less)
+  {
+    glAlphaFunc ( GL_LESS, drawData.AlphaValue) ;
+    glEnable ( GL_ALPHA_TEST ) ;
+  }
+  else {
+    glDisable( GL_ALPHA_TEST ) ;
   }
 
   if(drawData.BlendingFunction == Blending::Normal)
@@ -197,6 +211,10 @@ void RenderContext::draw(const DrawDataList& drawDataList, ShaderUniforms shader
 void RenderContext::setUniforms(ShaderProgramPtr shader, ShaderUniforms uniforms) {
   if(shader == nullptr) return;
 
+  for(IntUniformsMap::value_type uniform : uniforms.IntUniforms)
+  {
+    shader->setUniformValue(uniform.first, uniform.second);
+  }
   for(FloatUniformsMap::value_type uniform : uniforms.FloatUniforms)
   {
     shader->setUniformValue(uniform.first, uniform.second);

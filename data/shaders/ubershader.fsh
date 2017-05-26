@@ -86,7 +86,7 @@ vec3 aeralPerspectiveFog(
     in vec3  rayDir,   // camera to point vector
     in vec3  sunDir,
     in vec3 rgbFog,
-    in float fogDensity)  // sun light direction
+    in float fogDensity)
 {
   //const float b = 0.0005;
   const float LOG2 = 1.442695;
@@ -147,6 +147,7 @@ uniform DirectionalLight u_directionalLight;
 uniform sampler2D u_aeralPerspectiveFogColorTexture;
 uniform float u_fogDensity;
 uniform vec3 u_sunPosition;
+uniform int u_isTwoSided;
 
 void main()
 {
@@ -177,20 +178,22 @@ void main()
   vec4 amb = vec4(0,0,0,1);
   vec4 dif = vec4(0,0,0,1);
   vec4 spe = vec4(0,0,0,1);
-  blinnPhong(
-        u_directionalLight.diffuse,
-        u_directionalLight.specular,
-        ambient,
-        diffuse,
-        specular,
-        u_directionalLight.direction,
-        normalize(v_norAttr.xyz),
-        u_eyePosition - v_posAttr,
-        u_shininess,
-        u_shininessStrength,
-        amb,
-        dif,
-        spe);
+
+
+//  blinnPhong(
+//        u_directionalLight.diffuse,
+//        u_directionalLight.specular,
+//        ambient,
+//        diffuse,
+//        specular,
+//        u_directionalLight.direction,
+//        normalize(theLightingNormal),
+//        u_eyePosition - v_posAttr,
+//        u_shininess,
+//        u_shininessStrength,
+//        amb,
+//        dif,
+//        spe);
 
   vec4 shadowCoordDivW;
 
@@ -222,16 +225,24 @@ void main()
    //if(u_directionalLight.direction.y < 0)
    //  visibility = 0.0;
 
-   amb = clamp(amb, 0, 1);
-   spe = clamp(spe, 0, 1);
-   dif = clamp(dif, 0, 1);
+//   amb = clamp(amb, 0, 1);
+//   spe = clamp(spe, 0, 1);
+//   dif = clamp(dif, 0, 1);
 
-   //vec4 finalColor = (amb + visibility * (dif + spe));
+   //vec4 finalColor = (visibility * (dif));
    //vec4 finalColor = (amb*dif + visibility * (dif + spe));
 
-   float nDotL =   visibility * max(dot(normalize(v_norAttr.xyz), normalize(u_directionalLight.direction)), 0);
+   vec3 theLightingNormal = v_norAttr.xyz;
+
+//   if(u_isTwoSided) {
+//     if(dot(normalize(u_eyePosition - v_posAttr), normalize(v_norAttr.xyz)) < 0) {
+//       theLightingNormal*=-1.0;
+//     }
+//     else {
+//     }
+//   }
+   float nDotL =   visibility * max(dot(normalize(theLightingNormal), normalize(u_directionalLight.direction)), 0);
    vec4 finalColor = vec4(u_directionalLight.ambient.rgb * diffuse.rgb + u_directionalLight.diffuse.rgb * diffuse.rgb * nDotL, diffuse.a);
-   //vec4 finalColor = (diffuseTex*amb );
 
    float dist = distance(v_posAttr, u_eyePosition);
 

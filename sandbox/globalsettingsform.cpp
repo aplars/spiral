@@ -38,6 +38,7 @@ GlobalSettingsForm::GlobalSettingsForm(QWidget *parent) :
     m_model->setFogDensity(ui->atmosphereFogDensityLineEdit->text().toFloat());
   });
 
+
   QObject::connect(ui->runSunButton, &QPushButton::clicked, [=]() {
     QObject::disconnect(ui->timeOfDaySpinBox);
     QObject::disconnect(ui->julianDaySpinBox);
@@ -59,7 +60,7 @@ GlobalSettingsForm::~GlobalSettingsForm()
   delete ui;
 }
 
-void GlobalSettingsForm::setModel(GlobalSettingsModel *model)
+void GlobalSettingsForm::setModel(GlobalSettingsModelPtr model)
 {
   m_model = model;
 

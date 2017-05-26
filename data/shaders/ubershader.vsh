@@ -20,7 +20,6 @@ uniform highp mat4 u_depthBiasMVPMatrix[NUMBER_OF_CASCADES];
 #ifdef BONE_ANIMATION
 uniform highp mat4 u_bones[100];
 #endif
-
 void main()
 {
   mat4 boneTransform = mat4(0.0);

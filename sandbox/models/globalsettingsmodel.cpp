@@ -15,7 +15,7 @@ void GlobalSettingsModel::setTimeOfDay(int timeOfDay)
   timeOfDay = timeOfDay % 86400;
   if(m_timeOfDay != timeOfDay) {
     m_timeOfDay = timeOfDay;
-    PropertyChanged.notify("timeOfDay");
+    //PropertyChanged.notify(1, "timeOfDay");
   }
 }
 
@@ -28,7 +28,7 @@ void GlobalSettingsModel::setJulianDay(int julianDay)
 {
   if(m_julianDay != julianDay) {
     m_julianDay = julianDay;
-    PropertyChanged.notify("julianDay");
+    //PropertyChanged.notify("julianDay");
   }
 }
 
@@ -41,7 +41,7 @@ void GlobalSettingsModel::setTimeScale(int timeScale)
 {
   if(m_timeScale != timeScale) {
     m_timeScale = timeScale;
-    PropertyChanged.notify("timeScale");
+    //PropertyChanged.notify("timeScale");
   }
 }
 

@@ -34,5 +34,5 @@ private:
   bool m_isUpdating = false;
   bool m_useStableShadowMapping = false;
 };
-
+typedef std::shared_ptr<GlobalSettingsModel> GlobalSettingsModelPtr;
 #endif // GLOBALSETTINGSMODEL_H

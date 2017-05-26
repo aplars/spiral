@@ -17,12 +17,12 @@ public:
   explicit GlobalSettingsForm(QWidget *parent = 0);
   ~GlobalSettingsForm();
 
-  void setModel(GlobalSettingsModel *model);
+  void setModel(GlobalSettingsModelPtr model);
 
   void updateUi();
 private:
   Ui::GlobalSettingsForm *ui;
-  GlobalSettingsModel* m_model;
+  GlobalSettingsModelPtr m_model;
 };
 
 #endif // GLOBALSETTINGSFORM_H

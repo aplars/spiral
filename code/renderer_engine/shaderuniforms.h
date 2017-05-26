@@ -5,6 +5,7 @@
 #include <glm/mat4x4.hpp>
 
 namespace sa {
+typedef std::map<std::string, int> IntUniformsMap;
 typedef std::map<std::string, float> FloatUniformsMap;
 typedef std::map<std::string, glm::vec2> Vec2UniformsMap;
 typedef std::map<std::string, glm::vec3> Vec3UniformsMap;
@@ -16,6 +17,7 @@ typedef std::map<std::string, std::vector<glm::mat4>> Matrix4ArrayUniformsMap;
 typedef std::map<std::string, std::vector<unsigned int>> Sampler2DArrayUniformsMap;
 
 struct ShaderUniforms {
+  IntUniformsMap IntUniforms;
   FloatUniformsMap FloatUniforms;
   Vec2UniformsMap Vec2Uniforms;
   Vec3UniformsMap Vec3Uniforms;

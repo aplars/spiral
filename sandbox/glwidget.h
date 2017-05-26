@@ -11,6 +11,7 @@
 namespace sa {
 class MeshRenderable;
 class Scene;
+typedef std::shared_ptr<Scene> ScenePtr;
 }
 class GLWidget : public sa::Widget, protected QOpenGLFunctions
 {
@@ -18,7 +19,7 @@ public:
   GLWidget(QWidget* parent = nullptr);
   ~GLWidget();
 
-  void setModel(GlobalSettingsModel* globalSettingsModel);
+  void setModel(GlobalSettingsModelPtr globalSettingsModel);
   // QOpenGLWidget interface
 protected:
   void initializeGL();
@@ -29,14 +30,14 @@ protected:
   void onKeyDown(KeyEvent event);
   void onKeyUp(KeyEvent event);
 private:
-  GlobalSettingsModel* m_globalSettingsModel = nullptr;
+  GlobalSettingsModelPtr m_globalSettingsModel;
 
   QOpenGLDebugLogger *m_debugLogger = nullptr;
 
   sa::RenderDevice renderDevice;
   sa::RenderContext renderContext;
 
-  sa::Scene* scene;
+  sa::ScenePtr scene;
   static const int NUMKEYS = 1024;
   bool keys[NUMKEYS];
 

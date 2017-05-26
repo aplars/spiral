@@ -33,7 +33,7 @@ void StreamedMeshEntity::setPosition(float x, float y, float z) {
   if(m_position!=glm::vec3(x, y, z)) {
     m_position = glm::vec3(x, y, z);
     PropertyChangedEvent evt("position", this);
-    m_propertyChanged.notify(evt);
+    m_propertyChanged.notify( evt);
   }
 }
 
@@ -61,9 +61,9 @@ AABBModel StreamedMeshEntity::getBoundingBox() const {
 }
 
 DataStorage StreamedMeshEntity::currentDataStorage() const {
-  DataStorage local;
 
   m_mutex.lock();
+  DataStorage local;
   local = m_currentStorage;
   m_mutex.unlock();
   return local;

@@ -27,6 +27,12 @@ enum class DrawPrimitive {
   TriangleStrip,
 };
 
+enum class Alpha {
+  None,
+  Greater,
+  Less
+};
+
 /**
  * @brief The DrawData struct contains all information needed to render a mesh.
  */
@@ -34,6 +40,9 @@ struct DrawData {
   bool IsVisible = true;
   bool IsTwoSided = true;
   Blending BlendingFunction = Blending::Normal;
+  Alpha AlphaFunction = Alpha::None;
+  float AlphaValue = 0.0f;
+
   PolygonMode PolygonDrawMode = PolygonMode::Fill;
   DrawPrimitive Primitive = DrawPrimitive::Triangles;
   static const int NUM_TEX_UNITS = 16;

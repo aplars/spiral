@@ -99,10 +99,10 @@ void Scene::addMeshEntity(const std::string& name, MeshRenderablePtr mesh, bool 
 //      aabbmodel.getHalfSize()[0], aabbmodel.getHalfSize()[1], aabbmodel.getHalfSize()[2]);
   m_meshes[name] = streamedEntity;
 
-  streamedEntity->addPropertyChangedListener([&name, this](const StreamedMeshEntity::PropertyChangedEvent& /*evt*/) {
+ // streamedEntity->addPropertyChangedListener([&name, this](const StreamedMeshEntity::PropertyChangedEvent& /*evt*/) {
     //DebugEntityBox* box = getDebugBoxEntety(name+"db");
     //box->setPosition(evt.m_object->getBoundingBox().getCenter());
-  });
+ // });
 }
 
 void Scene::removeMeshEntity(const std::string& name) {
@@ -122,13 +122,11 @@ void Scene::toCPU() {
   for(Entities::value_type e : m_meshes) {
     AABBModel bbox = e.second->getBoundingBox();
     IntersectionTests::Side side = IntersectionTests::FrustumAABBIntersect(frustum, bbox.getMin(), bbox.getMax());
-    bool isInFrustums = (side == IntersectionTests::Inside || side == IntersectionTests::Intersect);
-    isInFrustums = isInFrustums | m_shadowMapping.isAABBVisibleFromSun(m_sunCamera, bbox.getMin(), bbox.getMax());
+    bool isInFrustums = (side == IntersectionTests::Inside || side == IntersectionTests::Intersect) | m_shadowMapping.isAABBVisibleFromSun(m_sunCamera, bbox.getMin(), bbox.getMax());
 
     if(isInFrustums) {
       if(e.second->currentDataStorage() == DataStorage::Disk)
       {
-        //qDebug() << "is in frustum: " << e.first.c_str();
         //We don not want to load this sucker again therefore we set it as pending.
         //if not set to pending it will try to laod again when its alreadiy loading.
         e.second->setPendingStorage();
@@ -144,16 +142,11 @@ void Scene::toCPU() {
       }
     }
     else {
-      //qDebug() << "is NOT in frustum: " << e.first.c_str();
       if(e.second->currentDataStorage() == DataStorage::GPU) {
         e.second->unload();
       }
     }
   }
-
-  //glm::vec3 centerpoint = m_camera.getFrusumCenterPoint(m_projection);
-
-  //m_sunCamera.setLookAt(centerpoint + m_sun.direction(), centerpoint, glm::vec3(0, 1, 0));
   m_sunCamera.setLookAt(m_sun.direction(), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
 }
 
@@ -233,12 +226,6 @@ void Scene::update(float dt) {
     StreamedMeshEntity* e = entetiesDeq[i];
     e->applyAnimations(dt);
   }
-//#pragma omp parallel for
-//  for(unsigned int i = 0; i < entetiesDeq.size(); ++i) {
-//    StreamedMeshEntity* e = entetiesDeq[i];
-//    if(e->currentDataStorage() == DataStorage::GPU)
-//      e->applyTransformations();
-//  }
 
   m_sky.update(dt, glm::vec3(m_camera.eye()));
 

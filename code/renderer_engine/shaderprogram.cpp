@@ -123,6 +123,10 @@ void sa::ShaderProgram::setUniformValue(const std::string &location, const float
   m_glObject.setUniformValue(location.c_str(), value);
 }
 
+void sa::ShaderProgram::setUniformValue(const std::string &location, int value) {
+  m_glObject.setUniformValue(location.c_str(), value);
+}
+
 void sa::ShaderProgram::setUniformValue(const std::string &location, unsigned int value) {
   m_glObject.setUniformValue(location.c_str(), value);
 }

@@ -16,7 +16,7 @@ BackgroundWorker::BackgroundWorker()
 
 void BackgroundWorker::push(BackgroundWorkPtr work) {
   {
-    std::unique_lock<std::mutex> lock(m_mutex);
+    std::lock_guard<std::mutex> lock(m_mutex);
     m_work.push_back(work);
   }
   m_condition.notify_one();

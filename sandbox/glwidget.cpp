@@ -34,14 +34,12 @@ GLWidget::GLWidget(QWidget* parent)
 GLWidget::~GLWidget()
 {
   this->makeCurrent();
-  delete scene;
-  scene = nullptr;
 
   renderContext.destroy();
 }
 
 
-void GLWidget::setModel(GlobalSettingsModel* globalSettingsModel) {
+void GLWidget::setModel(GlobalSettingsModelPtr globalSettingsModel) {
   m_globalSettingsModel = globalSettingsModel;
   m_globalSettingsModel->PropertyChanged += [this](const std::string&) {
     scene->setTime(m_globalSettingsModel->julianDay(), m_globalSettingsModel->timeOfDay());
@@ -65,7 +63,7 @@ void GLWidget::initializeGL() {
 
   sa::ConfigurationManager config;
   config.init("sa_config.conf");
-  scene = new sa::Scene(this->width(), this->height(), config);
+  scene = sa::ScenePtr(new sa::Scene(this->width(), this->height(), config));
   scene->camera().setEye({0,50,200});
 //  scene->setSun(sa::DirectionalLight(
 //  {1,1,1},
@@ -99,7 +97,7 @@ void GLWidget::initializeGL() {
 
 
   scene->addMeshEntity("bob0", bobMesh, true);
-  scene->getMeshEntity("bob0")->playSkeletalAnimation("");
+  //scene->getMeshEntity("bob0")->playSkeletalAnimation("");
 
 
   scene->addMeshEntity("motioncaptureLeft", motioncaptureMesh, true);
