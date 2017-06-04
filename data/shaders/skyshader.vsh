@@ -26,8 +26,8 @@ void main(void)
   v_texAttr = texAttr;
   v_texAttr.x = getTexUCoord(elevation);
 
-  v_sunPosition = u_sunPosition;
-  v_fragmentPosition = vec4(posAttr, 1);
+  //v_sunPosition = u_sunPosition;
+  //v_fragmentPosition = vec4(posAttr, 1);
   gl_Position = u_skyProjectionMatrix * u_viewMatrix * vec4(thePos, 1);
 }
 

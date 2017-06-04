@@ -28,7 +28,7 @@ SOURCES += meshrenderable.cpp \
     backgroundworker.cpp \
     streamedmeshentity.cpp \
     converters.cpp \
-    shadowmapping.cpp \
+    shadows/shadowmapping.cpp \
     sky/sky.cpp \
     terrain/simple/terrain.cpp \
     terrain/plane/plane.cpp \
@@ -48,7 +48,7 @@ HEADERS += meshrenderable.h \
     shadercache.h \
     texturecache.h \
     converters.h \
-    shadowmapping.h \
+    shadows/shadowmapping.h \
     sky/sky.h \
     terrain/simple/terrain.h \
     terrain/plane/plane.h \

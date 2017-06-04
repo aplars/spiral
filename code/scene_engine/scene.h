@@ -11,7 +11,7 @@
 #include "adt/lru.h"
 #include "imagecache.h"
 #include "shadercache.h"
-#include "shadowmapping.h"
+#include "shadows/shadowmapping.h"
 #include "meshrenderable.h"
 #include "sky/sky.h"
 #include "sky/lightshafts.h"
@@ -35,7 +35,6 @@ public:
   void setSunSimulationTimeScale(double timeScale);
   void runSunSimulation(bool runSimulation);
   void setAtmosphereFogDensity(float desity);
-  void setUseStableShadowMapping(bool stable);
   FPSCamera& camera() { return m_camera; }
   void addMeshEntity(const std::string& name, MeshRenderablePtr mesh, bool castShadow);
   void removeMeshEntity(const std::string& name);

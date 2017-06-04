@@ -83,17 +83,25 @@ void sa::ShaderProgram::link() {
 }
 
 int sa::ShaderProgram::attributeLocation(const char* name) const {
-  return m_glObject.attributeLocation(name);
+  int attribLocation = m_glObject.attributeLocation(name);
+  return attribLocation;
 }
 
 void sa::ShaderProgram::bindAttributeLocation(const char* name, int location) {
-  m_glObject.bindAttributeLocation(name, location);
+  if(location == -1) {
+    qDebug() << "ShaderProgram: Attribute " << name << " not found";
+  }
+  else {
+    m_glObject.bindAttributeLocation(name, location);
+  }
 }
 
 int sa::ShaderProgram::uniformLocation(const char* name) const {
   std::map<std::string, int>::const_iterator it = m_uniformsCache.find(name);
   if(it != m_uniformsCache.end())
     return it->second;
+
+  qDebug() << "ShaderProgram: Uniform " << name << " not found";
   return -1;
 }
 
@@ -137,7 +145,6 @@ void sa::ShaderProgram::setUniformValueArray(const std::string &location, const 
 
 void sa::ShaderProgram::setUniformValueArray(const std::string &location, const std::vector<glm::mat4> &values) {
   m_glObject.bind();
-  //glUniformMatrix4fv(m_glObject.uniformLocation(location.c_str()), values.size(), false, values.data()->GetConstPtr());
   const glm::mat4& ff = values[0];
   glUniformMatrix4fv(m_glObject.uniformLocation(location.c_str()), values.size(), false, glm::value_ptr(ff));
 }

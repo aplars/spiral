@@ -52,33 +52,7 @@ void ShadowMapping::updateShadowPass(const FPSCamera& camera, const FPSCamera& s
 
     glm::mat4 ortho;
 
-//    if(m_stable) {
-//      std::array<glm::vec3, 2> minmax = std::array<glm::vec3, 2>({min, max});
-//      Sphere<float> sphere = Sphere<float>::createFromPoints<2>(minmax);
-
-
-//      if(m_sphereradius[shadowPass] < -0.5)
-//        m_sphereradius[shadowPass] = sphere.getRadius();
-
-//      // Calculate the view space extents of the frustum points.
-//      float f = (m_sphereradius[shadowPass] * 2.0f) / float(m_shadowMapWidth);
-
-//      glm::vec3 thePos(floor(sphere.getPosition()[0]/f)*f, floor(sphere.getPosition()[1]/f)*f, floor(sphere.getPosition()[2]/f)*f);
-//      glm::vec3 smin = thePos-m_sphereradius[shadowPass];
-//      glm::vec3 smax = thePos+m_sphereradius[shadowPass];
-
-
-//      float viewportExtent = floor((m_sphereradius[shadowPass] * 2.0f) / f) * f;    // Ensure view point extents are a texel multiple.
-
-//      smax[0] = smin[0] + viewportExtent;
-//      smax[1] = smin[1] + viewportExtent;
-//      smax[2] = smin[2] + viewportExtent;
-
-//      ortho = glm::ortho(smin.x, smax.x, smin.y, smax.y, -smax.z, -smin.z);
-//    }
-//    else {
-      ortho = glm::ortho(min.x, max.x, min.y, max.y, -max.z, -min.z);
-//    }
+    ortho = glm::ortho(min.x, max.x, min.y, max.y, -max.z, -min.z);
 
     static float biasMatrix[16] = {
           0.5, 0.0, 0.0, 0.0,
@@ -135,15 +109,5 @@ unsigned int ShadowMapping::getShadowMapWidth() const
 unsigned int ShadowMapping::getShadowMapHeight() const
 {
   return m_shadowMapheight;
-}
-
-bool ShadowMapping::getStable() const
-{
-  return m_stable;
-}
-
-void ShadowMapping::setStable(bool stable)
-{
-  m_stable = stable;
 }
 }

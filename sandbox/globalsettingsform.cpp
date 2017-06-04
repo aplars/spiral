@@ -48,11 +48,6 @@ GlobalSettingsForm::GlobalSettingsForm(QWidget *parent) :
   QObject::connect(ui->stopSunButton, &QPushButton::clicked, [=]() {
     timer->stop();
   });
-
-  QObject::connect(ui->useStableShadowsCheckBox, &QCheckBox::toggled, [=](bool isChecked) {
-    m_model->setUseStableShadowMapping(isChecked);
-  });
-
 }
 
 GlobalSettingsForm::~GlobalSettingsForm()
@@ -75,5 +70,4 @@ void GlobalSettingsForm::updateUi() {
   ui->timeOfDaySpinBox->setValue(m_model->timeOfDay());
   ui->julianDaySpinBox->setValue(m_model->julianDay());
   ui->atmosphereFogDensityLineEdit->setText(QString::number(m_model->fogDensity()));
-  ui->useStableShadowsCheckBox->setChecked(m_model->useStableShadowMapping());
 }

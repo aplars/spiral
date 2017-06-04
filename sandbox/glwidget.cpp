@@ -44,7 +44,6 @@ void GLWidget::setModel(GlobalSettingsModelPtr globalSettingsModel) {
   m_globalSettingsModel->PropertyChanged += [this](const std::string&) {
     scene->setTime(m_globalSettingsModel->julianDay(), m_globalSettingsModel->timeOfDay());
     scene->setAtmosphereFogDensity(m_globalSettingsModel->fogDensity());
-    scene->setUseStableShadowMapping(m_globalSettingsModel->useStableShadowMapping());
   };
 }
 

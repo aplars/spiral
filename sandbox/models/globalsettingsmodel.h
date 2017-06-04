@@ -22,9 +22,6 @@ public:
   float fogDensity() const;
   void setFogDensity(float fogDensity);
 
-  bool useStableShadowMapping() const;
-  void setUseStableShadowMapping(bool useStableShadowMapping);
-
   sa::Subject<const std::string&> PropertyChanged;
 private:
   int m_timeOfDay = 16;
@@ -32,7 +29,6 @@ private:
   int m_timeScale = 1.0;
   float m_fogDensity = 0.0005;
   bool m_isUpdating = false;
-  bool m_useStableShadowMapping = false;
 };
 typedef std::shared_ptr<GlobalSettingsModel> GlobalSettingsModelPtr;
 #endif // GLOBALSETTINGSMODEL_H

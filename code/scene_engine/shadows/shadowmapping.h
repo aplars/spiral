@@ -29,9 +29,6 @@ public:
 
   unsigned int getShadowMapHeight() const;
 
-  bool getStable() const;
-  void setStable(bool stable);
-
 private:
   bool m_stable = false;
   std::vector<float> m_sphereradius;

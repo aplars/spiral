@@ -76,11 +76,6 @@ void Scene::setAtmosphereFogDensity(float desity)
   m_sky.FogDensity = desity;
 }
 
-void Scene::setUseStableShadowMapping(bool stable)
-{
-  m_shadowMapping.setStable(stable);
-}
-
 void Scene::setSun(const DirectionalLight& sun) {
   m_sun = sun;
 }

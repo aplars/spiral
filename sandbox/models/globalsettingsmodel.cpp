@@ -15,7 +15,7 @@ void GlobalSettingsModel::setTimeOfDay(int timeOfDay)
   timeOfDay = timeOfDay % 86400;
   if(m_timeOfDay != timeOfDay) {
     m_timeOfDay = timeOfDay;
-    //PropertyChanged.notify(1, "timeOfDay");
+    PropertyChanged.notify("timeOfDay");
   }
 }
 
@@ -28,7 +28,7 @@ void GlobalSettingsModel::setJulianDay(int julianDay)
 {
   if(m_julianDay != julianDay) {
     m_julianDay = julianDay;
-    //PropertyChanged.notify("julianDay");
+    PropertyChanged.notify("julianDay");
   }
 }
 
@@ -41,7 +41,7 @@ void GlobalSettingsModel::setTimeScale(int timeScale)
 {
   if(m_timeScale != timeScale) {
     m_timeScale = timeScale;
-    //PropertyChanged.notify("timeScale");
+    PropertyChanged.notify("timeScale");
   }
 }
 
@@ -68,18 +68,5 @@ void GlobalSettingsModel::setFogDensity(float fogDensity)
   if(m_fogDensity != fogDensity) {
     m_fogDensity = fogDensity;
     PropertyChanged.notify("fogDensity");
-  }
-}
-
-bool GlobalSettingsModel::useStableShadowMapping() const
-{
-    return m_useStableShadowMapping;
-}
-
-void GlobalSettingsModel::setUseStableShadowMapping(bool useStableShadowMapping)
-{
-  if(m_useStableShadowMapping != useStableShadowMapping) {
-    m_useStableShadowMapping = useStableShadowMapping;
-    PropertyChanged.notify("useStableShadowMapping");
   }
 }
