@@ -9,24 +9,6 @@
 #include <scene_engine/scene.h>
 #include <deque>
 
-
-
-//struct Vertex {
-//  Vertex(float xx, float yy, float zz, float rr, float gg, float bb, float aa)
-//    : x(xx)
-//    , y(yy)
-//    , z(zz)
-//    , r(rr)
-//    , g(gg)
-//    , b(bb)
-//    , a(aa ){ }
-
-//  float x = 0, y = 0, z;
-//  float r, g, b, a;
-//} *vertices;
-
-
-
 GLWidget::GLWidget(QWidget* parent)
   : sa::Widget(parent)
 { }
@@ -34,7 +16,6 @@ GLWidget::GLWidget(QWidget* parent)
 GLWidget::~GLWidget()
 {
   this->makeCurrent();
-
   renderContext.destroy();
 }
 
@@ -90,14 +71,10 @@ void GLWidget::initializeGL() {
   sa::MeshRenderablePtr landscapeMesh;
   landscapeMesh.reset(new sa::MeshRenderable(config.getParam("DATA_DIR") + "/meshes/", "landscape.xml"));
 
-
-
   scene->addMeshEntity("landscape", landscapeMesh, false);
 
-
   scene->addMeshEntity("bob0", bobMesh, true);
-  //scene->getMeshEntity("bob0")->playSkeletalAnimation("");
-
+  scene->getMeshEntity("bob0")->playSkeletalAnimation("");
 
   scene->addMeshEntity("motioncaptureLeft", motioncaptureMesh, true);
   scene->getMeshEntity("motioncaptureLeft")->playNodeAnimation("");

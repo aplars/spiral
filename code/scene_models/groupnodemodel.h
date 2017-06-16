@@ -1,5 +1,4 @@
-#ifndef GROUPNODEMODEL_H
-#define GROUPNODEMODEL_H
+#pragma once
 #include "nodemodel.h"
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
@@ -40,4 +39,3 @@ private:
   std::deque<NodeModel*> m_children;
 };
 }
-#endif // GROUPNODEMODEL_H

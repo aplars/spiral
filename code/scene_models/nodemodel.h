@@ -1,5 +1,4 @@
-#ifndef NODEMODEL_H
-#define NODEMODEL_H
+#pragma once
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
 #include<boost/uuid/uuid.hpp>
@@ -33,4 +32,3 @@ private:
 
 };
 }
-#endif // NODEMODEL_H

@@ -1,5 +1,5 @@
-#ifndef SKY_H
-#define SKY_H
+#pragma once
+
 #include <memory>
 #include <glm/vec3.hpp>
 #include <renderer_engine/drawdata.h>
@@ -59,4 +59,3 @@ private:
 };
 }
 }
-#endif // SKY_H

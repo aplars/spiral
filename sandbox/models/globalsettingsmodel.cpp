@@ -12,7 +12,7 @@ int GlobalSettingsModel::timeOfDay() const
 
 void GlobalSettingsModel::setTimeOfDay(int timeOfDay)
 {
-  timeOfDay = timeOfDay % 86400;
+//  timeOfDay = timeOfDay % 86400;
   if(m_timeOfDay != timeOfDay) {
     m_timeOfDay = timeOfDay;
     PropertyChanged.notify("timeOfDay");

@@ -1,5 +1,4 @@
-#ifndef VISITORAPPLYANIMATION_H
-#define VISITORAPPLYANIMATION_H
+#pragma once
 #include "visitor.h"
 #include "animationmodel.h"
 namespace sa {
@@ -16,4 +15,3 @@ private:
   const AnimationModel<boost::uuids::uuid > * m_animation;
 };
 }
-#endif // VISITORAPPLYANIMATION_H

@@ -35,8 +35,6 @@ void ShadowMapping::updateShadowPass(const FPSCamera& camera, const FPSCamera& s
   {
 
     std::array<glm::vec3, 8> frustumpoints = camera.getFrusumPoints(m_cascadedProjections[shadowPass]);
-    //Sphere<float> tb = Sphere<float>::createFromPoints<8>(frustumpoints);
-
 
     glm::mat4 sunCameraViewMatrix = sunCamera.viewMatrix();
 

@@ -1,9 +1,8 @@
-#ifndef RENDERPASS_H
-#define RENDERPASS_H
+#pragma once
+
 enum class RenderPass {
   Uber,
   Shadow,
   SunLightShafts
 };
 
-#endif // RENDERPASS_H

@@ -30,13 +30,13 @@ public:
   IndexBufferPtr createIndexBuffer(const unsigned int* data, int numberOfIndices) const;
   IndexBufferPtr createIndexBuffer(const std::vector<unsigned int>& indices) const;
 
-  ShaderProgramPtr createShaderProgram(const char* vertexProgram, const char* fragmantProgram, const std::set<std::string>& defines) const;
+  ShaderProgramPtr createShaderProgram(const char* vertexProgram, const char* fragmantProgram, const std::set<std::string>& defines = std::set<std::string>()) const;
 
-  ShaderProgramPtr createShaderProgramFromFile(const char* vertexProgram, const char* fragmantProgram, const std::set<std::string>& defines) const;
+  ShaderProgramPtr createShaderProgramFromFile(const char* vertexProgram, const char* fragmantProgram, const std::set<std::string>& defines = std::set<std::string>()) const;
 
-  ShaderProgramPtr createShaderProgram(const char* vertexProgram, const char* fragmantProgram, const char* geometryProgram, const std::set<std::string>& defines) const;
+  ShaderProgramPtr createShaderProgram(const char* vertexProgram, const char* fragmantProgram, const char* geometryProgram, const std::set<std::string>& defines = std::set<std::string>()) const;
 
-  ShaderProgramPtr createShaderProgramFromFile(const char* vertexProgram, const char* fragmantProgram, const char* geometryProgram, const std::set<std::string>& defines) const;
+  ShaderProgramPtr createShaderProgramFromFile(const char* vertexProgram, const char* fragmantProgram, const char* geometryProgram, const std::set<std::string>& defines = std::set<std::string>()) const;
 
   TexturePtr createTextureFromImage(const Image& image, Texture::WrapMode wrapMode) const;
 

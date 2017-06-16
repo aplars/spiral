@@ -1,5 +1,5 @@
-#ifndef SCENE_H
-#define SCENE_H
+#pragma once
+
 #include "streamedmeshentity.h"
 #include "debugentity.h"
 #include <deque>
@@ -110,4 +110,3 @@ private:
 
 typedef std::shared_ptr<Scene> ScenePtr;
 }
-#endif // SCENE_H

@@ -72,46 +72,25 @@ glm::vec3 Sky::getSunPosition() const {
   glm::vec3 SunPos(
         sin(SunTheta) * cos(SunPhi) * m_radius,
         cos(SunTheta) * m_radius,
-        sin(SunTheta) * sin(SunPhi) * m_radius
-        );
+        sin(SunTheta) * sin(SunPhi) * m_radius);
   return SunPos;
 }
 
 void Sky::update(float /*dt*/, const glm::vec3 &cameraPosition) {
-
-  //  if(IsRunningSimulation)
-  //    TimeOfDay += dt*TimeScale;
-  //  //TimeOfDay += dt;
-  //  if (TimeOfDay > 3600 * 24) //next day?
-  //  {
-  //    JulianDay += 1.0f;
-  //    TimeOfDay -= 3600 * 24;
-  //  }
-
   float hour = TimeOfDay / 3600.0f;
   float solarTime = hour + 0.170 * sin( 4 * Pi<float>() * (JulianDay - 80) / 373 ) - 0.129 * sin( 2 * Pi<float>() * (JulianDay - 8) / 355) + 12 * (Latitude - Longitude) / Pi<float>();
-  float declination = 0.4093 * sin( 2 * Pi<float>() * (JulianDay - 81) / 368 );
+  float declination = 0.4093 * sin( 2.0f * Pi<float>() * (JulianDay - 81) / 368 );
 
   SunTheta = Pi<float>() / 2 - asin(sin(Latitude) * sin(declination) - cos(Latitude) * cos(declination) * cos(Pi<float>() * solarTime / 12));
-  SunPhi   = atan( -cos(declination) * sin(Pi<float>() * solarTime / 12) / ((cos(Latitude) * cos(declination) - sin(Latitude) * sin(declination) * sin(Pi<float>() * solarTime / 12))));
-  if (SunPhi < 0) SunPhi = 2 * Pi<float>() + SunPhi;
-  m_drawData.Uniforms.Vec3Uniforms["u_cameraPosition"] = cameraPosition;
-
-  //m_drawData.Uniforms.Vec3Uniforms["u_sunPosition"] = getSunPosition();
-
-
-
-  /*if (time > 3600 * 24) //next day?
+  SunPhi   = atan(
+        -cos(declination) * sin(Pi<float>() * solarTime / 12.0f) /
+        ((cos(Latitude) * sin(declination) - sin(Latitude) * cos(declination) * cos(Pi<float>() * solarTime / 12.0f)))
+        );
+  if (SunPhi < 0)
   {
-    time = 0;
+    SunPhi = 2 * Pi<float>() + SunPhi;
   }
-  else
-    time+=100.0;
-*/
-
-  //m_clock.update(dt);
-
-
+  m_drawData.Uniforms.Vec3Uniforms["u_cameraPosition"] = cameraPosition;
 }
 
 void Sky::toGPU(const ConfigurationManager& config, RenderDevice* device, RenderContext* context) {
@@ -119,16 +98,13 @@ void Sky::toGPU(const ConfigurationManager& config, RenderDevice* device, Render
 
   std::string dataDir = config.getParam("DATA_DIR");
 
-  std::set<std::string> defines;
   ShaderProgramPtr sp = device->createShaderProgramFromFile(
         (dataDir + "/shaders/skyshader.vsh").c_str(),
-        (dataDir + "/shaders/skyshader.fsh").c_str(),
-        defines);
+        (dataDir + "/shaders/skyshader.fsh").c_str());
 
   m_spBlackAndWhite = device->createShaderProgramFromFile(
         (dataDir + "/shaders/skyshaderblackandwhite.vsh").c_str(),
-        (dataDir + "/shaders/skyshaderblackandwhite.fsh").c_str(),
-        defines);
+        (dataDir + "/shaders/skyshaderblackandwhite.fsh").c_str());
 
 
   int posAttr = sp->attributeLocation("posAttr");
@@ -142,8 +118,6 @@ void Sky::toGPU(const ConfigurationManager& config, RenderDevice* device, Render
   VertexArrayPtr vao = context->createVertexArray(vertexDesc, vb);
 
   IndexBufferPtr ib = device->createIndexBuffer(m_indices);
-
-
 
   m_drawData.BlendingFunction = Blending::Normal;
   m_drawData.PolygonDrawMode = PolygonMode::Fill;

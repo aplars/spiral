@@ -22,21 +22,24 @@
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
        <layout class="QGridLayout" name="gridLayout">
-        <item row="1" column="1">
-         <widget class="QDoubleSpinBox" name="julianDaySpinBox">
-          <property name="maximum">
-           <double>5000.000000000000000</double>
+        <item row="5" column="1">
+         <widget class="QLineEdit" name="atmosphereFogDensityLineEdit">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
           </property>
          </widget>
         </item>
-        <item row="0" column="0">
-         <widget class="QLabel" name="timeOfDayLabel">
+        <item row="5" column="0">
+         <widget class="QLabel" name="atmosphereFogDensityLabel">
           <property name="text">
-           <string>Time of day</string>
+           <string>Fog density</string>
           </property>
          </widget>
         </item>
-        <item row="3" column="1">
+        <item row="4" column="1">
          <widget class="QDoubleSpinBox" name="sunTimeScaleSpinBox">
           <property name="maximum">
            <double>1000.000000000000000</double>
@@ -47,9 +50,44 @@
          </widget>
         </item>
         <item row="3" column="0">
+         <widget class="QPushButton" name="runSunButton">
+          <property name="text">
+           <string>Run </string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QPushButton" name="stopSunButton">
+          <property name="text">
+           <string>Stop</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="0">
          <widget class="QLabel" name="label">
           <property name="text">
            <string>Time scale</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="julianDayLabel">
+          <property name="text">
+           <string>Julian day</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QLabel" name="timeOfDayLabel">
+          <property name="text">
+           <string>Time of day</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QDoubleSpinBox" name="julianDaySpinBox">
+          <property name="maximum">
+           <double>5000.000000000000000</double>
           </property>
          </widget>
         </item>
@@ -59,48 +97,24 @@
            <bool>true</bool>
           </property>
           <property name="maximum">
-           <double>86400.000000000000000</double>
+           <double>96400.000000000000000</double>
           </property>
           <property name="singleStep">
            <double>60.000000000000000</double>
           </property>
          </widget>
         </item>
-        <item row="2" column="0">
-         <widget class="QPushButton" name="runSunButton">
-          <property name="text">
-           <string>Run </string>
-          </property>
-         </widget>
-        </item>
         <item row="1" column="0">
-         <widget class="QLabel" name="julianDayLabel">
+         <widget class="QLabel" name="timeOfDayHourLabel">
           <property name="text">
-           <string>Julian day</string>
+           <string>Time of day (h)</string>
           </property>
          </widget>
         </item>
-        <item row="4" column="1">
-         <widget class="QLineEdit" name="atmosphereFogDensityLineEdit">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1">
-         <widget class="QPushButton" name="stopSunButton">
-          <property name="text">
-           <string>Stop</string>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="0">
-         <widget class="QLabel" name="atmosphereFogDensityLabel">
-          <property name="text">
-           <string>Fog density</string>
+        <item row="1" column="1">
+         <widget class="QDoubleSpinBox" name="timeOfDayHourSpinBox">
+          <property name="enabled">
+           <bool>false</bool>
           </property>
          </widget>
         </item>

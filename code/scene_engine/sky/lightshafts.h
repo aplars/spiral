@@ -1,5 +1,4 @@
-#ifndef LIGHTSHAFTS_H
-#define LIGHTSHAFTS_H
+#pragma once
 #include <renderer_engine/drawdata.h>
 #include <glm/mat4x4.hpp>
 #include "../rectanglerenderable.h"
@@ -22,4 +21,3 @@ private:
   RectangleRenderable m_rectangleRenderable;
 };
 }
-#endif // LIGHTSHAFTS_H

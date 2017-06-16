@@ -1,5 +1,5 @@
-#ifndef CONVERTERS_H
-#define CONVERTERS_H
+#pragma once
+
 #include <scene_models/materialmodel.h>
 #include <renderer_engine/texture.h>
 
@@ -11,4 +11,3 @@ public:
   static Texture::WrapMode convertWrapMode(MaterialModel::TextureMappingMode mode);
 };
 }
-#endif // CONVERTERS_H

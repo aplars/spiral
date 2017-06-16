@@ -1,5 +1,4 @@
-#ifndef RECTANGLERENDERABLE_H
-#define RECTANGLERENDERABLE_H
+#pragma once
 #include <vector>
 #include <array>
 #include <renderer_engine/drawdata.h>
@@ -89,4 +88,3 @@ private:
   DrawData m_drawData;
 };
 }
-#endif // RECTANGLERENDERABLE_H

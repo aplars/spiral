@@ -1,5 +1,4 @@
-#ifndef SHADOWMAPPING_H
-#define SHADOWMAPPING_H
+#pragma once
 #include <deque>
 #include <vector>
 #include <glm/vec3.hpp>
@@ -40,4 +39,3 @@ private:
   std::vector<glm::mat4> m_depthBiasMVPMatrix;
 };
 }
-#endif // SHADOWMAPPING_H

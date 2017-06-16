@@ -2,6 +2,7 @@
 #include "ui_globalsettingsform.h"
 #include <QSpinBox>
 #include <QTimer>
+#include <QDebug>
 
 double dt = 1.0/60.0;
 
@@ -15,6 +16,8 @@ GlobalSettingsForm::GlobalSettingsForm(QWidget *parent) :
   connect(timer, &QTimer::timeout, [=]() {
 
     m_model->setTimeOfDay(m_model->timeOfDay()+dt*m_model->timeScale());
+    qDebug() << "time of day: " << m_model->timeOfDay() << " : " << 3600 * 24;
+
     if (m_model->timeOfDay() > 3600 * 24) //next day?
     {
       m_model->setJulianDay(m_model->julianDay() + 1.0f);
@@ -22,8 +25,6 @@ GlobalSettingsForm::GlobalSettingsForm(QWidget *parent) :
     }
 
   });
-  //timer->start(16);
-
 
   QObject::connect<void(QDoubleSpinBox::*)(double)>(ui->timeOfDaySpinBox, &QDoubleSpinBox::valueChanged, [=](double value) {
     m_model->setTimeOfDay(value);
@@ -37,14 +38,11 @@ GlobalSettingsForm::GlobalSettingsForm(QWidget *parent) :
   QObject::connect<void(QLineEdit::*)()>(ui->atmosphereFogDensityLineEdit, &QLineEdit::editingFinished, [=]() {
     m_model->setFogDensity(ui->atmosphereFogDensityLineEdit->text().toFloat());
   });
-
-
   QObject::connect(ui->runSunButton, &QPushButton::clicked, [=]() {
     QObject::disconnect(ui->timeOfDaySpinBox);
     QObject::disconnect(ui->julianDaySpinBox);
     timer->start(16);
   });
-
   QObject::connect(ui->stopSunButton, &QPushButton::clicked, [=]() {
     timer->stop();
   });
@@ -68,6 +66,7 @@ void GlobalSettingsForm::setModel(GlobalSettingsModelPtr model)
 
 void GlobalSettingsForm::updateUi() {
   ui->timeOfDaySpinBox->setValue(m_model->timeOfDay());
+  ui->timeOfDayHourSpinBox->setValue(m_model->timeOfDay()/3200.0f);
   ui->julianDaySpinBox->setValue(m_model->julianDay());
   ui->atmosphereFogDensityLineEdit->setText(QString::number(m_model->fogDensity()));
 }

@@ -1,5 +1,5 @@
-#ifndef FPSCAMERA_H
-#define FPSCAMERA_H
+#pragma once
+
 #include <math/FrustumT.h>
 #define GLM_SWIZZLE
 #include <glm/vec3.hpp>
@@ -38,4 +38,3 @@ private:
 };
 typedef std::shared_ptr<FPSCamera> FPSCameraPtr;
 }
-#endif // FPSCAMERA_H

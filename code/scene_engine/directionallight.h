@@ -1,5 +1,5 @@
-#ifndef DIRECTIONALLIGHT_H
-#define DIRECTIONALLIGHT_H
+#pragma once
+
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 
@@ -30,4 +30,3 @@ private:
 
 };
 }
-#endif // DIRECTIONALLIGHT_H
