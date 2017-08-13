@@ -34,7 +34,9 @@ SOURCES += meshrenderable.cpp \
     terrain/plane/plane.cpp \
     sky/lightshafts.cpp \
     rectanglerenderable.cpp \
-    grass.cpp
+    grass/grass.cpp \
+    sky/sunposition.cpp \
+    grass/oneplant.cpp
 
 HEADERS += meshrenderable.h \
     scene.h \
@@ -56,7 +58,9 @@ HEADERS += meshrenderable.h \
     renderpass.h \
     sky/lightshafts.h \
     rectanglerenderable.h \
-    grass.h
+    grass/grass.h \
+    sky/sunposition.h \
+    grass/oneplant.h
 
 CONFIG( debug, debug|release ) {
     DESTDIR = $$(SPAR_ROOT)/libs/lib-debug

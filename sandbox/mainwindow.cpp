@@ -14,7 +14,6 @@ MainWindow::MainWindow(QWidget *parent) :
   GlobalSettingsModelPtr globalSettingsModel = GlobalSettingsModelPtr(new GlobalSettingsModel());
   ui->globalSettingsForm->setModel(globalSettingsModel);
   ui->widget->setModel(globalSettingsModel);
-  //delete globalSettingsModel;
 }
 
 MainWindow::~MainWindow()

@@ -356,12 +356,11 @@ void Scene::drawLightShaftsPass(RenderContext *context)
         m_projection,
         glm::vec4(0, 0, m_sunLightShaftsTarget->getWidth(), m_sunLightShaftsTarget->getHeight()));
 
-  //qDebug() << sunPositionInScreenCoords.x << ", " << sunPositionInScreenCoords.y;
   sunPositionInScreenCoords.x /= m_sunLightShaftsTarget->getWidth();
   sunPositionInScreenCoords.y /= m_sunLightShaftsTarget->getHeight();
-  if(sunPositionInScreenCoords.x < 0.0f || sunPositionInScreenCoords.x > 1.0f)
+  if(sunPositionInScreenCoords.x < -0.1f || sunPositionInScreenCoords.x > 1.1f)
     return;
-  if(sunPositionInScreenCoords.y < 0.0f || sunPositionInScreenCoords.y > 1.0f)
+  if(sunPositionInScreenCoords.y < -0.1f || sunPositionInScreenCoords.y > 1.1f)
     return;
 
   context->setCullFace(RenderContext::CullFace::Back);

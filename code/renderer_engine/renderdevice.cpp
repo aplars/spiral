@@ -57,6 +57,14 @@ std::string RenderDevice::readFromFile(const char* filePath) {
 
 }
 
+ShaderProgramPtr RenderDevice::createShaderProgramFromFile(const std::string& vertexProgram, const std::string& fragmantProgram, const std::set<std::string>& defines) const {
+
+  return createShaderProgram(
+        readFromFile(vertexProgram.c_str()).c_str(),
+        readFromFile(fragmantProgram.c_str()).c_str(),
+        defines);
+}
+
 ShaderProgramPtr RenderDevice::createShaderProgramFromFile(const char* vertexProgram, const char* fragmantProgram, const std::set<std::string>& defines) const {
 
   return createShaderProgram(

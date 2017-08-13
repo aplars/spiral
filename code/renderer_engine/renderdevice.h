@@ -32,6 +32,7 @@ public:
 
   ShaderProgramPtr createShaderProgram(const char* vertexProgram, const char* fragmantProgram, const std::set<std::string>& defines = std::set<std::string>()) const;
 
+  ShaderProgramPtr createShaderProgramFromFile(const std::string& vertexProgram, const std::string& fragmantProgram, const std::set<std::string>& defines = std::set<std::string>()) const;
   ShaderProgramPtr createShaderProgramFromFile(const char* vertexProgram, const char* fragmantProgram, const std::set<std::string>& defines = std::set<std::string>()) const;
 
   ShaderProgramPtr createShaderProgram(const char* vertexProgram, const char* fragmantProgram, const char* geometryProgram, const std::set<std::string>& defines = std::set<std::string>()) const;
