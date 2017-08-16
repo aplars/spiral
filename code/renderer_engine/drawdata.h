@@ -37,6 +37,7 @@ enum class Alpha {
  * @brief The DrawData struct contains all information needed to render a mesh.
  */
 struct DrawData {
+  std::string Name; //Used for debugging.
   bool IsVisible = true;
   bool IsTwoSided = true;
   Blending BlendingFunction = Blending::Normal;

@@ -26,7 +26,9 @@ sa::ShaderProgram::ShaderProgram(const char* vertexProgram, const char* fragment
 
   m_glObject.addShaderFromSourceCode(QOpenGLShader::Vertex, vertexProgramWithDefines.c_str());
   m_glObject.addShaderFromSourceCode(QOpenGLShader::Fragment, fragmentProgramWithDefines.c_str());
-  m_glObject.link();
+  if(!m_glObject.link()) {
+    qDebug() << "Failed to ling shader: " << vertexProgram << " " << fragmentProgram;
+  }
 
   m_glObject.bind();
   initializeOpenGLFunctions();

@@ -6,7 +6,7 @@
 namespace sa {
 
 
-Grass::Grass(const glm::vec3& extentsMin, const glm::vec3& extentsMax)
+Grass::Grass(const glm::vec2 &extentsMin, const glm::vec2 &extentsMax, float groundPlane)
   : m_extentsMin(extentsMin)
   , m_extentsMax(extentsMax)
 { }

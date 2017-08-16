@@ -9,6 +9,7 @@
 #include "math/mat4ext.h"
 
 namespace sa {
+
 Scene::~Scene()
 {
   for(Entities::value_type e : m_meshes) {
@@ -25,6 +26,7 @@ Scene::Scene(unsigned int width, unsigned int height, ConfigurationManager confi
   , m_sun({1,0,1}, {0.75, 0.75, 0.75, 1}, {0.2, 0.2, 0.2, 1})
   , m_sky(5400, 5, 10, 1)
   , m_lightShafts(config)
+  , onePlant(10.5f, glm::vec3())
   , m_imageCache(1000)
   , m_textureCache(1000)
   , m_shaderCache(1000)
@@ -48,7 +50,7 @@ Scene::Scene(unsigned int width, unsigned int height, ConfigurationManager confi
 
   m_projection = glm::perspective(sa::DegToRad(60.0f), aspect, 0.1f, m_shadowMapping.getShadowMapCascadeDistance().back());
 
-
+  onePlant.setPosition(glm::vec3(100.0f, 0.0f, 0.0f));
 }
 
 void Scene::resize(unsigned int w, unsigned int h)
@@ -157,6 +159,8 @@ void Scene::toGPUOnce(RenderDevice* device, RenderContext* context) {
     m_lightShafts.toGPU(m_config, device, context);
 
     m_sunLightShaftsTarget = context->createRenderToTexture(m_screenWidth, m_screenheight);
+
+    onePlant.toGPU(m_config, device, context);
 
     //addDebugBox("thesun", m_sky.getSunPosition()[0], m_sky.getSunPosition()[1], m_sky.getSunPosition()[2], 100, 100, 100);
     //addDebugBox("thesun", 100, 0, 0, 10, 10, 10);
@@ -278,9 +282,11 @@ void Scene::drawUberPass(RenderContext* context)
   context->setViewport(m_screenWidth, m_screenheight);
 
   DrawDataList allToDraw;
-  DrawData skyDd = m_sky.getDrawData(RenderPass::Uber);
-
-  allToDraw.push_back(skyDd);
+  {
+    DrawDataList dds = onePlant.getDrawData(RenderPass::Uber);
+    allToDraw.insert(allToDraw.begin(), dds.begin(), dds.end());
+  }
+  allToDraw.push_back(m_sky.getDrawData(RenderPass::Uber));
 
   for(Entities::value_type e : m_meshes) {
     DrawDataList dds = e.second->getDrawData(RenderPass::Uber);

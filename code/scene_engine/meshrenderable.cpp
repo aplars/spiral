@@ -213,14 +213,18 @@ void MeshRenderable::toGPU(const ConfigurationManager& /*config*/, unsigned int 
 
     shadowMapSp->bindAttributeLocation("posAttr", posAttr);
     shadowMapSp->bindAttributeLocation("norAttr", norAttr);
-    shadowMapSp->bindAttributeLocation("bAttr", bAttr);
-    shadowMapSp->bindAttributeLocation("wAttr", wAttr);
+    if(bAttr != -1)
+      shadowMapSp->bindAttributeLocation("bAttr", bAttr);
+    if(wAttr != -1)
+      shadowMapSp->bindAttributeLocation("wAttr", wAttr);
     shadowMapSp->link();
 
     SunLightShaftsSp->bindAttributeLocation("posAttr", posAttr);
     SunLightShaftsSp->bindAttributeLocation("norAttr", norAttr);
-    SunLightShaftsSp->bindAttributeLocation("bAttr", bAttr);
-    SunLightShaftsSp->bindAttributeLocation("wAttr", wAttr);
+    if(bAttr != -1)
+      SunLightShaftsSp->bindAttributeLocation("bAttr", bAttr);
+    if(wAttr != -1)
+      SunLightShaftsSp->bindAttributeLocation("wAttr", wAttr);
     SunLightShaftsSp->link();
 
     sa::VertexDescription vertexDesc =

@@ -1,5 +1,5 @@
 #pragma once
-#include <glm/vec3.hpp>
+#include <glm/vec2.hpp>
 #include <renderer_engine/drawdata.h>
 
 namespace sa {
@@ -10,14 +10,15 @@ class RenderContext;
 class Grass
 {
 public:
-  Grass(const glm::vec3& extentsMin, const glm::vec3& extentsMax);
+  Grass(const glm::vec2& extentsMin, const glm::vec2& extentsMax, float groundPlane);
 
   void toGPU(const ConfigurationManager& config, RenderDevice* device, RenderContext* context);
 
   //void update(float dt, const glm::vec3& cameraPosition);
 private:
-  glm::vec3 m_extentsMin;
-  glm::vec3 m_extentsMax;
+  glm::vec2 m_extentsMin;
+  glm::vec2 m_extentsMax;
+  float m_groundPlane;
   DrawData m_drawData;
 };
 

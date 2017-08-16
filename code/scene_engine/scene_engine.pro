@@ -88,4 +88,6 @@ DISTFILES += \
     ../../data/shaders/skyshaderblackandwhite.fsh \
     ../../data/shaders/skyshaderblackandwhite.vsh \
     ../../data/shaders/lightshafts.fsh \
-    ../../data/shaders/lightshafts.vsh
+    ../../data/shaders/lightshafts.fsh \
+    ../../data/shaders/grassshader.vsh \
+    ../../data/shaders/grassshader.fsh

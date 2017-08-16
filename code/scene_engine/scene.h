@@ -15,6 +15,8 @@
 #include "meshrenderable.h"
 #include "sky/sky.h"
 #include "sky/lightshafts.h"
+#include "grass/oneplant.h"
+
 #include <config/config.h>
 
 namespace sa {
@@ -90,6 +92,8 @@ private:
   std::deque<std::string> m_meshesToDelete;
   DebugBoxEntities m_debugBoxes;
   sky::Sky m_sky;
+  OnePlant onePlant;
+
   LightShafts m_lightShafts;
   float m_currentTime = 0.0f;
 

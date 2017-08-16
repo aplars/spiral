@@ -31,14 +31,10 @@ public:
   }
 
   void notify(Args... a) {
-   // std::lock_guard<std::mutex> lock(m_mutex);
-    //if(m_mutex.try_lock()) {
-      for(typename function_map::value_type vt : m_functions) {
-        function f = vt.second;
-        f(a...);
-      }
-     // m_mutex.unlock();
-    //}
+    for(typename function_map::value_type vt : m_functions) {
+      function f = vt.second;
+      f(a...);
+    }
   }
 
   observer_id operator+=(const function& function) {

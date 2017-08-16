@@ -3,43 +3,101 @@
 #include <renderer_engine/renderdevice.h>
 #include <renderer_engine/vertexdescription.h>
 #include <renderer_engine/rendercontext.h>
+#include <glm/gtc/matrix_transform.hpp>
 
 namespace sa {
 
+OnePlant::OnePlant(float halfSizeOfPlant, const glm::vec3 &position)
+  : HalfSizeOfPlant(halfSizeOfPlant)
+  , m_position(position)
+{
+}
+
 void OnePlant::toGPU(const sa::ConfigurationManager &config, sa::RenderDevice *device, sa::RenderContext *context)
 {
-  ShaderProgramPtr sp = device->createShaderProgramFromFile(config.getParam("DTATA_DIR") + "/shaders/grass.vp", config.getParam("DTATA_DIR") + "/shaders/grass.fp");
+  ShaderProgramPtr sp = device->createShaderProgramFromFile(config.getParam("DATA_DIR") + "/shaders/grassshader.vsh", config.getParam("DATA_DIR") + "/shaders/grassshader.fsh");
 
-  TexturePtr tex = device->createTextureFromFile((config.getParam("DTATA_DIR") + "/textures/grass.png").c_str(), Texture::WrapMode::ClampToEdge);
+  TexturePtr tex = device->createTextureFromFile((config.getParam("DATA_DIR") + "/textures/grasspack.png").c_str(), Texture::WrapMode::ClampToEdge);
 
-  std::vector<Face> faces;
-  std::vector<Vertex> vertices;
-  //Create the faces
-  vertices.push_back({-HalfSizeOfPlant, -HalfSizeOfPlant, -HalfSizeOfPlant, 0.0f, 0.0f});
-  vertices.push_back({-HalfSizeOfPlant,  HalfSizeOfPlant, -HalfSizeOfPlant, 0.0f, 1.0f});
-  vertices.push_back({ HalfSizeOfPlant,  HalfSizeOfPlant,  HalfSizeOfPlant, 1.0f, 1.0f});
-  vertices.push_back({ HalfSizeOfPlant, -HalfSizeOfPlant,  HalfSizeOfPlant, 1.0f, 0.0f});
+  std::string dataDir = config.getParam("DATA_DIR");
 
-  faces.push_back({0, 1, 2});
-  faces.push_back({0, 1, 3});
+  float vertices[] {
+        -HalfSizeOfPlant, 0,  HalfSizeOfPlant, 0, 0,
+        HalfSizeOfPlant,  0,  -HalfSizeOfPlant, 0.25f, 0,
+        HalfSizeOfPlant,  2.0f * HalfSizeOfPlant,  -HalfSizeOfPlant, 0.25f, 1,
+        -HalfSizeOfPlant,  2.0f * HalfSizeOfPlant,  HalfSizeOfPlant, 0, 1,
+        //
+        -HalfSizeOfPlant, 0,  -HalfSizeOfPlant, 0, 0,
+        HalfSizeOfPlant, 0,   HalfSizeOfPlant, 0.25f, 0,
+        HalfSizeOfPlant,  2.0f * HalfSizeOfPlant,   HalfSizeOfPlant, 0.25f, 1,
+        -HalfSizeOfPlant,  2.0f * HalfSizeOfPlant,  -HalfSizeOfPlant, 0, 1,
 
+        //
+        -HalfSizeOfPlant, 0,  -0, 0, 0,
+        HalfSizeOfPlant, 0,   -0, 0.25f, 0,
+        HalfSizeOfPlant,  2.0f * HalfSizeOfPlant,   -0, 0.25f, 1,
+        -HalfSizeOfPlant,  2.0f * HalfSizeOfPlant,  -0, 0, 1
+  };
+
+  unsigned int faces[] = {
+    //
+    0, 1, 2,
+    2, 3, 0,
+
+    4, 5, 6,
+    6, 7, 4,
+
+    8, 9, 10,
+    10, 11, 8
+  };
+  VertexBufferPtr vb = device->createVertexBuffer(vertices, 5*12*sizeof(float));
 
   int posAttr = sp->attributeLocation("posAttr");
   int texAttr = sp->attributeLocation("texAttr");
-  sa::VertexDescription vertexDesc =
+  VertexDescription vertexDesc =
   {
     {posAttr, sa::VertexDescriptionElement::Type::FLOAT, 3},
-    {texAttr, sa::VertexDescriptionElement::Type::FLOAT, 2}
+    {texAttr, sa::VertexDescriptionElement::Type::FLOAT, 2},
   };
 
+  VertexArrayPtr vao = context->createVertexArray(vertexDesc, vb);
 
-  IndexBufferPtr indexBuffer = device->createIndexBuffer((unsigned int*)faces.data(), faces.size()*3);
-  VertexBufferPtr vertexBuffer = device->createVertexBuffer(vertices.data(), sizeof(Vertex)*vertices.size());
-  VertexArrayPtr vertexArray = context->createVertexArray(vertexDesc, vertexBuffer);
+  IndexBufferPtr ib = device->createIndexBuffer(faces, 18);
 
-  m_drawData.Current_SP = sp;
+
+
+  m_drawData.IsTwoSided = true;
+  m_drawData.BlendingFunction = Blending::None;
   m_drawData.TEX[0] = tex;
-  m_drawData.VAO = vertexArray;
-  m_drawData.IB = indexBuffer;
+  m_drawData.Current_SP = sp;
+  m_drawData.VAO = vao;
+  m_drawData.IB = ib;
+
+  m_drawData.AlphaFunction = Alpha::Greater;
+  m_drawData.AlphaValue = 0.1f;
+
+  glm::mat4 modelMatrix;
+  m_drawData.Uniforms.Matrix4Uniforms["u_modelMatrix"] = glm::translate(modelMatrix, m_position);
+  //m_drawData.Uniforms.Vec4Uniforms["u_color"] = glm::vec4(1,0,0,0.5);
+  context->resetCurrentState();
+}
+
+void OnePlant::update(float /*dt*/) {
+  glm::mat4 modelMatrix;
+  m_drawData.Uniforms.Matrix4Uniforms["u_modelMatrix"] = glm::translate(modelMatrix, m_position);
+}
+
+void OnePlant::setPosition(const glm::vec3 &position)
+{
+  m_position = position;
+}
+
+DrawDataList OnePlant::getDrawData(RenderPass pass)
+{
+  DrawDataList ddlist;
+  if(pass == RenderPass::Uber) {
+    ddlist.push_back(m_drawData);
+  }
+  return ddlist;
 }
 }

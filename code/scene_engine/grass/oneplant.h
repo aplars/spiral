@@ -1,6 +1,7 @@
 #pragma once
 #include <glm/vec3.hpp>
 #include <renderer_engine/drawdata.h>
+#include "../renderpass.h"
 
 namespace sa {
 class RenderContext;
@@ -29,9 +30,17 @@ public:
 
   float HalfSizeOfPlant = 0.5f;
 
-  DrawData m_drawData;
+
+  OnePlant(float halfSizeOfPlant, const glm::vec3& position);
 
   void toGPU(const sa::ConfigurationManager &config, sa::RenderDevice *device, sa::RenderContext *context);
+  void update(float /*dt*/);
+  void setPosition(const glm::vec3 &position);
+  DrawDataList getDrawData(RenderPass pass);
+
+private:
+  glm::vec3 m_position;
+  DrawData m_drawData;
 
 };
 

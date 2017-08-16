@@ -43,6 +43,12 @@ std::string RenderDevice::readFromFile(const char* filePath) {
   std::string fileString;
   std::string line;
   std::ifstream file(filePath); // Open an input stream with the selected file
+
+//  if (QOpenGLContext::currentContext()->isOpenGLES())
+//      fileString.append("#version 300 es\n");
+//  else
+//      fileString.append("#version 330\n");
+
   if (file.is_open()) { // If the file opened successfully
     while (!file.eof()) { // While we are not at the end of the file
       getline(file, line); // Get the current line
@@ -58,15 +64,13 @@ std::string RenderDevice::readFromFile(const char* filePath) {
 }
 
 ShaderProgramPtr RenderDevice::createShaderProgramFromFile(const std::string& vertexProgram, const std::string& fragmantProgram, const std::set<std::string>& defines) const {
+  const char* vp_c_str = vertexProgram.c_str();
+  const char* fp_c_str = fragmantProgram.c_str();
 
-  return createShaderProgram(
-        readFromFile(vertexProgram.c_str()).c_str(),
-        readFromFile(fragmantProgram.c_str()).c_str(),
-        defines);
+  return createShaderProgramFromFile(vp_c_str, fp_c_str, defines);
 }
 
 ShaderProgramPtr RenderDevice::createShaderProgramFromFile(const char* vertexProgram, const char* fragmantProgram, const std::set<std::string>& defines) const {
-
   return createShaderProgram(
         readFromFile(vertexProgram).c_str(),
         readFromFile(fragmantProgram).c_str(),

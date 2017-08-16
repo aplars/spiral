@@ -29,6 +29,8 @@ void GLWidget::setModel(GlobalSettingsModelPtr globalSettingsModel) {
 }
 
 void GLWidget::initializeGL() {
+
+
   for(int i = 0; i < NUMKEYS; ++i) {
     keys[i] = false;
   }
@@ -45,25 +47,14 @@ void GLWidget::initializeGL() {
   config.init("sa_config.conf");
   scene = sa::ScenePtr(new sa::Scene(this->width(), this->height(), config));
   scene->camera().setEye({0,50,200});
-//  scene->setSun(sa::DirectionalLight(
-//  {1,1,1},
-//  {0.75,0.75, 0.75, 1},
-//  {0.2,0.2, 0.2, 1}));
 
 
 
 
-//  sa::MeshRenderablePtr fortezza;
-//  fortezza.reset(new sa::MeshRenderable(config.getParam("DATA_DIR") + "/meshes/", "Fortezza.xml"));
-
-//  sa::MeshRenderablePtr silenthill;
-//  silenthill.reset(new sa::MeshRenderable(config.getParam("DATA_DIR") + "/meshes/", "silenthill.xml"));
 
   sa::MeshRenderablePtr bobMesh;
   bobMesh.reset(new sa::MeshRenderable(config.getParam("DATA_DIR") + "/meshes/", "bob.xml"));
 
-//  sa::MeshRenderablePtr groundMesh;
-//  groundMesh.reset(new sa::MeshRenderable(config.getParam("DATA_DIR") + "/meshes/", "groundplane100x100.xml"));
 
   sa::MeshRenderablePtr motioncaptureMesh;
   motioncaptureMesh.reset(new sa::MeshRenderable(config.getParam("DATA_DIR") + "/meshes/", "motioncapture.xml"));
