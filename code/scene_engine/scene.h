@@ -15,7 +15,10 @@
 #include "meshrenderable.h"
 #include "sky/sky.h"
 #include "sky/lightshafts.h"
-#include "grass/oneplant.h"
+//#include "grass/oneplant.h"
+#include "grass/grass.h"
+
+#include "weather/weather.h"
 
 #include <config/config.h>
 
@@ -37,6 +40,10 @@ public:
   void setSunSimulationTimeScale(double timeScale);
   void runSunSimulation(bool runSimulation);
   void setAtmosphereFogDensity(float desity);
+  void setAtmosExposure(float exposure);
+  void setAtmosDecay(float decay);
+  void setAtmosDensity(float density);
+  void setAtmosWeight(float weight);
   FPSCamera& camera() { return m_camera; }
   void addMeshEntity(const std::string& name, MeshRenderablePtr mesh, bool castShadow);
   void removeMeshEntity(const std::string& name);
@@ -92,7 +99,9 @@ private:
   std::deque<std::string> m_meshesToDelete;
   DebugBoxEntities m_debugBoxes;
   sky::Sky m_sky;
-  OnePlant onePlant;
+  Weather m_weather;
+  Grass grass;
+  //OnePlant onePlant;
 
   LightShafts m_lightShafts;
   float m_currentTime = 0.0f;
@@ -102,7 +111,7 @@ private:
 
   AABBModel* m_lightFrustumAabb = nullptr;
 
-  BackgroundWorker m_meshLoader;
+  background_worker m_meshLoader;
 
 
   ImageCache m_imageCache;

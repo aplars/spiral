@@ -15,6 +15,7 @@ typedef std::map<std::string, unsigned int> Sampler2DUniformsMap;
 typedef std::map<std::string, std::vector<float>> FloatArrayUniformsMap;
 typedef std::map<std::string, std::vector<glm::mat4>> Matrix4ArrayUniformsMap;
 typedef std::map<std::string, std::vector<unsigned int>> Sampler2DArrayUniformsMap;
+typedef std::map<std::string, std::vector<glm::vec3>> Vec3ArrayUniformsMap;
 
 struct ShaderUniforms {
   IntUniformsMap IntUniforms;
@@ -27,6 +28,7 @@ struct ShaderUniforms {
   FloatArrayUniformsMap FloatArrayUniforms;
   Matrix4ArrayUniformsMap Matrix4ArrayUniforms;
   Sampler2DArrayUniformsMap Sampler2DArrayUniforms;
+  Vec3ArrayUniformsMap Vec3ArrayUniforms;
 };
 }
 #endif // SHADERUNIFORMS_H

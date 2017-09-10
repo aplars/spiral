@@ -31,7 +31,7 @@ public:
   float HalfSizeOfPlant = 0.5f;
 
 
-  OnePlant(float halfSizeOfPlant, const glm::vec3& position);
+  OnePlant(float halfSizeOfPlant, const std::vector<glm::vec3>& positions);
 
   void toGPU(const sa::ConfigurationManager &config, sa::RenderDevice *device, sa::RenderContext *context);
   void update(float /*dt*/);
@@ -39,7 +39,7 @@ public:
   DrawDataList getDrawData(RenderPass pass);
 
 private:
-  glm::vec3 m_position;
+  std::vector<glm::vec3> m_positions;
   DrawData m_drawData;
 
 };

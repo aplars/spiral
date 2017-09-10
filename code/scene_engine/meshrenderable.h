@@ -46,6 +46,9 @@ public:
    */
   void toGPU(const ConfigurationManager& config, unsigned int numberOfShadowCascades, TextureCache& textureCache, ShaderCache& shaderCache, RenderDevice* device, RenderContext* context);
 
+  /**
+   * @brief unload frees the resources on the gpu.
+   */
   void unload();
   /**
    * @brief update updates the animations and applies them.
@@ -61,6 +64,8 @@ public:
 
 
   void setAnimationFrame(const std::string& skeletalAnimationName, const std::string& nodeAnimationName, float currentSkeletalAnimationTime, float currentNodeAnimationTime);
+
+
   void applyTransformations();
 
   //Returns a list of all skeletal animations

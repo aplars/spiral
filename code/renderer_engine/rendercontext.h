@@ -5,11 +5,12 @@
 #include "framebuffer.h"
 #include "vertexdescription.h"
 #include <QOpenGLFunctions>
+#include <QOpenGLExtraFunctions>
 #include <memory>
 #include <glm/vec2.hpp>
 namespace sa {
 
-class RenderContext : protected QOpenGLFunctions
+class RenderContext : protected QOpenGLExtraFunctions
 {
 public:
   enum CullFace {

@@ -10,9 +10,9 @@ int main(int argc, char *argv[])
   MainWindow w;
   w.show();
 
-  QSurfaceFormat fmt;
-  fmt.setSamples(4);
-  /*
+ // QSurfaceFormat fmt;
+ // fmt.setSamples(4);
+
   QSurfaceFormat fmt;
   fmt.setDepthBufferSize(24);
   if (QOpenGLContext::openGLModuleType() == QOpenGLContext::LibGL) {
@@ -22,6 +22,6 @@ int main(int argc, char *argv[])
       fmt.setVersion(3, 0);
   }
   QSurfaceFormat::setDefaultFormat(fmt);
-  */
+
   return a.exec();
 }

@@ -26,12 +26,19 @@ Scene::Scene(unsigned int width, unsigned int height, ConfigurationManager confi
   , m_sun({1,0,1}, {0.75, 0.75, 0.75, 1}, {0.2, 0.2, 0.2, 1})
   , m_sky(5400, 5, 10, 1)
   , m_lightShafts(config)
-  , onePlant(10.5f, glm::vec3())
+  //, onePlant(10.5f, {glm::vec3(-100, 0, 0), glm::vec3(100, 0, 0)})
+  , grass({-100.0f, -100.0f}, {100.0f, 100.0f}, 10.0f, 20.0f, 0.0f)
   , m_imageCache(1000)
   , m_textureCache(1000)
   , m_shaderCache(1000)
 
 {
+  m_weather.setWindDirection(glm::vec3(1.0f, 0.0f, 0.0f));
+  m_weather.setWindStrenght(5.0f);
+  setAtmosExposure(0.0034f);
+  setAtmosDecay(1.0f);
+  setAtmosDensity(0.84f);
+  setAtmosWeight(5.65f);
   std::vector<float> shadowMapCascadeDistance;
   shadowMapCascadeDistance.push_back(50);
   shadowMapCascadeDistance.push_back(75);
@@ -50,7 +57,6 @@ Scene::Scene(unsigned int width, unsigned int height, ConfigurationManager confi
 
   m_projection = glm::perspective(sa::DegToRad(60.0f), aspect, 0.1f, m_shadowMapping.getShadowMapCascadeDistance().back());
 
-  onePlant.setPosition(glm::vec3(100.0f, 0.0f, 0.0f));
 }
 
 void Scene::resize(unsigned int w, unsigned int h)
@@ -76,6 +82,26 @@ void Scene::runSunSimulation(bool runSimulation) {
 void Scene::setAtmosphereFogDensity(float desity)
 {
   m_sky.FogDensity = desity;
+}
+
+void Scene::setAtmosExposure(float exposure)
+{
+  m_lightShafts.setExposure(exposure);
+}
+
+void Scene::setAtmosDecay(float decay)
+{
+  m_lightShafts.setDecay(decay);
+}
+
+void Scene::setAtmosDensity(float density)
+{
+  m_lightShafts.setDensity(density);
+}
+
+void Scene::setAtmosWeight(float weight)
+{
+  m_lightShafts.setWeight(weight);
 }
 
 void Scene::setSun(const DirectionalLight& sun) {
@@ -127,12 +153,12 @@ void Scene::toCPU() {
         //We don not want to load this sucker again therefore we set it as pending.
         //if not set to pending it will try to laod again when its alreadiy loading.
         e.second->setPendingStorage();
-        BackgroundWorkPtr work;
-        work.reset(new BackgroundWork(e.second));
-        work->doWork = [=](StreamedMeshEntity* entity) {
-          entity->toCPU(m_imageCache, m_config.getParam("DATA_DIR") + "/textures/", m_config.getParam("DATA_DIR") + "/shaders/");
+        background_worker::work_ptr work;
+        work.reset(new background_worker::work());
+        work->doWork = [=]() {
+          e.second->toCPU(m_imageCache, m_config.getParam("DATA_DIR") + "/textures/", m_config.getParam("DATA_DIR") + "/shaders/");
         };
-        work->workDone = [](StreamedMeshEntity* /*entity*/) {
+        work->workDone = []() {
         };
 
         m_meshLoader.push(work);
@@ -160,7 +186,8 @@ void Scene::toGPUOnce(RenderDevice* device, RenderContext* context) {
 
     m_sunLightShaftsTarget = context->createRenderToTexture(m_screenWidth, m_screenheight);
 
-    onePlant.toGPU(m_config, device, context);
+    grass.toGPU(m_config, device, context);
+    //onePlant.toGPU(m_config, device, context);
 
     //addDebugBox("thesun", m_sky.getSunPosition()[0], m_sky.getSunPosition()[1], m_sky.getSunPosition()[2], 100, 100, 100);
     //addDebugBox("thesun", 100, 0, 0, 10, 10, 10);
@@ -230,6 +257,8 @@ void Scene::update(float dt) {
 
   m_sun.setDirection(glm::vec3(glm::normalize(m_sky.getSunPosition())));
 
+  grass.update(dt);
+  //onePlant.update(dt);
   //m_debugBoxes["thesun"]->setPosition(m_sky.getSunPosition());
 
   //m_camera.setLookAt(m_sky.getSunPosition(), glm::vec3(0,0,0), glm::vec3(0,1,0));
@@ -283,7 +312,7 @@ void Scene::drawUberPass(RenderContext* context)
 
   DrawDataList allToDraw;
   {
-    DrawDataList dds = onePlant.getDrawData(RenderPass::Uber);
+    DrawDataList dds = grass.getDrawData(RenderPass::Uber);
     allToDraw.insert(allToDraw.begin(), dds.begin(), dds.end());
   }
   allToDraw.push_back(m_sky.getDrawData(RenderPass::Uber));
@@ -322,7 +351,9 @@ void Scene::drawUberPass(RenderContext* context)
   m_sceneSpecificShaderUniforms.Vec3Uniforms["u_eyePosition"] = m_camera.eye();
   m_sceneSpecificShaderUniforms.FloatArrayUniforms["u_shadowMapCascadeDistance"] = m_shadowMapping.getShadowMapCascadeDistance();
   m_sceneSpecificShaderUniforms.Vec3Uniforms["u_sunPosition"] = m_sky.getSunPosition();
-
+  m_sceneSpecificShaderUniforms.FloatUniforms["u_windStrenght"] = m_weather.windStrenght();
+  m_sceneSpecificShaderUniforms.Vec3Uniforms["u_windDirection"] = m_weather.windDirection();
+  m_sceneSpecificShaderUniforms.FloatUniforms["u_time"] = m_currentTime;
   context->draw(allToDraw, m_sceneSpecificShaderUniforms);
 }
 
@@ -341,8 +372,12 @@ void Scene::createLightShaftsPass(RenderContext *context)
 
   //Add the sun drawable
   DrawData skyDd = m_sky.getDrawData(RenderPass::SunLightShafts);
-
   allToDraw.push_back(skyDd);
+
+  {
+    DrawDataList dds = grass.getDrawData(RenderPass::SunLightShafts);
+    allToDraw.insert(allToDraw.begin(), dds.begin(), dds.end());
+  }
 
 
   m_sceneSpecificShaderUniforms.Matrix4Uniforms["u_viewMatrix"] = m_camera.viewMatrix();

@@ -3,7 +3,8 @@ varying vec4 v_fragmentPosition;
 varying vec3 v_sunPosition;
 
 uniform sampler2D u_texture;
-uniform sampler2D u_fogColor;
+uniform float u_sunSize;
+//uniform sampler2D u_fogColor;
 
 void main(void)
 {
@@ -12,7 +13,7 @@ void main(void)
 
   vec4 tex = texture2D(u_texture, v_texAttr);
 
-  if(dist > 300) {
+  if(dist > u_sunSize) {
     //gl_FragColor =  vec4(tex.r/20.0, tex.g/20.0, tex.b/20.0, 1.0);// vec4(0,0,0.0,1);
     gl_FragColor =  vec4(0, 0, 0, 1.0);// vec4(0,0,0.0,1);
   }

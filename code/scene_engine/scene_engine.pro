@@ -36,7 +36,8 @@ SOURCES += meshrenderable.cpp \
     rectanglerenderable.cpp \
     grass/grass.cpp \
     sky/sunposition.cpp \
-    grass/oneplant.cpp
+    grass/oneplant.cpp \
+    weather/weather.cpp
 
 HEADERS += meshrenderable.h \
     scene.h \
@@ -60,7 +61,8 @@ HEADERS += meshrenderable.h \
     rectanglerenderable.h \
     grass/grass.h \
     sky/sunposition.h \
-    grass/oneplant.h
+    grass/oneplant.h \
+    weather/weather.h
 
 CONFIG( debug, debug|release ) {
     DESTDIR = $$(SPAR_ROOT)/libs/lib-debug
@@ -90,4 +92,6 @@ DISTFILES += \
     ../../data/shaders/lightshafts.fsh \
     ../../data/shaders/lightshafts.fsh \
     ../../data/shaders/grassshader.vsh \
-    ../../data/shaders/grassshader.fsh
+    ../../data/shaders/grassshader.fsh \
+    ../../data/shaders/grassblackshader.fsh \
+    ../../data/textures/grasspack.png

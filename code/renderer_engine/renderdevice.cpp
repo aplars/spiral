@@ -6,6 +6,9 @@
 #include <fstream>
 
 namespace sa {
+
+bool RenderDevice::isOpenGLES = false;
+
 RenderDevice::RenderDevice()
 {
 
@@ -44,10 +47,6 @@ std::string RenderDevice::readFromFile(const char* filePath) {
   std::string line;
   std::ifstream file(filePath); // Open an input stream with the selected file
 
-//  if (QOpenGLContext::currentContext()->isOpenGLES())
-//      fileString.append("#version 300 es\n");
-//  else
-//      fileString.append("#version 330\n");
 
   if (file.is_open()) { // If the file opened successfully
     while (!file.eof()) { // While we are not at the end of the file

@@ -4,56 +4,71 @@
 #include <condition_variable>
 #include <deque>
 #include <functional>
-#include "streamedmeshentity.h"
 
 namespace sa {
-class BackgroundWork {
 
-public:
-  BackgroundWork(StreamedMeshEntity* entity) {
-    m_entity = entity;
-  }
-
-  std::function<void(StreamedMeshEntity*)> doWork = nullptr;
-  std::function<void(StreamedMeshEntity*)> workDone = nullptr;
-
-  void doWork_call() {
-    if(doWork)
-      doWork(m_entity);
-  }
-
-  void workDone_call() {
-    if(workDone)
-      workDone(m_entity);
-  }
-
-
-  StreamedMeshEntity* m_entity;
-};
-
-typedef std::shared_ptr<BackgroundWork> BackgroundWorkPtr;
-
-class BackgroundWorker
+/**
+ * @brief The background_worker class runs tasks (do work) in the background.
+ * The user makes an instance of background_worker and adds work to it with
+ * the push method. The actual work is executed in the doWork function. When
+ * the work is completed the workDone function is called. Its u to the user to
+ * specify doWork and workDone.
+ */
+class background_worker
 {
 public:
-  ~BackgroundWorker();
-  BackgroundWorker();
+  /**
+   * @brief The work class represents the actual work. Its just two user defined
+   * functions. One that is called to do the work and one that is called when the
+   * work is completed.
+   *
+   * Example usage:
+   * \code{.cpp}
+   * background_worker::work work;
+   * \endcode
+   */
+  class work {
+  public:
+    work() {
+    }
 
-  void push(BackgroundWorkPtr work);
+    std::function<void()> doWork = nullptr;
+    std::function<void()> workDone = nullptr;
+
+    void doWork_call() {
+      if(doWork)
+        doWork();
+    }
+
+    void workDone_call() {
+      if(workDone)
+        workDone();
+    }
+
+  };
+  typedef std::shared_ptr<work> work_ptr;
+
+
+  ~background_worker();
+  background_worker();
+
+  void push(std::shared_ptr<background_worker::work> work);
 
 private:
-  void runThread();
+  void run_thread();
 
-  typedef std::unique_ptr<std::thread> ThreadScopedPtr;
-  ThreadScopedPtr m_thread;
+  typedef std::unique_ptr<std::thread> thread_ptr;
+  thread_ptr m_thread;
 
-  typedef std::deque<BackgroundWorkPtr> WorkQueue;
+  typedef std::deque<std::shared_ptr<background_worker::work>> work_queue;
 
-  bool m_threadAlive;
+  bool m_threadAlive = false;
 
   std::mutex m_mutex;
   std::condition_variable m_condition;
 
-  WorkQueue m_work;
+  work_queue m_work;
 };
+
+
 }

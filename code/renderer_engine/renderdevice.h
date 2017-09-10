@@ -18,6 +18,7 @@ typedef std::shared_ptr<VertexBuffer> VertexBufferPtr;
 class RenderDevice
 {
 public:
+  static bool isOpenGLES;
   RenderDevice();
   ~RenderDevice();
 

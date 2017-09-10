@@ -10,13 +10,13 @@ namespace sa {
 typedef int observer_id;
 
 template <class... Args>
-class Subject {
+class subject {
 public:
   typedef std::function<void(Args...)> function;
   typedef std::map<observer_id, function> function_map;
   observer_id m_currentId = 0;
 
-  Subject() {}
+  subject() {}
 
   observer_id registerObserver(const function& function) {
     std::lock_guard<std::mutex> lock(m_mutex);
@@ -42,8 +42,8 @@ public:
   }
 
 private:
-  Subject(const Subject&);
-  Subject operator=(const Subject&);
+  subject(const subject&);
+  subject operator=(const subject&);
   mutable std::mutex m_mutex;
   function_map m_functions;
 };

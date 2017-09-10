@@ -35,9 +35,6 @@ GlobalSettingsForm::GlobalSettingsForm(QWidget *parent) :
   QObject::connect<void(QDoubleSpinBox::*)(double)>(ui->sunTimeScaleSpinBox, &QDoubleSpinBox::valueChanged, [=](double value) {
     m_model->setTimeScale(value);
   });
-  QObject::connect<void(QLineEdit::*)()>(ui->atmosphereFogDensityLineEdit, &QLineEdit::editingFinished, [=]() {
-    m_model->setFogDensity(ui->atmosphereFogDensityLineEdit->text().toFloat());
-  });
   QObject::connect(ui->runSunButton, &QPushButton::clicked, [=]() {
     QObject::disconnect(ui->timeOfDaySpinBox);
     QObject::disconnect(ui->julianDaySpinBox);
@@ -46,6 +43,29 @@ GlobalSettingsForm::GlobalSettingsForm(QWidget *parent) :
   QObject::connect(ui->stopSunButton, &QPushButton::clicked, [=]() {
     timer->stop();
   });
+
+
+  QObject::connect<void(QDoubleSpinBox::*)(double)>(ui->atmosExposureDoubleSpinBox, &QDoubleSpinBox::valueChanged, [=](double value) {
+    m_model->setAtmosExposure(value);
+  });
+
+  QObject::connect<void(QDoubleSpinBox::*)(double)>(ui->atmosDecayDoubleSpinBox, &QDoubleSpinBox::valueChanged, [=](double value) {
+    m_model->setAtmosDecay(value);
+  });
+
+  QObject::connect<void(QDoubleSpinBox::*)(double)>(ui->atmosDensityDoubleSpinBox, &QDoubleSpinBox::valueChanged, [=](double value) {
+    m_model->setAtmosDensity(value);
+  });
+
+  QObject::connect<void(QDoubleSpinBox::*)(double)>(ui->atmosWeightDoubleSpinBox, &QDoubleSpinBox::valueChanged, [=](double value) {
+    m_model->setAtmosWeight(value);
+  });
+
+
+  QObject::connect<void(QLineEdit::*)()>(ui->atmosphereFogDensityLineEdit, &QLineEdit::editingFinished, [=]() {
+    m_model->setFogDensity(ui->atmosphereFogDensityLineEdit->text().toFloat());
+  });
+
 }
 
 GlobalSettingsForm::~GlobalSettingsForm()
@@ -69,4 +89,8 @@ void GlobalSettingsForm::updateUi() {
   ui->timeOfDayHourSpinBox->setValue(m_model->timeOfDay()/3200.0f);
   ui->julianDaySpinBox->setValue(m_model->julianDay());
   ui->atmosphereFogDensityLineEdit->setText(QString::number(m_model->fogDensity()));
+  ui->atmosExposureDoubleSpinBox->setValue(m_model->atmosExposure());
+  ui->atmosDecayDoubleSpinBox->setValue(m_model->atmosDecay());
+  ui->atmosDensityDoubleSpinBox->setValue(m_model->atmosDensity());
+  ui->atmosWeightDoubleSpinBox->setValue(m_model->atmosWeight());
 }

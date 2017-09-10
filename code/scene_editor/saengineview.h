@@ -12,6 +12,14 @@ public:
 signals:
 
 public slots:
+  void handleWindowChanged(QQuickWindow *win);
+  void sync();
+  void beforeRendering();
+
+private:
+  bool m_beforeRenderingConnected = false;
+  QSize m_viewportSize;
+  QPoint m_viewportPosition;
 };
 
 #endif // SAENGINEVIEW_H

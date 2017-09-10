@@ -175,19 +175,35 @@ void RenderContext::draw(DrawData drawData) {
       m_currentIB = drawData.IB;
     }
     if(drawData.IsVisible) {
-      if(drawData.Primitive == DrawPrimitive::Triangles)
-        glDrawElements(GL_TRIANGLES, drawData.IB->numberOfIndices(), GL_UNSIGNED_INT, 0);
-      else
-        glDrawElements(GL_TRIANGLE_STRIP, drawData.IB->numberOfIndices(), GL_UNSIGNED_INT, 0);
+      if(drawData.Primitive == DrawPrimitive::Triangles) {
+        if(drawData.NumberOfInstances <= 0)
+          glDrawElements(GL_TRIANGLES, drawData.IB->numberOfIndices(), GL_UNSIGNED_INT, 0);
+        else
+          glDrawElementsInstanced(GL_TRIANGLES, drawData.IB->numberOfIndices(), GL_UNSIGNED_INT, 0, drawData.NumberOfInstances);
+      }
+      else {
+        if(drawData.NumberOfInstances <= 0)
+          glDrawElements(GL_TRIANGLE_STRIP, drawData.IB->numberOfIndices(), GL_UNSIGNED_INT, 0);
+        else
+          glDrawElementsInstanced(GL_TRIANGLE_STRIP, drawData.IB->numberOfIndices(), GL_UNSIGNED_INT, 0, drawData.NumberOfInstances);
+      }
     }
   }
   else {
     //No index buffer. Draw using the number of triangles attribute instead.
     if(drawData.IsVisible) {
-      if(drawData.Primitive == DrawPrimitive::Triangles)
-        glDrawArrays(GL_TRIANGLES, 0, drawData.NumberOfTrianglesToDraw);
-      else
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, drawData.NumberOfTrianglesToDraw);
+      if(drawData.Primitive == DrawPrimitive::Triangles) {
+        if(drawData.NumberOfInstances <= 0)
+          glDrawArrays(GL_TRIANGLES, 0, drawData.NumberOfTrianglesToDraw);
+        else
+          glDrawArraysInstanced(GL_TRIANGLES, 0, drawData.NumberOfTrianglesToDraw, drawData.NumberOfInstances);
+      }
+      else {
+        if(drawData.NumberOfInstances <= 0)
+          glDrawArrays(GL_TRIANGLE_STRIP, 0, drawData.NumberOfTrianglesToDraw);
+        else
+          glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, drawData.NumberOfTrianglesToDraw, drawData.NumberOfInstances);
+      }
     }
   }
 }
@@ -248,6 +264,10 @@ void RenderContext::setUniforms(ShaderProgramPtr shader, ShaderUniforms uniforms
     shader->setUniformValueArray(uniform.first, uniform.second);
   }
   for(Sampler2DArrayUniformsMap::value_type uniform : uniforms.Sampler2DArrayUniforms)
+  {
+    shader->setUniformValueArray(uniform.first, uniform.second);
+  }
+  for(Vec3ArrayUniformsMap::value_type uniform : uniforms.Vec3ArrayUniforms)
   {
     shader->setUniformValueArray(uniform.first, uniform.second);
   }

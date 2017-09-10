@@ -46,6 +46,7 @@ struct DrawData {
 
   PolygonMode PolygonDrawMode = PolygonMode::Fill;
   DrawPrimitive Primitive = DrawPrimitive::Triangles;
+  unsigned int NumberOfInstances = 0;
   static const int NUM_TEX_UNITS = 16;
   ShaderUniforms Uniforms;
   IndexBufferPtr IB;

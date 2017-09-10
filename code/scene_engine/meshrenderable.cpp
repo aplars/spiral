@@ -322,7 +322,7 @@ void MeshRenderable::toGPU(const ConfigurationManager& /*config*/, unsigned int 
     m_drawData[meshIndex] = subMeshDrawData;
     if(isTransparent) {
       m_drawData[meshIndex].AlphaFunction = Alpha::Greater;
-      m_drawData[meshIndex].AlphaValue = 0.1f;
+      m_drawData[meshIndex].AlphaValue = 0.99f;
 
     }
 //    else
@@ -439,8 +439,7 @@ void MeshRenderable::applyTransformations() {
       skeleton->applyTransformations();
       unsigned int i = 0;
       for(Skeleton::JointMap::value_type j : skeleton->Joints) {
-        std::string uniformName = std::string("u_bones") + std::string("[") + std::to_string(i) + std::string("]");
-        m_drawData[subMeshIndex].Uniforms.Matrix4Uniforms[uniformName] = j.second.Transformation;
+        m_drawData[subMeshIndex].Uniforms.Matrix4Uniforms[std::string("u_bones") + std::string("[") + std::to_string(i) + std::string("]")] = j.second.Transformation;
         i++;
       }
       ++subMeshIndex;

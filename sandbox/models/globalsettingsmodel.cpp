@@ -70,3 +70,55 @@ void GlobalSettingsModel::setFogDensity(float fogDensity)
     PropertyChanged.notify("fogDensity");
   }
 }
+
+float GlobalSettingsModel::atmosExposure() const
+{
+  return m_atmosExposure;
+}
+
+void GlobalSettingsModel::setAtmosExposure(float atmosExposure)
+{
+  if(m_atmosExposure != atmosExposure) {
+    m_atmosExposure = atmosExposure;
+    PropertyChanged.notify("atmosExposure");
+  }
+}
+
+float GlobalSettingsModel::atmosDecay() const
+{
+  return m_atmosDecay;
+}
+
+void GlobalSettingsModel::setAtmosDecay(float atmosDecay)
+{
+  if(m_atmosDecay != atmosDecay) {
+    m_atmosDecay = atmosDecay;
+    PropertyChanged.notify("atmosDecay");
+  }
+}
+
+float GlobalSettingsModel::atmosDensity() const
+{
+  return m_atmosDensity;
+}
+
+void GlobalSettingsModel::setAtmosDensity(float atmosDensity)
+{
+  if(m_atmosDensity != atmosDensity) {
+    m_atmosDensity = atmosDensity;
+    PropertyChanged.notify("atmosDensity");
+  }
+}
+
+float GlobalSettingsModel::atmosWeight() const
+{
+  return m_atmosWeight;
+}
+
+void GlobalSettingsModel::setAtmosWeight(float atmosWeight)
+{
+  if(m_atmosWeight != atmosWeight) {
+    m_atmosWeight = atmosWeight;
+    PropertyChanged.notify("atmosWeight");
+  }
+}

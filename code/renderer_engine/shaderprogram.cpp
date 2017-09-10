@@ -12,12 +12,14 @@ sa::ShaderProgram::ShaderProgram(const char* vertexProgram, const char* fragment
 {
   //Add the defines to the shaders.
   std::string vertexProgramWithDefines;
+  vertexProgramWithDefines.append("#version 330\n");
   for(const std::string define : defines) {
     vertexProgramWithDefines += ("#define " + define + "\n");
   }
   vertexProgramWithDefines += vertexProgram;
 
   std::string fragmentProgramWithDefines;
+  fragmentProgramWithDefines.append("#version 330\n");
   for(const std::string define : defines) {
     fragmentProgramWithDefines += ("#define " + define + "\n");
   }
@@ -27,7 +29,7 @@ sa::ShaderProgram::ShaderProgram(const char* vertexProgram, const char* fragment
   m_glObject.addShaderFromSourceCode(QOpenGLShader::Vertex, vertexProgramWithDefines.c_str());
   m_glObject.addShaderFromSourceCode(QOpenGLShader::Fragment, fragmentProgramWithDefines.c_str());
   if(!m_glObject.link()) {
-    qDebug() << "Failed to ling shader: " << vertexProgram << " " << fragmentProgram;
+    qDebug() << "Failed to link shader: " << vertexProgram << " " << fragmentProgram;
   }
 
   m_glObject.bind();
@@ -42,19 +44,22 @@ sa::ShaderProgram::ShaderProgram(const char* vertexProgram, const char* fragment
   , m_gsName(geometryProgram)
 {
   //Add the defines to the shaders.
-  std::string vertexProgramWithDefines;
+  std::string vertexProgramWithDefines;  
+  vertexProgramWithDefines.append("#version 330\n");
   for(const std::string define : defines) {
     vertexProgramWithDefines += ("#define " + define + "\n");
   }
   vertexProgramWithDefines += vertexProgram;
 
   std::string fragmentProgramWithDefines;
+  fragmentProgramWithDefines.append("#version 330\n");
   for(const std::string define : defines) {
     fragmentProgramWithDefines += ("#define " + define + "\n");
   }
   fragmentProgramWithDefines += fragmentProgram;
 
   std::string geometryProgramWithDefines;
+  geometryProgramWithDefines.append("#version 330\n");
   for(const std::string define : defines) {
     geometryProgramWithDefines += ("#define " + define + ";\n");
   }
@@ -153,6 +158,12 @@ void sa::ShaderProgram::setUniformValueArray(const std::string &location, const 
 
 void sa::ShaderProgram::setUniformValueArray(const std::string &location, const std::vector<unsigned int>& values) {
   m_glObject.setUniformValueArray(location.c_str(), values.data(), values.size());
+}
+
+void sa::ShaderProgram::setUniformValueArray(const std::string &location, const std::vector<glm::vec3>& values) {
+  m_glObject.bind();
+  const glm::vec3& ff = values[0];
+  glUniform3fv(m_glObject.uniformLocation(location.c_str()), values.size(), glm::value_ptr(ff));
 }
 
 void sa::ShaderProgram::cacheUniforms() {

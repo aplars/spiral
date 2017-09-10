@@ -76,7 +76,7 @@ public:
 
   void addPropertyChangedListener(const std::function<void(const PropertyChangedEvent&)>& f);
 private:
-  Subject<const PropertyChangedEvent&> m_propertyChanged;
+  subject<const PropertyChangedEvent&> m_propertyChanged;
   MeshRenderablePtr m_mesh;
   bool m_castShadow = false;
   DataStorage m_currentStorage;

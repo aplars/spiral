@@ -159,6 +159,7 @@ void Sky::toGPU(const ConfigurationManager& config, RenderDevice* device, Render
   m_drawData.Uniforms.Vec4Uniforms["u_color"] = glm::vec4(1,0,0,0.5);
   m_drawData.Uniforms.Sampler2DUniforms["u_texture"] = 0;
   m_drawData.Uniforms.Sampler2DUniforms["u_fogColor"] = 1;
+  m_drawData.Uniforms.FloatUniforms["u_sunSize"] = 250.0f;
   context->resetCurrentState();
 }
 

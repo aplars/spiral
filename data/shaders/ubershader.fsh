@@ -252,6 +252,6 @@ void main()
    elevation = (elevation) * 0.5 + 0.5;
    vec4 fogColor = texture2D(u_aeralPerspectiveFogColorTexture, vec2(elevation, 0.1));
 
-   finalColor.rgb = aeralPerspectiveFog(finalColor.rgb, dist, dir, u_directionalLight.direction, fogColor, u_fogDensity);
+   finalColor.rgb = aeralPerspectiveFog(finalColor.rgb, dist, dir, u_directionalLight.direction, fogColor.rgb, u_fogDensity);
    gl_FragColor =  finalColor ;
 }

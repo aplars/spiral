@@ -22,7 +22,7 @@ void main()
 			
 			samp *= illuminationDecay * u_weight;
 			
-			color += samp;
+			color += samp.xyz;
 			
 			illuminationDecay *= u_decay;
 	}

@@ -1,6 +1,7 @@
 #pragma once
 #include <glm/vec2.hpp>
 #include <renderer_engine/drawdata.h>
+#include "oneplant.h"
 
 namespace sa {
 class ConfigurationManager;
@@ -10,16 +11,18 @@ class RenderContext;
 class Grass
 {
 public:
-  Grass(const glm::vec2& extentsMin, const glm::vec2& extentsMax, float groundPlane);
+  Grass(const glm::vec2& extentsMin, const glm::vec2& extentsMax, float minSpacing, float maxSpacing,float groundPlane);
 
   void toGPU(const ConfigurationManager& config, RenderDevice* device, RenderContext* context);
 
-  //void update(float dt, const glm::vec3& cameraPosition);
+  void update(float dt);
+
+  DrawDataList getDrawData(RenderPass pass);
 private:
   glm::vec2 m_extentsMin;
   glm::vec2 m_extentsMax;
   float m_groundPlane;
-  DrawData m_drawData;
+  OnePlant m_onePlant;
 };
 
 }
