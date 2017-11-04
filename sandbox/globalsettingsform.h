@@ -1,5 +1,4 @@
-#ifndef GLOBALSETTINGSFORM_H
-#define GLOBALSETTINGSFORM_H
+#pragma once
 
 #include <QWidget>
 #include <adt/subject.h>
@@ -24,5 +23,3 @@ private:
   Ui::GlobalSettingsForm *ui;
   GlobalSettingsModelPtr m_model;
 };
-
-#endif // GLOBALSETTINGSFORM_H

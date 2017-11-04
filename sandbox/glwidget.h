@@ -1,5 +1,5 @@
-#ifndef GLWIDGET_H
-#define GLWIDGET_H
+#pragma once
+
 #include <renderer_engine/widget.h>
 #include <QOpenGLFunctions>
 #include <QOpenGLDebugLogger>
@@ -55,5 +55,3 @@ protected:
   void dropEvent(QDropEvent *event) override;
 };
 
-
-#endif // GLWIDGET_H

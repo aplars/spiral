@@ -1,5 +1,4 @@
-#ifndef ENTITYMODEL_H
-#define ENTITYMODEL_H
+#pragma once
 #include <string>
 #include <json.hpp>
 #include <glm/vec3.hpp>
@@ -36,4 +35,4 @@ private:
 signals:
 };
 }
-#endif // ENTITYMODEL_H
+

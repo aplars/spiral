@@ -1,5 +1,4 @@
-#ifndef ADDENTITIESFORM_H
-#define ADDENTITIESFORM_H
+#pragma once
 #include <QWidget>
 
 namespace sa {
@@ -21,5 +20,3 @@ public:
 private:
   Ui::AddEntitiesForm *ui;
 };
-
-#endif // ADDENTITIESFORM_H

@@ -67,43 +67,9 @@ public:
 
   template <typename T>
   static Side FrustumAABBIntersect(const std::array<PlaneT<T>, 6>& planes, const glm::vec3& mins, const glm::vec3& maxs) {
-    Side    ret = Inside;
-    glm::vec3 vmin, vmax;
-
-    vmin = mins;
-    vmax = maxs;
-    for(int i = 0; i < 6; ++i) {
-      // X axis
-      if(planes[i].normal().x > 0) {
-        vmin.x = (mins.x);
-        vmax.x = (maxs.x);
-      } else {
-        vmin.x = (maxs.x);
-        vmax.x = (mins.x);
-      }
-      // Y axis
-      if(planes[i].normal().y > 0) {
-        vmin.y = (mins.y);
-        vmax.y = (maxs.y);
-      } else {
-        vmin.y = (maxs.y);
-        vmax.y = (mins.y);
-      }
-      // Z axis
-      if(planes[i].normal().z > 0) {
-        vmin.z = (mins.z);
-        vmax.z = (maxs.z);
-      } else {
-        vmin.z = (maxs.z);
-        vmax.z = (mins.z);
-      }
-
-      if(glm::dot(planes[i].normal(), vmax) + planes[i].d() < 0)
-        return Outside;
-      if(glm::dot(planes[i].normal(), vmin) + planes[i].d() <= 0)
-        ret = Intersect;
-    }
-    return ret;
+    std::deque<PlaneT<T>> planesDeque;
+    std::copy(std::begin(planes), std::end(planes), std::back_inserter(planesDeque));
+    return FrustumAABBIntersect(planesDeque, mins, maxs);
   }
 
   template <typename T>

@@ -1,5 +1,4 @@
-#ifndef GLOBALSETTINGSMODEL_H
-#define GLOBALSETTINGSMODEL_H
+#pragma once
 #include <adt/subject.h>
 
 class GlobalSettingsModel
@@ -47,4 +46,4 @@ private:
   bool m_isUpdating = false;
 };
 typedef std::shared_ptr<GlobalSettingsModel> GlobalSettingsModelPtr;
-#endif // GLOBALSETTINGSMODEL_H
+
