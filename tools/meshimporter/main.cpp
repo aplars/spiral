@@ -10,7 +10,7 @@ int main(int argc, char *argv[]) {
   Q_UNUSED(argc);
   Q_UNUSED(argv);
 
-  sa::ConfigurationManager config;
+  sa::Config config;
   bool isOk = config.init("sa_config.conf");
   if(isOk) {
   qDebug() << "config OK";

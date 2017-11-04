@@ -28,7 +28,7 @@ void RectangleRenderable::setPosition(const glm::vec3 &pos) {
   m_position = pos;
 }
 
-void RectangleRenderable::toGPU(const ConfigurationManager& config, RenderDevice *device, RenderContext *context)
+void RectangleRenderable::toGPU(const Config& config, RenderDevice *device, RenderContext *context)
 {
   std::string dataDir = config.getParam("DATA_DIR");
 

@@ -160,7 +160,7 @@ void set_insert_range(const std::set<std::string>& in, std::set<std::string>& ou
   out.insert(in.begin(), in.end());
 }
 
-void MeshRenderable::toGPU(const ConfigurationManager& /*config*/, unsigned int numberOfShadowCascades, TextureCache& textureCache, ShaderCache& shaderCache, RenderDevice* device, RenderContext* context) {
+void MeshRenderable::toGPU(const Config& /*config*/, unsigned int numberOfShadowCascades, TextureCache& textureCache, ShaderCache& shaderCache, RenderDevice* device, RenderContext* context) {
   if(m_currentDataStorage == DataStorage::GPU) {
     m_numberOfInstances++;
 

@@ -24,7 +24,7 @@ void CubeRenderable::setPosition(const glm::vec3 &pos) {
   m_position = pos;
 }
 
-void CubeRenderable::toGPU(const ConfigurationManager& config, RenderDevice *device, RenderContext *context)
+void CubeRenderable::toGPU(const Config& config, RenderDevice *device, RenderContext *context)
 {
   float vertices[] {
     // front

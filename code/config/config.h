@@ -9,7 +9,7 @@ namespace sa
 	/**
 
 	*/
-	class ConfigurationManager
+  class Config
 	{
 	public:
 		///Starts the configuration manager looking for the file 'configFile'.

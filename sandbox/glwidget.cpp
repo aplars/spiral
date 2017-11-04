@@ -8,6 +8,7 @@
 #include <renderer_engine/drawdata.h>
 #include <scene_engine/scene.h>
 #include <deque>
+#include <QDebug>
 
 GLWidget::GLWidget(QWidget* parent)
   : sa::Widget(parent)
@@ -47,7 +48,7 @@ void GLWidget::initializeGL() {
 //    m_debugLogger->startLogging();
   }
 
-  sa::ConfigurationManager config;
+  sa::Config config;
   config.init("sa_config.conf");
   scene = sa::ScenePtr(new sa::Scene(this->width(), this->height(), config));
   scene->camera().setEye({0,50,200});
@@ -135,4 +136,17 @@ void GLWidget::onKeyDown(KeyEvent event) {
 
 void GLWidget::onKeyUp(KeyEvent event) {
   keys[event.keyCode] = false;
+}
+
+void GLWidget::dragEnterEvent(QDragEnterEvent *event)
+{
+  qDebug() << "dragEnterEvent";
+}
+
+void GLWidget::dragMoveEvent(QDragMoveEvent *event)
+{
+}
+
+void GLWidget::dropEvent(QDropEvent *event)
+{
 }

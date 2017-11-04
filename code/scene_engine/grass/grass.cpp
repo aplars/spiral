@@ -26,9 +26,9 @@ Grass::Grass(const glm::vec2 &extentsMin, const glm::vec2 &extentsMax, float min
   , m_onePlant(10.5f, getPositions(extentsMin, extentsMax, minSpacing, maxSpacing))
 { }
 
-void Grass::toGPU(const sa::ConfigurationManager &config, sa::RenderDevice *device, sa::RenderContext *context)
+void Grass::toGPU(const sa::Config &config, unsigned int numberOfShadowCascades, sa::RenderDevice *device, sa::RenderContext *context)
 {
-  m_onePlant.toGPU(config, device, context);
+  m_onePlant.toGPU(config, numberOfShadowCascades, device, context);
 }
 
 void Grass::update(float dt)

@@ -8,7 +8,7 @@
 namespace sa {
 class RenderDevice;
 class RenderContext;
-class ConfigurationManager;
+class Config;
 
 class RectangleRenderable
 {
@@ -73,7 +73,7 @@ public:
   ~RectangleRenderable();
   RectangleRenderable(float posx, float posy, float posz, float hw, float hh, std::string vertexShader="", std::string fragmentShader="");
   void setPosition(const glm::vec3& pos);
-  void toGPU(const ConfigurationManager& config, RenderDevice* device, RenderContext* context);
+  void toGPU(const Config& config, RenderDevice* device, RenderContext* context);
   void update(float dt);
   DrawData getDrawData();
 

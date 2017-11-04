@@ -49,18 +49,60 @@ public:
   typedef std::shared_ptr<work> work_ptr;
 
 
-  ~background_worker();
-  background_worker();
+  ~background_worker()
+  {
+    m_threadAlive = false;
+    m_condition.notify_one();
+    m_thread->join();
+  }
 
-  void push(std::shared_ptr<background_worker::work> work);
+  background_worker()
+    : m_threadAlive(true)
+  {
+    m_thread.reset(new std::thread(&background_worker::run_thread, this));
+  }
+
+  void push(const background_worker::work& work) {
+    {
+      std::lock_guard<std::mutex> lock(m_mutex);
+      m_work.push_back(work);
+    }
+    m_condition.notify_one();
+  }
 
 private:
-  void run_thread();
+  void run_thread() {
+    while(m_threadAlive)
+    {
+      work_queue localJobs;
+      {
+        std::unique_lock<std::mutex> lock(m_mutex);
+
+        //No work need to be done.
+        //We just wait so we dont waste any CPU.
+        while(m_work.empty() && m_threadAlive)
+        {
+          m_condition.wait(lock);
+        }
+
+        localJobs = m_work;
+        m_work.clear();
+      }
+
+      while(!localJobs.empty())
+      {
+        localJobs.back().doWork_call();
+        localJobs.back().workDone_call();
+
+        localJobs.pop_back();
+      }
+    }
+  }
 
   typedef std::unique_ptr<std::thread> thread_ptr;
   thread_ptr m_thread;
 
-  typedef std::deque<std::shared_ptr<background_worker::work>> work_queue;
+  typedef std::deque<background_worker::work> work_queue;
 
   bool m_threadAlive = false;
 
@@ -69,6 +111,4 @@ private:
 
   work_queue m_work;
 };
-
-
 }

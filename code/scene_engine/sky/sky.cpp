@@ -93,7 +93,7 @@ void Sky::update(float /*dt*/, const glm::vec3 &cameraPosition) {
   m_drawData.Uniforms.Vec3Uniforms["u_cameraPosition"] = cameraPosition;
 }
 
-void Sky::toGPU(const ConfigurationManager& config, RenderDevice* device, RenderContext* context) {
+void Sky::toGPU(const Config& config, RenderDevice* device, RenderContext* context) {
   VertexBufferPtr vb = device->createVertexBuffer(m_vertices.data(), m_vertices.size()*sizeof(Vertex));
 
   std::string dataDir = config.getParam("DATA_DIR");

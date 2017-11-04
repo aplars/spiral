@@ -4,7 +4,7 @@
 #include "../rectanglerenderable.h"
 
 namespace sa {
-class ConfigurationManager;
+class Config;
 class RenderDevice;
 class RenderContext;
 
@@ -12,8 +12,8 @@ class LightShafts
 {
 public:
 
-  LightShafts(const ConfigurationManager &config);
-  void toGPU(const ConfigurationManager& config, RenderDevice* device, RenderContext* context);
+  LightShafts(const Config &config);
+  void toGPU(const Config& config, RenderDevice* device, RenderContext* context);
   const glm::mat4 &getProjection() const;
   DrawData getDrawData();
   void setExposure(float exposure);

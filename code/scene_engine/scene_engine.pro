@@ -25,7 +25,6 @@ SOURCES += meshrenderable.cpp \
     directionallight.cpp \
     cuberenderable.cpp \
     debugentity.cpp \
-    backgroundworker.cpp \
     streamedmeshentity.cpp \
     converters.cpp \
     shadows/shadowmapping.cpp \
@@ -46,7 +45,6 @@ HEADERS += meshrenderable.h \
     cuberenderable.h \
     debugentity.h \
     datastorage.h \
-    backgroundworker.h \
     streamedmeshentity.h \
     imagecache.h \
     shadercache.h \

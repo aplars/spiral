@@ -32,7 +32,9 @@ sa::ShaderProgram::ShaderProgram(const char* vertexProgram, const char* fragment
     qDebug() << "Failed to link shader: " << vertexProgram << " " << fragmentProgram;
   }
 
-  m_glObject.bind();
+  if(!m_glObject.bind()) {
+    qDebug() << "Failed to bind shader: " << vertexProgram << " " << fragmentProgram;
+  }
   initializeOpenGLFunctions();
   cacheUniforms();
   m_glObject.release();
@@ -68,9 +70,13 @@ sa::ShaderProgram::ShaderProgram(const char* vertexProgram, const char* fragment
   m_glObject.addShaderFromSourceCode(QOpenGLShader::Vertex, vertexProgramWithDefines.c_str());
   m_glObject.addShaderFromSourceCode(QOpenGLShader::Fragment, fragmentProgramWithDefines.c_str());
   m_glObject.addShaderFromSourceCode(QOpenGLShader::Geometry, geometryProgramWithDefines.c_str());
-  m_glObject.link();
+  if(!m_glObject.link()) {
+    qDebug() << "Failed to link shader: " << vertexProgram << " " << fragmentProgram;
+  }
 
-  m_glObject.bind();
+  if(!m_glObject.bind()) {
+    qDebug() << "Failed to bind shader: " << vertexProgram << " " << fragmentProgram;
+  }
   initializeOpenGLFunctions();
   cacheUniforms();
   m_glObject.release();

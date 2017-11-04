@@ -23,5 +23,7 @@ int main(int argc, char *argv[])
   }
   QSurfaceFormat::setDefaultFormat(fmt);
 
-  return a.exec();
+  int kuken = a.exec();
+
+  return kuken;
 }

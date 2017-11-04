@@ -52,7 +52,7 @@ public:
   void setPendingStorage();
   void setDiskStorage();
   void toCPU(ImageCache& imageCache, const std::string& dataDir, const std::__cxx11::string &shaderPath);
-  void toGPU(const ConfigurationManager& config, unsigned int numberOfShadowCascades, TextureCache& textureCache, ShaderCache& shaderCache, RenderDevice* device, RenderContext* context);
+  void toGPU(const Config& config, unsigned int numberOfShadowCascades, TextureCache& textureCache, ShaderCache& shaderCache, RenderDevice* device, RenderContext* context);
   void applyAnimations(float dt);
   //Returns a list of all skeletal animations
   std::deque<std::string> getSkeletalAnimations() const;

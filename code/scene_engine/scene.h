@@ -7,15 +7,14 @@
 
 #include "fpscamera.h"
 #include "directionallight.h"
-#include "backgroundworker.h"
-#include "adt/lru.h"
+#include <adt/backgroundworker.h>
+#include <adt/lru.h>
 #include "imagecache.h"
 #include "shadercache.h"
 #include "shadows/shadowmapping.h"
 #include "meshrenderable.h"
 #include "sky/sky.h"
 #include "sky/lightshafts.h"
-//#include "grass/oneplant.h"
 #include "grass/grass.h"
 
 #include "weather/weather.h"
@@ -34,7 +33,7 @@ class Scene
 {
 public:
   ~Scene();
-  Scene(unsigned int width, unsigned int height, ConfigurationManager config);
+  Scene(unsigned int width, unsigned int height, Config config);
   void resize(unsigned int w, unsigned int h);
   void setTime(double julianDay, double timeOfDay);
   void setSunSimulationTimeScale(double timeScale);
@@ -83,7 +82,7 @@ private:
 
   unsigned int m_screenWidth, m_screenheight;
 
-  ConfigurationManager m_config;
+  Config m_config;
 
   bool m_firstTimeInToGPU = true;
 

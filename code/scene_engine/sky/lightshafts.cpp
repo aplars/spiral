@@ -7,13 +7,13 @@
 
 namespace sa {
 
-LightShafts::LightShafts(const ConfigurationManager& config)
+LightShafts::LightShafts(const Config& config)
   : m_rectangleRenderable(0, 0, 0, 100, 100, (config.getParam("DATA_DIR") + "/shaders/lightshafts.vsh").c_str(), (config.getParam("DATA_DIR") + "/shaders/lightshafts.fsh").c_str())
 {
   m_projection = glm::ortho(-100.0f, 100.0f, -100.0f, 100.0f, 0.0f, 0.01f);
 }
 
-void LightShafts::toGPU(const ConfigurationManager& config, RenderDevice* device, RenderContext* context) {
+void LightShafts::toGPU(const Config& config, RenderDevice* device, RenderContext* context) {
   m_rectangleRenderable.toGPU(config, device, context);
 }
 

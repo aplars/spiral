@@ -19,7 +19,7 @@ Scene::~Scene()
   }
 }
 
-Scene::Scene(unsigned int width, unsigned int height, ConfigurationManager config)
+Scene::Scene(unsigned int width, unsigned int height, Config config)
   : m_screenWidth(width)
   , m_screenheight(height)
   , m_config(config)
@@ -161,7 +161,7 @@ void Scene::toCPU() {
         work->workDone = []() {
         };
 
-        m_meshLoader.push(work);
+        m_meshLoader.push(*work);
       }
     }
     else {
@@ -186,8 +186,7 @@ void Scene::toGPUOnce(RenderDevice* device, RenderContext* context) {
 
     m_sunLightShaftsTarget = context->createRenderToTexture(m_screenWidth, m_screenheight);
 
-    grass.toGPU(m_config, device, context);
-    //onePlant.toGPU(m_config, device, context);
+    grass.toGPU(m_config, m_shadowMapping.getNumberOfPasses(), device, context);
 
     //addDebugBox("thesun", m_sky.getSunPosition()[0], m_sky.getSunPosition()[1], m_sky.getSunPosition()[2], 100, 100, 100);
     //addDebugBox("thesun", 100, 0, 0, 10, 10, 10);
@@ -247,7 +246,7 @@ void Scene::update(float dt) {
   }
 
 
-//#pragma omp parallel for
+#pragma omp parallel for
   for(unsigned int i = 0; i < entetiesDeq.size(); ++i) {
     StreamedMeshEntity* e = entetiesDeq[i];
     e->applyAnimations(dt);

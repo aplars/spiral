@@ -4,7 +4,7 @@
 
 namespace sa
 {
-  bool ConfigurationManager::init(const std::string& configFile)
+  bool Config::init(const std::string& configFile)
   {
     bool isOk = true;
     DirectoryHelper dirH;
@@ -26,7 +26,7 @@ namespace sa
     return isOk;
   }
 
-  std::string ConfigurationManager::getParam(const std::string& key) const
+  std::string Config::getParam(const std::string& key) const
 	{
 		Parser::SymbolTable::const_iterator it = m_symbols.find(key);
 	
@@ -38,7 +38,7 @@ namespace sa
 		return "";
 	}
 
-  std::string ConfigurationManager::getMyHostName()
+  std::string Config::getMyHostName()
 	{
     QString qHostName = QHostInfo::localHostName();
     std::string hostName = "";//qHostName.toStdString();

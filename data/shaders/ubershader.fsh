@@ -179,42 +179,22 @@ void main()
   vec4 dif = vec4(0,0,0,1);
   vec4 spe = vec4(0,0,0,1);
 
-
-//  blinnPhong(
-//        u_directionalLight.diffuse,
-//        u_directionalLight.specular,
-//        ambient,
-//        diffuse,
-//        specular,
-//        u_directionalLight.direction,
-//        normalize(theLightingNormal),
-//        u_eyePosition - v_posAttr,
-//        u_shininess,
-//        u_shininessStrength,
-//        amb,
-//        dif,
-//        spe);
-
   vec4 shadowCoordDivW;
 
   float visibility = 1.0;
   float distanceFromLight = 10000;
 
    vec4 cascadeColor = vec4(1,1,1,0.5);
-   //float bias = 0.01;
    float bias = 0.005 + 0.001 * tan(acos(dot(normalize(v_norAttr.xyz), normalize(u_directionalLight.direction))));
    for(int i = 0; i < NUMBER_OF_CASCADES; i++) {
      if(v_posViewZ < u_shadowMapCascadeDistance[i]){
        shadowCoordDivW = v_shadowCoord[i]/v_shadowCoord[i].w;
        cascadeColor = cascadeColors[i];
        distanceFromLight = texture2D(u_shadowMap[i], shadowCoordDivW.xy).z;
-       //distanceFromLight = PCF(u_shadowMap[i], vec2(1024, 1024), shadowCoordDivW.xy);
        if(v_shadowCoord[i].w > 0 )
        {
-
          visibility = 1.0;
          if(distanceFromLight < shadowCoordDivW.z - bias) {
-           //visibility = distanceFromLight;
            visibility = 0.0;
          }
        }
@@ -222,25 +202,8 @@ void main()
      }
    }
 
-   //if(u_directionalLight.direction.y < 0)
-   //  visibility = 0.0;
-
-//   amb = clamp(amb, 0, 1);
-//   spe = clamp(spe, 0, 1);
-//   dif = clamp(dif, 0, 1);
-
-   //vec4 finalColor = (visibility * (dif));
-   //vec4 finalColor = (amb*dif + visibility * (dif + spe));
-
    vec3 theLightingNormal = v_norAttr.xyz;
 
-//   if(u_isTwoSided) {
-//     if(dot(normalize(u_eyePosition - v_posAttr), normalize(v_norAttr.xyz)) < 0) {
-//       theLightingNormal*=-1.0;
-//     }
-//     else {
-//     }
-//   }
    float nDotL =   visibility * max(dot(normalize(theLightingNormal), normalize(u_directionalLight.direction)), 0);
    vec4 finalColor = vec4(u_directionalLight.ambient.rgb * diffuse.rgb + u_directionalLight.diffuse.rgb * diffuse.rgb * nDotL, diffuse.a);
 

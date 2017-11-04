@@ -47,6 +47,13 @@ private:
   float currentTime = 0.0;
   bool firstTime = true;
   float dt = 1/60.0;
+
+  // QWidget interface
+protected:
+  void dragEnterEvent(QDragEnterEvent *event) override;
+  void dragMoveEvent(QDragMoveEvent *event) override;
+  void dropEvent(QDropEvent *event) override;
 };
+
 
 #endif // GLWIDGET_H

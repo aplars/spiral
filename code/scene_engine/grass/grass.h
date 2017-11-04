@@ -4,7 +4,7 @@
 #include "oneplant.h"
 
 namespace sa {
-class ConfigurationManager;
+class Config;
 class RenderDevice;
 class RenderContext;
 
@@ -13,7 +13,7 @@ class Grass
 public:
   Grass(const glm::vec2& extentsMin, const glm::vec2& extentsMax, float minSpacing, float maxSpacing,float groundPlane);
 
-  void toGPU(const ConfigurationManager& config, RenderDevice* device, RenderContext* context);
+  void toGPU(const Config& config, unsigned int numberOfShadowCascades, RenderDevice* device, RenderContext* context);
 
   void update(float dt);
 

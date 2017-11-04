@@ -8,7 +8,7 @@
 namespace sa {
 class RenderDevice;
 class RenderContext;
-class ConfigurationManager;
+class Config;
 
 class CubeRenderable
 {
@@ -65,7 +65,7 @@ public:
   ~CubeRenderable();
   CubeRenderable(float posx, float posy, float posz, float hw, float hh, float hd);
   void setPosition(const glm::vec3& pos);
-  void toGPU(const ConfigurationManager& config, RenderDevice* device, RenderContext* context);
+  void toGPU(const Config& config, RenderDevice* device, RenderContext* context);
   void update(float dt);
   const DrawData& getDrawData() const;
 

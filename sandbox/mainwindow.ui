@@ -72,6 +72,9 @@ QToolButton { /* all types of tool button */
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
      <widget class="GLWidget" name="widget" native="true">
+      <property name="acceptDrops">
+       <bool>true</bool>
+      </property>
       <property name="styleSheet">
        <string notr="true">background-color:red;</string>
       </property>
@@ -79,7 +82,7 @@ QToolButton { /* all types of tool button */
     </item>
    </layout>
   </widget>
-  <widget class="QDockWidget" name="settingsDockWidget">
+  <widget class="QDockWidget" name="globalSettingsDockWidget">
    <attribute name="dockWidgetArea">
     <number>1</number>
    </attribute>
@@ -87,6 +90,18 @@ QToolButton { /* all types of tool button */
     <layout class="QVBoxLayout" name="verticalLayout_2">
      <item>
       <widget class="GlobalSettingsForm" name="globalSettingsForm" native="true"/>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QDockWidget" name="dockWidget">
+   <attribute name="dockWidgetArea">
+    <number>1</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents">
+    <layout class="QVBoxLayout" name="verticalLayout_3">
+     <item>
+      <widget class="AddEntitiesForm" name="addEntitiesForm" native="true"/>
      </item>
     </layout>
    </widget>
@@ -104,6 +119,12 @@ QToolButton { /* all types of tool button */
    <class>GlobalSettingsForm</class>
    <extends>QWidget</extends>
    <header>globalsettingsform.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>AddEntitiesForm</class>
+   <extends>QWidget</extends>
+   <header>addentitiesform.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

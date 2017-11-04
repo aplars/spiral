@@ -4,6 +4,8 @@
 #include "glwidget.h"
 
 #include "models/globalsettingsmodel.h"
+#include "models/entities_tree_model/entityfactoryitemmodel.h"
+#include "config/config.h"
 
 MainWindow::MainWindow(QWidget *parent) :
   QMainWindow(parent),
@@ -11,8 +13,15 @@ MainWindow::MainWindow(QWidget *parent) :
 {
   ui->setupUi(this);
 
+  sa::Config config;
+  config.init("sa_config.conf");
+
   GlobalSettingsModelPtr globalSettingsModel = GlobalSettingsModelPtr(new GlobalSettingsModel());
+  sa::EntityFactoryItemModel* entityFactoryItemModel = new sa::EntityFactoryItemModel(this, config.getParam("CLASSES_DIR"));
+
+
   ui->globalSettingsForm->setModel(globalSettingsModel);
+  ui->addEntitiesForm->setModel(entityFactoryItemModel);
   ui->widget->setModel(globalSettingsModel);
 }
 

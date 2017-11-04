@@ -6,7 +6,7 @@
 #include "../renderpass.h"
 
 namespace sa {
-class ConfigurationManager;
+class Config;
 class RenderDevice;
 class RenderContext;
 namespace sky {
@@ -35,7 +35,7 @@ public:
   Sky(float radius, int Slices, int Sides, float dampening);
 
   glm::vec3 getSunPosition() const;
-  void toGPU(const ConfigurationManager& config, RenderDevice* device, RenderContext* context);
+  void toGPU(const Config& config, RenderDevice* device, RenderContext* context);
 
   void update(float dt, const glm::vec3& cameraPosition);
 

@@ -17,7 +17,8 @@ INCLUDEPATH += "$$(SPAR_ROOT)/thirdparty/boost/"
 
 HEADERS += lru.h \ 
     stringid.h \
-    subject.h
+    subject.h \
+    backgroundworker.h
 
 
 CONFIG( debug, debug|release ) {

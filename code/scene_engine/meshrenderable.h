@@ -16,7 +16,7 @@ namespace sa {
 class RenderDevice;
 class RenderContext;
 class VertexBuffer;
-class ConfigurationManager;
+class Config;
 typedef std::shared_ptr<VertexBuffer> VertexBufferPtr;
 
 class MeshRenderable {
@@ -44,7 +44,7 @@ public:
    * @param context
    * @return
    */
-  void toGPU(const ConfigurationManager& config, unsigned int numberOfShadowCascades, TextureCache& textureCache, ShaderCache& shaderCache, RenderDevice* device, RenderContext* context);
+  void toGPU(const Config& config, unsigned int numberOfShadowCascades, TextureCache& textureCache, ShaderCache& shaderCache, RenderDevice* device, RenderContext* context);
 
   /**
    * @brief unload frees the resources on the gpu.

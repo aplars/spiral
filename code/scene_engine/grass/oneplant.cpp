@@ -13,30 +13,33 @@ OnePlant::OnePlant(float halfSizeOfPlant, const std::vector<glm::vec3> &position
 {
 }
 
-void OnePlant::toGPU(const sa::ConfigurationManager &config, sa::RenderDevice *device, sa::RenderContext *context)
+void OnePlant::toGPU(const sa::Config &config, unsigned int numberOfShadowCascades, sa::RenderDevice *device, sa::RenderContext *context)
 {
-  ShaderProgramPtr sp = device->createShaderProgramFromFile(config.getParam("DATA_DIR") + "/shaders/grassshader.vsh", config.getParam("DATA_DIR") + "/shaders/grassshader.fsh");
-  ShaderProgramPtr SunLightShaftsSp = device->createShaderProgramFromFile(config.getParam("DATA_DIR") + "/shaders/grassshader.vsh", config.getParam("DATA_DIR") + "/shaders/grassblackshader.fsh");
+  std::set<std::string> globalDefines;
+  globalDefines.insert("NUMBER_OF_CASCADES " + std::to_string(numberOfShadowCascades));
+
+  ShaderProgramPtr sp = device->createShaderProgramFromFile(config.getParam("DATA_DIR") + "/shaders/grassshader.vsh", config.getParam("DATA_DIR") + "/shaders/grassshader.fsh", globalDefines);
+  ShaderProgramPtr SunLightShaftsSp = device->createShaderProgramFromFile(config.getParam("DATA_DIR") + "/shaders/grassshader.vsh", config.getParam("DATA_DIR") + "/shaders/grassblackshader.fsh", globalDefines);
   TexturePtr tex = device->createTextureFromFile((config.getParam("DATA_DIR") + "/textures/grasspack.png").c_str(), Texture::WrapMode::ClampToEdge);
 
   std::string dataDir = config.getParam("DATA_DIR");
 
   float vertices[] {
-        -HalfSizeOfPlant, 0,  HalfSizeOfPlant, 0, 0, 0,
-        HalfSizeOfPlant,  0,  -HalfSizeOfPlant, 0.25f, 0, 0,
-        HalfSizeOfPlant,  2.0f * HalfSizeOfPlant,  -HalfSizeOfPlant, 0.25f, 1, 1,
-        -HalfSizeOfPlant,  2.0f * HalfSizeOfPlant,  HalfSizeOfPlant, 0, 1, 1,
+        -HalfSizeOfPlant,  0,                       HalfSizeOfPlant,    0,  1, 0,      0,     0, 0,
+        HalfSizeOfPlant,   0,                       -HalfSizeOfPlant,   0,  1, 0,      0.25f, 0, 0,
+        HalfSizeOfPlant,   2.0f * HalfSizeOfPlant,  -HalfSizeOfPlant,   0,  1, 0,      0.25f, 1, 1,
+        -HalfSizeOfPlant,  2.0f * HalfSizeOfPlant,  HalfSizeOfPlant,    0,  1, 0,      0,     1, 1,
         //
-        -HalfSizeOfPlant, 0,  -HalfSizeOfPlant, 0, 0, 0,
-        HalfSizeOfPlant, 0,   HalfSizeOfPlant, 0.25f, 0, 0,
-        HalfSizeOfPlant,  2.0f * HalfSizeOfPlant,   HalfSizeOfPlant, 0.25f, 1, 1,
-        -HalfSizeOfPlant,  2.0f * HalfSizeOfPlant,  -HalfSizeOfPlant, 0, 1, 1,
+        -HalfSizeOfPlant,  0,  -HalfSizeOfPlant,                        0,  1, 0,      0,     0, 0,
+        HalfSizeOfPlant,   0,   HalfSizeOfPlant,                        0,  1, 0,      0.25f, 0, 0,
+        HalfSizeOfPlant,   2.0f * HalfSizeOfPlant,   HalfSizeOfPlant,   0,  1,  0,     0.25f, 1, 1,
+        -HalfSizeOfPlant,  2.0f * HalfSizeOfPlant,  -HalfSizeOfPlant,   0,  1,  0,     0,     1, 1,
 
         //
-        -HalfSizeOfPlant, 0,  -0, 0, 0, 0,
-        HalfSizeOfPlant, 0,   -0, 0.25f, 0, 0,
-        HalfSizeOfPlant,  2.0f * HalfSizeOfPlant,   -0, 0.25f, 1, 1,
-        -HalfSizeOfPlant,  2.0f * HalfSizeOfPlant,  -0, 0, 1, 1
+        -HalfSizeOfPlant,  0,                       -0,                 0,  1, 0,      0,     0, 0,
+        HalfSizeOfPlant,   0,                       -0,                 0,  1, 0,      0.25f, 0, 0,
+        HalfSizeOfPlant,   2.0f * HalfSizeOfPlant,  -0,                 0,  1,  0,     0.25f, 1, 1,
+        -HalfSizeOfPlant,  2.0f * HalfSizeOfPlant,  -0,                 0,  1,  0,     0,     1, 1
   };
 
   unsigned int faces[] = {
@@ -50,14 +53,19 @@ void OnePlant::toGPU(const sa::ConfigurationManager &config, sa::RenderDevice *d
     8, 9, 10,
     10, 11, 8
   };
-  VertexBufferPtr vb = device->createVertexBuffer(vertices, 5*12*sizeof(float));
+  VertexBufferPtr vb = device->createVertexBuffer(vertices, 9*12*sizeof(float));
 
   int posAttr = sp->attributeLocation("posAttr");
+
+  int norAttr = sp->attributeLocation("norAttr");
+
   int texAttr = sp->attributeLocation("texAttr");
+
   int windAttr = sp->attributeLocation("windAttr");
   VertexDescription vertexDesc =
   {
     {posAttr, sa::VertexDescriptionElement::Type::FLOAT, 3},
+    {norAttr, sa::VertexDescriptionElement::Type::FLOAT, 3},
     {texAttr, sa::VertexDescriptionElement::Type::FLOAT, 2},
     {windAttr, sa::VertexDescriptionElement::Type::FLOAT, 1},
   };

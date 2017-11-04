@@ -19,7 +19,7 @@ void DebugEntityBox::setPosition(const glm::vec3 &pos)
  m_renderable->setPosition(pos);
 }
 
-void DebugEntityBox::toGPU(const ConfigurationManager& config, RenderDevice* device, RenderContext* context) {
+void DebugEntityBox::toGPU(const Config& config, RenderDevice* device, RenderContext* context) {
   m_renderable->toGPU(config, device, context);
 }
 

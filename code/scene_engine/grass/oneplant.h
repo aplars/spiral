@@ -5,7 +5,7 @@
 
 namespace sa {
 class RenderContext;
-class ConfigurationManager;
+class Config;
 class RenderDevice;
 
 class OnePlant
@@ -33,7 +33,7 @@ public:
 
   OnePlant(float halfSizeOfPlant, const std::vector<glm::vec3>& positions);
 
-  void toGPU(const sa::ConfigurationManager &config, sa::RenderDevice *device, sa::RenderContext *context);
+  void toGPU(const sa::Config &config, unsigned int numberOfShadowCascades, sa::RenderDevice *device, sa::RenderContext *context);
   void update(float /*dt*/);
   void setPosition(const glm::vec3 &position);
   DrawDataList getDrawData(RenderPass pass);

@@ -42,7 +42,7 @@ void main()
   for(int i = 0; i < NUMBER_OF_CASCADES; i++) {
      v_shadowCoord[i] = u_depthBiasMVPMatrix[i] * u_modelMatrix * boneTransform * vec4(posAttr, 1.0);
   }
-  vec4 thePos = u_projectionMatrix * viewmodelbone * vec4(posAttr, 1.0);
+  //vec4 thePos = u_projectionMatrix * viewmodelbone * vec4(posAttr, 1.0);
   gl_Position = u_projectionMatrix * viewmodelbone * vec4(posAttr, 1.0);
   v_posViewZ = gl_Position.z;
 }
