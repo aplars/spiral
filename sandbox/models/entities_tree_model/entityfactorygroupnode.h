@@ -7,7 +7,7 @@ class EntityFactoryGroupNode : public EntityFactoryNode
 {
 public:
   EntityFactoryGroupNode(const std::string &dir, const std::string& name);
-
+  virtual ~EntityFactoryGroupNode();
   const std::deque<EntityFactoryNode*>& children() const;
   void addChild(EntityFactoryLeafNode* leaf);
   void addChild(EntityFactoryGroupNode* group);

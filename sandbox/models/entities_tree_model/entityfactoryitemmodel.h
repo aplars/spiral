@@ -11,7 +11,7 @@ class EntityFactoryItemModel : public QAbstractItemModel
 
 public:
   explicit EntityFactoryItemModel(QObject *parent, const std::string &entitiesDir);
-
+  virtual ~EntityFactoryItemModel();
   void refresh(const std::string& entitiesDir);
 
   // Header:

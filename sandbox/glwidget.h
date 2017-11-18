@@ -37,7 +37,7 @@ private:
   sa::RenderDevice renderDevice;
   sa::RenderContext renderContext;
 
-  sa::ScenePtr scene;
+  sa::ScenePtr m_scene;
   static const int NUMKEYS = 1024;
   bool keys[NUMKEYS];
 

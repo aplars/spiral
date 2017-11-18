@@ -10,6 +10,8 @@
 #include <boost/serialization/nvp.hpp>
 #include <boost/serialization/deque.hpp>
 #include <boost/serialization/map.hpp>
+#include <boost/serialization/set.hpp>
+
 #pragma GCC diagnostic pop
 #include <deque>
 #include <map>
@@ -55,6 +57,12 @@ public:
     typedef std::deque<SubMeshModel* > SubMeshes;
     typedef std::deque<MaterialModel*> Materials;
     typedef std::map<std::string, AnimationModel<boost::uuids::uuid >* > Animations;
+    ~Data() {
+      unload();
+    }
+    /**
+     * @brief m_haveBones is true if the model have bones
+     */
     bool m_haveBones = false;
     /**
      * @brief m_materials is a collection of all the mesh's materials.
@@ -72,6 +80,11 @@ public:
      * @brief m_animations is a collection of animations that can be used to update the transformation-tree.
      */
     Animations m_animations;
+//    /**
+//     * @brief m_skeletons is a collection of skeletons that can be animated. The sub meshes points to the same data.
+//     */
+//    std::set<Skeleton*> m_skeletons;
+
     std::deque<std::string> getNodeAnimationNames() const {
       std::deque<std::string> names;
       for(Animations::value_type animation : m_animations) {
@@ -80,6 +93,7 @@ public:
       return names;
     }
 
+
     friend class boost::serialization::access;
     template<class Archive>
     void serialize(Archive & ar, const unsigned int ) {
@@ -87,16 +101,36 @@ public:
       ar & BOOST_SERIALIZATION_NVP(m_materials);
       ar & BOOST_SERIALIZATION_NVP(m_subMeshes);
       ar & BOOST_SERIALIZATION_NVP(m_transformationTreeRoot);
+      //ar & BOOST_SERIALIZATION_NVP(m_skeletons);
       ar & BOOST_SERIALIZATION_NVP(m_animations);
+      m_isLoaded = true;
     }
 
     void unload() {
+      for(auto m : m_materials) {
+        delete m;
+        m = nullptr;
+      }
       m_materials.clear();
+      for(auto m : m_subMeshes) {
+        delete m;
+        m = nullptr;
+      }
       m_subMeshes.clear();
       delete m_transformationTreeRoot;
       m_transformationTreeRoot = nullptr;
       m_animations.clear();
+      m_isLoaded = false;
     }
+
+    bool isLoaded() const;
+
+  private:
+    /**
+     * @brief m_isLoaded is true if the data is loaded.
+     */
+    bool m_isLoaded = false;
+
   };
   static MeshModel createGroundPlane(int width, int depth);
 
@@ -107,6 +141,7 @@ public:
   void setMaterials(const std::deque<MaterialModel*>& materials);
   void setMeshes(const std::deque<SubMeshModel*>& meshes);
   void setTransformationTree(NodeModel* root);
+  //void setSkeletons(const std::set<Skeleton*>& skeletons);
   void setAnimations(const std::deque<AnimationModel<boost::uuids::uuid> * >& anim);
   std::deque<std::string> getSkeletalAnimations() const;
   std::deque<std::string> getNodeAnimations() const;

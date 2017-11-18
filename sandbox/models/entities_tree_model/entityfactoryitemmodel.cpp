@@ -16,9 +16,16 @@ EntityFactoryItemModel::EntityFactoryItemModel(QObject *parent, const std::strin
   refresh(m_entetiesDir);
 }
 
+EntityFactoryItemModel::~EntityFactoryItemModel() {
+  delete m_root;
+  m_root = nullptr;
+}
+
 void EntityFactoryItemModel::refresh(const std::string &entitiesDir)
 {
   beginResetModel();
+  delete m_root;
+  m_root = nullptr;
   m_root = EntityFactoryRootNode::loadFromDisk(entitiesDir);
   endResetModel();
 }
@@ -152,8 +159,7 @@ QStringList EntityFactoryItemModel::mimeTypes() const
 QMimeData* EntityFactoryItemModel::mimeData(const QModelIndexList &indexes) const
 {
   std::stringstream strstream;
-  for(QModelIndex index : indexes)
-  {
+  for(QModelIndex index : indexes) {
     EntityFactoryNode *node = static_cast<EntityFactoryNode*>(index.internalPointer());
     EntityFactoryLeafNode* leaf = dynamic_cast<EntityFactoryLeafNode*>(node);
 

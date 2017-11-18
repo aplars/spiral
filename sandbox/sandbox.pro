@@ -74,5 +74,6 @@ MOBILITY =
 
 DISTFILES += \
     ../sa_config.conf \
-    ../data/classes/trees/tree.json
+    ../data/classes/trees/tree.json \
+    ../data/classes/test/test.json
 

@@ -320,10 +320,10 @@ void MeshRenderable::toGPU(const Config& /*config*/, unsigned int numberOfShadow
 
     subMeshDrawData.Uniforms.Matrix4Uniforms["u_modelMatrix"] = glm::mat4(1.0f);
     m_drawData[meshIndex] = subMeshDrawData;
-    if(isTransparent) {
+    if(isTransparent)
+    {
       m_drawData[meshIndex].AlphaFunction = Alpha::Greater;
       m_drawData[meshIndex].AlphaValue = 0.99f;
-
     }
 //    else
 //      m_drawData[meshIndex].IsTransparent = true;
@@ -414,6 +414,13 @@ void MeshRenderable::setAnimationFrame(const std::string& skeletalAnimationName,
     }
   }
 
+//  for(Skeleton* skeleton : m_meshModel.m_data.m_skeletons) {
+//    skeleton->reset();
+//    if(skeleton->Animations.end() != skeleton->Animations.find(skeletalAnimationName)) {
+//      skeleton->animate(currentSkeletalAnimationTime, skeletalAnimationName);
+//    }
+//  }
+
   for(sa::MeshModel::Data::SubMeshes::value_type subMesh : m_meshModel.m_data.m_subMeshes) {
     if(subMesh && subMesh->skeleton())
       subMesh->skeleton()->reset();
@@ -422,7 +429,6 @@ void MeshRenderable::setAnimationFrame(const std::string& skeletalAnimationName,
     }
   }
 
-  //applyTransformations();
 }
 
 

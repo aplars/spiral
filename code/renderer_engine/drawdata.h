@@ -86,6 +86,12 @@ public:
   template< class InputIt >
   void insert(DD_List::const_iterator pos, InputIt first, InputIt last) {
     m_list.insert(pos, first, last);
+    std::for_each(first, last, [this](const_reference dd) {
+      m_spList.insert(dd.Current_SP);
+      m_spList.insert(dd.Uber_SP);
+      m_spList.insert(dd.ShadowMap_SP);
+      m_spList.insert(dd.SunLightShafts_SP);
+    });
   }
 
   void clear() {

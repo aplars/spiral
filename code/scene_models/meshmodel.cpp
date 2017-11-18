@@ -63,58 +63,14 @@ void MeshModel::setMeshes(const std::deque<SubMeshModel*>& meshes) {
   m_data.m_subMeshes = meshes;
 }
 
-//void MeshModel::calculateBoundingBoxForAllAnimations() {
-//  float currentTime = 0.0f;
-//  if(m_data.m_animations.size() > 0) {
-//    while(m_data.m_animations[m_data.getAnimationNames()[0]]->Duration < currentTime) {
-//      VisitorApplyAnimation* visitor = new VisitorApplyAnimation(currentTime, m_data.m_animations[m_data.getAnimationNames()[0]]);
-//      m_data.m_transformationTreeRoot->accept(visitor);
-//    }
-//    calculateBoundingBoxAfterTransformations();
-//    currentTime+=1/60.0f;
-//  }
-
-
-//  if(m_data.m_haveBones && m_data.m_animations.size() > 0) {
-//    currentTime = 0.0f;
-//    while(m_data.m_animations[m_data.getAnimationNames()[0]]->Duration < currentTime) {
-//      for(sa::MeshModel::Data::SubMeshes::value_type sm : m_data.m_subMeshes) {
-//        SubMeshModel* subMesh = sm.second;
-//        if(subMesh->skeleton())
-//          subMesh->skeleton()->animate(currentTime, subMesh->skeleton()->getAnimationNames()[0]);
-//      }
-//      calculateBoundingBoxAfterTransformations();
-//      currentTime+=1/60.0f;
-//    }
-//  }
-//}
-
-
-//void MeshModel::calculateBoundingBoxAfterTransformations() {
-//  if(m_data.m_transformationTreeRoot) {
-//    VisitorApplyTransformations transformvisitor;
-//    m_data.m_transformationTreeRoot->accept(&transformvisitor);
-
-//    VisitorGetMeshNodes getvisitor;
-//    m_data.m_transformationTreeRoot->accept(&getvisitor);
-//    for(MeshNodeModel* mesh : getvisitor.m_meshes) {
-//      AABBModel subBoundingBox =  m_data.m_subMeshes[mesh->mesh()]->getBoundingBox();
-//      subBoundingBox.transform(mesh->transformation());
-//      m_header.boundingBox.expand(subBoundingBox);
-//    }
-//  }
-//}
-
-//void MeshModel::calculateBoundingBox() {
-//  MeshModel::Data::SubMeshes::iterator firstSubMeshIt = m_data.m_subMeshes.begin();
-//  m_header.boundingBox =  firstSubMeshIt->second->getBoundingBox();
-//  //calculateBoundingBoxForAllAnimations();
-//  calculateBoundingBoxAfterTransformations();
-//}
-
 void MeshModel::setTransformationTree(NodeModel* root) {
   m_data.m_transformationTreeRoot = root;
 }
+
+//void MeshModel::setSkeletons(const std::set<Skeleton *> &skeletons)
+//{
+//  m_data.m_skeletons = skeletons;
+//}
 
 void MeshModel::setAnimations(const std::deque<AnimationModel<boost::uuids::uuid> * >& anim) {
   for(AnimationModel<boost::uuids::uuid> * a : anim)
@@ -122,6 +78,14 @@ void MeshModel::setAnimations(const std::deque<AnimationModel<boost::uuids::uuid
 }
 
 std::deque<std::string> MeshModel::getSkeletalAnimations() const {
+
+//  std::set<std::string> allNamesSet;
+//  for(const Skeleton* skeleton : m_data.m_skeletons) {
+//    std::deque<std::string> names = skeleton->getAnimationNames();
+//    allNamesSet.insert(names.begin(), names.end());
+//  }
+
+
   std::set<std::string> allNamesSet;
   for(SubMeshModel* sm : m_data.m_subMeshes) {
     if(sm->skeleton()) {
@@ -147,5 +111,10 @@ const std::set<MeshNodeModel*>& MeshModel::getMeshNodes() {
     m_meshNodes = visitor.m_meshes;
   }
   return m_meshNodes;
+}
+
+bool MeshModel::Data::isLoaded() const
+{
+  return m_isLoaded;
 }
 }

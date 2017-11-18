@@ -118,7 +118,7 @@ public:
 
   SubMeshModel() {}
   SubMeshModel(const std::string& name);
-
+  ~SubMeshModel();
   const AABBModel& getBoundingBox() const { return m_boundingBox; }
   void setBoundingBox(const AABBModel& bbox) { m_boundingBox = bbox; }
   const std::vector<Vertex>& getVertices() const { return m_vertices; }
@@ -132,15 +132,7 @@ public:
 
   void setBoneDataForVertex(unsigned int vertexIndex,
                             unsigned int boneId,
-                            float weight) {
-    for(unsigned int i = 0; i < 4; ++i) {
-      if(m_vertices[vertexIndex].w[i] == 0.0f) {
-        m_vertices[vertexIndex].b[i] = boneId;
-        m_vertices[vertexIndex].w[i] = weight;
-        break;
-      }
-    }
-  }
+                            float weight);
 
   const Skeleton* skeleton() const;
   Skeleton* skeleton();

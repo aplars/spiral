@@ -1,6 +1,6 @@
 #pragma once
 
-#include "streamedmeshentity.h"
+#include "model.h"
 #include "debugentity.h"
 #include <deque>
 #include <map>
@@ -34,6 +34,17 @@ class Scene
 public:
   ~Scene();
   Scene(unsigned int width, unsigned int height, Config config);
+
+  void getPickRay(int winX, int winY, glm::vec3 &outOrigin, glm::vec3 &outDir) const;
+
+  /**
+   * @brief getWinPosVsGroundPointoint - returns the point where the (winX, winY)-screen position intersects the ground
+   * @param winX - x-element of screen position
+   * @param winY - y-element of screen position
+   * @return returns the intersection point
+   */
+  glm::vec3 getScreenPosVsGroundPointoint(int winX, int winY) const;
+
   void resize(unsigned int w, unsigned int h);
   void setTime(double julianDay, double timeOfDay);
   void setSunSimulationTimeScale(double timeScale);
@@ -45,8 +56,9 @@ public:
   void setAtmosWeight(float weight);
   FPSCamera& camera() { return m_camera; }
   void addMeshEntity(const std::string& name, MeshRenderablePtr mesh, bool castShadow);
+  void addGroundMeshEntity(const std::string& name, MeshRenderablePtr mesh, bool castShadow);
   void removeMeshEntity(const std::string& name);
-  StreamedMeshEntity* getMeshEntity(const std::string& name)
+  Model* getMeshEntity(const std::string& name)
   {
     return m_meshes[name];
   }
@@ -77,10 +89,10 @@ private:
   //void createShadowBufferRectangle(RenderDevice* device, RenderContext* context, float posx, float posy, float sw, float sh);
 
 
-  typedef std::map<std::string, StreamedMeshEntity*> Entities;
+  typedef std::map<std::string, Model*> Models;
   typedef std::map<std::string, DebugEntityBox*> DebugBoxEntities;
 
-  unsigned int m_screenWidth, m_screenheight;
+  unsigned int m_screenWidth, m_screenHeight;
 
   Config m_config;
 
@@ -94,15 +106,15 @@ private:
   FPSCamera m_sunCamera;
   DirectionalLight m_sun;
   glm::vec4 m_ambientColor = {0.5, 0.5, 0.5, 1.0};
-  Entities m_meshes;
+  Models m_meshes;
+  Models m_groundMeshes;
   std::deque<std::string> m_meshesToDelete;
   DebugBoxEntities m_debugBoxes;
   sky::Sky m_sky;
   Weather m_weather;
-  Grass grass;
-  //OnePlant onePlant;
-
   LightShafts m_lightShafts;
+  Grass grass;
+
   float m_currentTime = 0.0f;
 
   std::vector<RenderDepthToTexturePtr> m_shadowBufferTarget;
@@ -118,6 +130,7 @@ private:
   ShaderCache m_shaderCache;
 
   ShaderUniforms m_sceneSpecificShaderUniforms;
+  void deleteMeshes(Models meshes, Models groundMeshes);
 };
 
 typedef std::shared_ptr<Scene> ScenePtr;

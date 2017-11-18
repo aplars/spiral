@@ -1,0 +1,16 @@
+{
+    "editorImage": "tree.png",
+    "editorName": "tree",
+    "drawGeometry": {
+        "rectangle": {
+            "width": "10",
+            "height": "10"
+        }
+    },
+    "texturemap": {
+        "image": "tree.png"
+    },
+    "normalmap": {
+        "image": "normal.png"
+    }
+}

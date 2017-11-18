@@ -220,7 +220,12 @@ void RenderContext::draw(const DrawDataList& drawDataList, ShaderUniforms shader
   m_currentSP = nullptr;
   //Draw all objects.
   for(DrawDataList::value_type dd : drawDataList) {
-    draw(dd);
+    if(dd.AlphaFunction == Alpha::None)
+      draw(dd);
+  }
+  for(DrawDataList::value_type dd : drawDataList) {
+    if(dd.AlphaFunction != Alpha::None)
+      draw(dd);
   }
 }
 

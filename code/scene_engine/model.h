@@ -19,24 +19,24 @@ class RenderDevice;
 class RenderContext;
 class MeshRenderable;
 typedef std::shared_ptr<MeshRenderable> MeshRenderablePtr;
-class StreamedMeshEntity
+class Model
 {
 public:
   class PropertyChangedEvent {
   public:
-    PropertyChangedEvent(const std::string& name, StreamedMeshEntity* object) {
+    PropertyChangedEvent(const std::string& name, Model* object) {
       m_object = object;
       m_name = name;
     }
 
-    StreamedMeshEntity* m_object;
+    Model* m_object;
     std::string m_name;
   };
 
-  ~StreamedMeshEntity();
-  StreamedMeshEntity() {}
-  StreamedMeshEntity(const std::string& resourcePath, const std::string& resourceName, bool castShadow);
-  StreamedMeshEntity(MeshRenderablePtr mesh, bool castShadow);
+  ~Model();
+  Model() {}
+  Model(const std::string& resourcePath, const std::string& resourceName, bool castShadow);
+  Model(MeshRenderablePtr mesh, bool castShadow);
 
   std::string getName() const { return m_mesh->getName(); }
 

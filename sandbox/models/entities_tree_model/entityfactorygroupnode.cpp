@@ -6,6 +6,14 @@ EntityFactoryGroupNode::EntityFactoryGroupNode(const std::string &dir, const std
 
 }
 
+EntityFactoryGroupNode::~EntityFactoryGroupNode() {
+  for(EntityFactoryNode* c : m_children) {
+    delete c;
+    c = nullptr;
+  }
+  m_children.clear();;
+}
+
 const std::deque<EntityFactoryNode *>& EntityFactoryGroupNode::children() const
 {
   return m_children;

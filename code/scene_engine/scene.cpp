@@ -12,8 +12,8 @@ namespace sa {
 
 Scene::~Scene()
 {
-  for(Entities::value_type e : m_meshes) {
-    StreamedMeshEntity* entity = e.second;
+  for(Models::value_type e : m_meshes) {
+    Model* entity = e.second;
     delete entity;
     entity = nullptr;
   }
@@ -21,7 +21,7 @@ Scene::~Scene()
 
 Scene::Scene(unsigned int width, unsigned int height, Config config)
   : m_screenWidth(width)
-  , m_screenheight(height)
+  , m_screenHeight(height)
   , m_config(config)
   , m_sun({1,0,1}, {0.75, 0.75, 0.75, 1}, {0.2, 0.2, 0.2, 1})
   , m_sky(5400, 5, 10, 1)
@@ -46,8 +46,6 @@ Scene::Scene(unsigned int width, unsigned int height, Config config)
   shadowMapCascadeDistance.push_back(500);
   shadowMapCascadeDistance.push_back(3000);
 
-  //shadowMapCascadeDistance.push_back(200);
-
   float aspect = width/static_cast<float>(height);
   if(height > width)
     aspect = height/static_cast<float>(width);
@@ -59,10 +57,41 @@ Scene::Scene(unsigned int width, unsigned int height, Config config)
 
 }
 
+void Scene::getPickRay(int winX, int winY, glm::vec3 &outOrigin, glm::vec3 &outDir) const
+{
+  glm::vec3 pickA = glm::unProject(
+        glm::vec3(static_cast<float>(winX), static_cast<float>(m_screenHeight - winY), 0.0),
+        m_camera.viewMatrix(),
+        m_projection,
+        glm::vec4(0, 0, m_screenWidth, m_screenHeight));
+
+  glm::vec3 pickB = glm::unProject(
+        glm::vec3(static_cast<float>(winX), static_cast<float>(m_screenHeight - winY), 1.0),
+        m_camera.viewMatrix(),
+        m_projection,
+        glm::vec4(0, 0, m_screenWidth, m_screenHeight));
+
+  outOrigin = pickA;
+  outDir = glm::normalize(pickB - pickA);
+
+}
+
+glm::vec3 Scene::getScreenPosVsGroundPointoint(int winX, int winY) const
+{
+//  glm::vec3 origin;
+//  glm::vec3 dir;
+//  getPickRay(winX, winY, origin, dir);
+  
+//  foreach (StreamedMeshEntity* groundMesh, m_groundMeshes) {
+
+//  }
+
+}
+
 void Scene::resize(unsigned int w, unsigned int h)
 {
   m_screenWidth = w;
-  m_screenheight = h;
+  m_screenHeight = h;
 }
 
 void Scene::setTime(double julianDay, double timeOfDay)
@@ -116,7 +145,7 @@ void Scene::setSunPosition(float phi, float theta) {
 }
 
 void Scene::addMeshEntity(const std::string& name, MeshRenderablePtr mesh, bool castShadow) {
-  StreamedMeshEntity* streamedEntity = new StreamedMeshEntity(mesh, castShadow);
+  Model* streamedEntity = new Model(mesh, castShadow);
 //  AABBModel aabbmodel = streamedEntity->getBoundingBox();
 //  addDebugBox(name+"db", aabbmodel.getCenter()[0], aabbmodel.getCenter()[1], aabbmodel.getCenter()[2],
 //      aabbmodel.getHalfSize()[0], aabbmodel.getHalfSize()[1], aabbmodel.getHalfSize()[2]);
@@ -126,6 +155,12 @@ void Scene::addMeshEntity(const std::string& name, MeshRenderablePtr mesh, bool 
     //DebugEntityBox* box = getDebugBoxEntety(name+"db");
     //box->setPosition(evt.m_object->getBoundingBox().getCenter());
  // });
+}
+
+void Scene::addGroundMeshEntity(const std::string& name, MeshRenderablePtr mesh, bool castShadow) {
+  Model* streamedEntity = new Model(mesh, castShadow);
+  m_meshes[name] = streamedEntity;
+  m_groundMeshes[name] = streamedEntity;
 }
 
 void Scene::removeMeshEntity(const std::string& name) {
@@ -142,7 +177,7 @@ void Scene::addDebugBox(const std::string& name, float posx, float posy, float p
 void Scene::toCPU() {
   std::array<PlaneT<float>, 6> frustum = m_camera.getFrustum(m_projection);
 
-  for(Entities::value_type e : m_meshes) {
+  for(Models::value_type e : m_meshes) {
     AABBModel bbox = e.second->getBoundingBox();
     IntersectionTests::Side side = IntersectionTests::FrustumAABBIntersect(frustum, bbox.getMin(), bbox.getMax());
     bool isInFrustums = (side == IntersectionTests::Inside || side == IntersectionTests::Intersect) | m_shadowMapping.isAABBVisibleFromSun(m_sunCamera, bbox.getMin(), bbox.getMax());
@@ -184,7 +219,7 @@ void Scene::toGPUOnce(RenderDevice* device, RenderContext* context) {
     m_sky.toGPU(m_config, device, context);
     m_lightShafts.toGPU(m_config, device, context);
 
-    m_sunLightShaftsTarget = context->createRenderToTexture(m_screenWidth, m_screenheight);
+    m_sunLightShaftsTarget = context->createRenderToTexture(m_screenWidth, m_screenHeight);
 
     grass.toGPU(m_config, m_shadowMapping.getNumberOfPasses(), device, context);
 
@@ -204,7 +239,7 @@ void Scene::toGPU(RenderDevice* device, RenderContext* context) {
     }
   }
 
-  for(Entities::value_type e : m_meshes) {
+  for(Models::value_type e : m_meshes) {
     if(e.second->currentDataStorage() == DataStorage::CPU)
     {
       e.second->toGPU(m_config, m_shadowMapping.getNumberOfPasses(), m_textureCache, m_shaderCache, device, context);
@@ -216,19 +251,22 @@ void Scene::toGPU(RenderDevice* device, RenderContext* context) {
   }
 }
 
-void Scene::update(float dt) {
-  //Delete meshes that are not pending (loading)
+void Scene::deleteMeshes(Models meshes, Models groundMeshes)
+{
   for(std::deque<std::string>::iterator toDeleteIt = m_meshesToDelete.begin(); toDeleteIt != m_meshesToDelete.end(); ) {
-    Entities::const_iterator findIt = m_meshes.find(*toDeleteIt);
-    if(findIt != m_meshes.end())
+    Models::const_iterator findIt = meshes.find(*toDeleteIt);
+    Models::const_iterator gmFindIt = groundMeshes.find(*toDeleteIt);
+    if(findIt != meshes.end())
     {
-      StreamedMeshEntity* entity = findIt->second;
+      Model* entity = findIt->second;
       if(entity->currentDataStorage() != DataStorage::Pending)
       {
         delete entity;
         entity = nullptr;
         toDeleteIt = m_meshesToDelete.erase(toDeleteIt);
-        m_meshes.erase(findIt);
+        meshes.erase(findIt);
+        if(gmFindIt != groundMeshes.end())
+          groundMeshes.erase(gmFindIt);
       }
       else {
         ++toDeleteIt;
@@ -239,16 +277,22 @@ void Scene::update(float dt) {
       toDeleteIt = m_meshesToDelete.erase(toDeleteIt);
     }
   }
+}
 
-  std::deque<StreamedMeshEntity*> entetiesDeq;
-  for(Entities::value_type e : m_meshes) {
+void Scene::update(float dt) {
+  //Delete meshes that are not pending (loading)
+  deleteMeshes(m_meshes, m_groundMeshes);
+
+
+  std::deque<Model*> entetiesDeq;
+  for(Models::value_type e : m_meshes) {
     entetiesDeq.push_back(e.second);
   }
 
 
 #pragma omp parallel for
   for(unsigned int i = 0; i < entetiesDeq.size(); ++i) {
-    StreamedMeshEntity* e = entetiesDeq[i];
+    Model* e = entetiesDeq[i];
     e->applyAnimations(dt);
   }
 
@@ -276,7 +320,7 @@ void Scene::drawShadowPass(RenderContext* context) {
 
   DrawDataList allToDraw;
 
-  for(Entities::value_type e : m_meshes) {
+  for(Models::value_type e : m_meshes) {
     DrawDataList dds = e.second->getDrawData(RenderPass::Shadow);
     allToDraw.insert(allToDraw.end(), dds.begin(), dds.end());
   }
@@ -307,16 +351,17 @@ void Scene::drawShadowPass(RenderContext* context) {
 void Scene::drawUberPass(RenderContext* context)
 {
   context->setCullFace(RenderContext::CullFace::Back);
-  context->setViewport(m_screenWidth, m_screenheight);
+  context->setViewport(m_screenWidth, m_screenHeight);
 
   DrawDataList allToDraw;
   {
     DrawDataList dds = grass.getDrawData(RenderPass::Uber);
     allToDraw.insert(allToDraw.begin(), dds.begin(), dds.end());
+
   }
   allToDraw.push_back(m_sky.getDrawData(RenderPass::Uber));
 
-  for(Entities::value_type e : m_meshes) {
+  for(Models::value_type e : m_meshes) {
     DrawDataList dds = e.second->getDrawData(RenderPass::Uber);
     allToDraw.insert(allToDraw.end(), dds.begin(), dds.end());
   }
@@ -364,7 +409,7 @@ void Scene::createLightShaftsPass(RenderContext *context)
   context->clear();
   DrawDataList allToDraw;
 
-  for(Entities::value_type e : m_meshes) {
+  for(Models::value_type e : m_meshes) {
     DrawDataList dds = e.second->getDrawData(RenderPass::SunLightShafts);
     allToDraw.insert(allToDraw.end(), dds.begin(), dds.end());
   }
@@ -404,7 +449,7 @@ void Scene::drawLightShaftsPass(RenderContext *context)
     return;
 
   context->setCullFace(RenderContext::CullFace::Back);
-  context->setViewport(m_screenWidth, m_screenheight);
+  context->setViewport(m_screenWidth, m_screenHeight);
   DrawDataList dds;
   DrawData lightShaftsDD = m_lightShafts.getDrawData();
   lightShaftsDD.TEX[0] = m_sunLightShaftsTarget->getTexture();

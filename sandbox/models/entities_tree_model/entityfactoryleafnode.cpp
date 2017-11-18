@@ -6,7 +6,11 @@
 namespace sa {
 EntityFactoryLeafNode::EntityFactoryLeafNode(const std::string &dir, const std::string& name)
   : EntityFactoryNode(dir, name)
-{
+{ }
+
+EntityFactoryLeafNode::~EntityFactoryLeafNode() {
+  delete m_model;
+  m_model = nullptr;
 }
 
 const EntityFactoryModel *EntityFactoryLeafNode::model() const

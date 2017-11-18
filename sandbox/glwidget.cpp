@@ -9,6 +9,10 @@
 #include <scene_engine/scene.h>
 #include <deque>
 #include <QDebug>
+#include <QMimeData>
+#include <QDragEnterEvent>
+
+#include "models/entities_tree_model/entityfactorymodel.h"
 
 GLWidget::GLWidget(QWidget* parent)
   : sa::Widget(parent)
@@ -24,12 +28,12 @@ GLWidget::~GLWidget()
 void GLWidget::setModel(GlobalSettingsModelPtr globalSettingsModel) {
   m_globalSettingsModel = globalSettingsModel;
   m_globalSettingsModel->PropertyChanged += [this](const std::string&) {
-    scene->setTime(m_globalSettingsModel->julianDay(), m_globalSettingsModel->timeOfDay());
-    scene->setAtmosphereFogDensity(m_globalSettingsModel->fogDensity());
-    scene->setAtmosExposure(m_globalSettingsModel->atmosExposure());
-    scene->setAtmosDecay(m_globalSettingsModel->atmosDecay());
-    scene->setAtmosDensity(m_globalSettingsModel->atmosDensity());
-    scene->setAtmosWeight(m_globalSettingsModel->atmosWeight());
+    m_scene->setTime(m_globalSettingsModel->julianDay(), m_globalSettingsModel->timeOfDay());
+    m_scene->setAtmosphereFogDensity(m_globalSettingsModel->fogDensity());
+    m_scene->setAtmosExposure(m_globalSettingsModel->atmosExposure());
+    m_scene->setAtmosDecay(m_globalSettingsModel->atmosDecay());
+    m_scene->setAtmosDensity(m_globalSettingsModel->atmosDensity());
+    m_scene->setAtmosWeight(m_globalSettingsModel->atmosWeight());
   };
 }
 
@@ -50,8 +54,8 @@ void GLWidget::initializeGL() {
 
   sa::Config config;
   config.init("sa_config.conf");
-  scene = sa::ScenePtr(new sa::Scene(this->width(), this->height(), config));
-  scene->camera().setEye({0,50,200});
+  m_scene = sa::ScenePtr(new sa::Scene(this->width(), this->height(), config));
+  m_scene->camera().setEye({0,50,200});
 
 
 
@@ -61,20 +65,20 @@ void GLWidget::initializeGL() {
   bobMesh.reset(new sa::MeshRenderable(config.getParam("DATA_DIR") + "/meshes/", "bob.xml"));
 
 
-  sa::MeshRenderablePtr motioncaptureMesh;
-  motioncaptureMesh.reset(new sa::MeshRenderable(config.getParam("DATA_DIR") + "/meshes/", "motioncapture.xml"));
+//  sa::MeshRenderablePtr motioncaptureMesh;
+//  motioncaptureMesh.reset(new sa::MeshRenderable(config.getParam("DATA_DIR") + "/meshes/", "motioncapture.xml"));
 
   sa::MeshRenderablePtr landscapeMesh;
   landscapeMesh.reset(new sa::MeshRenderable(config.getParam("DATA_DIR") + "/meshes/", "landscape.xml"));
 
-  scene->addMeshEntity("landscape", landscapeMesh, false);
+  m_scene->addMeshEntity("landscape", landscapeMesh, false);
 
-  scene->addMeshEntity("bob0", bobMesh, true);
-  scene->getMeshEntity("bob0")->playSkeletalAnimation("");
+  m_scene->addMeshEntity("bob0", bobMesh, true);
+  m_scene->getMeshEntity("bob0")->playSkeletalAnimation("");
 
-  scene->addMeshEntity("motioncaptureLeft", motioncaptureMesh, true);
-  scene->getMeshEntity("motioncaptureLeft")->playNodeAnimation("");
-  scene->getMeshEntity("motioncaptureLeft")->setPosition(-120,0,40);
+//  m_scene->addMeshEntity("motioncaptureLeft", motioncaptureMesh, true);
+//  m_scene->getMeshEntity("motioncaptureLeft")->playNodeAnimation("");
+//  m_scene->getMeshEntity("motioncaptureLeft")->setPosition(-120,0,40);
 
 
 
@@ -87,7 +91,7 @@ void GLWidget::initializeGL() {
 
 void GLWidget::resizeGL(int w, int h) {
   renderContext.makeDirty();
-  scene->resize(w, h);
+  m_scene->resize(w, h);
 }
 
 
@@ -102,21 +106,21 @@ void GLWidget::paintGL(){
 
 
   if(keys[0x57])
-    scene->camera().moveForward(20*dt);
+    m_scene->camera().moveForward(20*dt);
   if(keys[0x53])
-    scene->camera().moveForward(-20*dt);
+    m_scene->camera().moveForward(-20*dt);
   if(keys[65])
-    scene->camera().moveRight(20*dt);
+    m_scene->camera().moveRight(20*dt);
   if(keys[68])
-    scene->camera().moveRight(-20*dt);
+    m_scene->camera().moveRight(-20*dt);
 
-  scene->camera().rotate(mouseDelta.x(), mouseDelta.y(), 0);
+  m_scene->camera().rotate(mouseDelta.x(), mouseDelta.y(), 0);
 
-  scene->toGPU(&renderDevice, &renderContext);
-  scene->update(dt);
-  scene->toCPU();
+  m_scene->toGPU(&renderDevice, &renderContext);
+  m_scene->update(dt);
+  m_scene->toCPU();
 
-  scene->draw(&renderContext);
+  m_scene->draw(&renderContext);
   currentTime+=dt;
 
   mouseDelta.setX(0);
@@ -141,6 +145,54 @@ void GLWidget::onKeyUp(KeyEvent event) {
 void GLWidget::dragEnterEvent(QDragEnterEvent *event)
 {
   qDebug() << "dragEnterEvent";
+
+  const QMimeData* mimeData = event->mimeData();
+
+  QByteArray data = mimeData->data(sa::EntityFactoryModel::MimeType);
+  if(!data.isEmpty() && !data.isNull())
+  {
+    std::stringstream strstream;
+    strstream.write(data.constData(), data.size());
+    if(strstream.good())
+    {
+      int npathtojson;
+      strstream >> npathtojson;
+      char * buffer = new char [npathtojson+1];
+
+      strstream.read(buffer, npathtojson);
+      buffer[npathtojson] = '\0';
+      std::string pathToJson(buffer);
+      int nnameofjson;
+      strstream >> nnameofjson;
+
+      std::string nameOfJson;
+      strstream >> nameOfJson;
+
+      nlohmann::json json;
+      std::ifstream thestream((pathToJson + nameOfJson).c_str());
+      json = json.parse(thestream);
+      sa::EntityFactoryModel* model = new sa::EntityFactoryModel(pathToJson);
+      model->fromJson(json);
+
+      glm::vec3 pickOrigin;
+      glm::vec3 pickDir;
+      m_scene->getPickRay(event->pos().x(), event->pos().y(), pickOrigin, pickDir);
+
+//      float dist;
+
+//      bool didIntersect = glm::intersectRayPlane(pickOrigin, pickDir, glm::vec3(), glm::vec3(0.0f, 0.0f, -1.0f), dist);
+
+//      glm::vec3 pos = pickOrigin + pickDir * dist;
+
+//      this->makeCurrent();
+//      m_actorToCreateModel = new ActorModel(model);
+//      m_actorToCreateModel->setPosition(pos);
+//      m_actorSpriteViewToCreate.reset(new ActorSpriteView());
+//      m_actorSpriteViewToCreate->setModel(m_actorToCreateModel);
+//      m_sceneView.addRenderable(m_actorSpriteViewToCreate);
+    }
+  }
+
 }
 
 void GLWidget::dragMoveEvent(QDragMoveEvent *event)

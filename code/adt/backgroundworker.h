@@ -71,6 +71,8 @@ public:
   }
 
 private:
+  background_worker(const background_worker&);
+  background_worker operator=(const background_worker&);
   void run_thread() {
     while(m_threadAlive)
     {

@@ -12,6 +12,7 @@ class EntityFactoryLeafNode : public EntityFactoryNode
 {
 public:
   EntityFactoryLeafNode(const std::string& dir, const std::string& name);
+  virtual ~EntityFactoryLeafNode();
   const EntityFactoryModel *model() const;
   void setModel(EntityFactoryModel *model);
 

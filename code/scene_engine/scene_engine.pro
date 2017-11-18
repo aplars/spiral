@@ -25,7 +25,6 @@ SOURCES += meshrenderable.cpp \
     directionallight.cpp \
     cuberenderable.cpp \
     debugentity.cpp \
-    streamedmeshentity.cpp \
     converters.cpp \
     shadows/shadowmapping.cpp \
     sky/sky.cpp \
@@ -36,7 +35,8 @@ SOURCES += meshrenderable.cpp \
     grass/grass.cpp \
     sky/sunposition.cpp \
     grass/oneplant.cpp \
-    weather/weather.cpp
+    weather/weather.cpp \
+    model.cpp
 
 HEADERS += meshrenderable.h \
     scene.h \
@@ -45,7 +45,6 @@ HEADERS += meshrenderable.h \
     cuberenderable.h \
     debugentity.h \
     datastorage.h \
-    streamedmeshentity.h \
     imagecache.h \
     shadercache.h \
     texturecache.h \
@@ -60,7 +59,8 @@ HEADERS += meshrenderable.h \
     grass/grass.h \
     sky/sunposition.h \
     grass/oneplant.h \
-    weather/weather.h
+    weather/weather.h \
+    model.h
 
 CONFIG( debug, debug|release ) {
     DESTDIR = $$(SPAR_ROOT)/libs/lib-debug

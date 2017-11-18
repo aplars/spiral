@@ -1,7 +1,9 @@
 #pragma once
 
 #include <QMainWindow>
-
+namespace sa {
+class EntityFactoryItemModel;
+}
 namespace Ui {
 class MainWindow;
 }
@@ -15,5 +17,6 @@ public:
   ~MainWindow();
 
 private:
+  sa::EntityFactoryItemModel* entityFactoryItemModel;
   Ui::MainWindow *ui;
 };

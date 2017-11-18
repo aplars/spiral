@@ -17,7 +17,7 @@ MainWindow::MainWindow(QWidget *parent) :
   config.init("sa_config.conf");
 
   GlobalSettingsModelPtr globalSettingsModel = GlobalSettingsModelPtr(new GlobalSettingsModel());
-  sa::EntityFactoryItemModel* entityFactoryItemModel = new sa::EntityFactoryItemModel(this, config.getParam("CLASSES_DIR"));
+  entityFactoryItemModel = new sa::EntityFactoryItemModel(this, config.getParam("CLASSES_DIR"));
 
 
   ui->globalSettingsForm->setModel(globalSettingsModel);
@@ -28,4 +28,7 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
   delete ui;
+  ui = nullptr;
+  delete entityFactoryItemModel;
+  entityFactoryItemModel = nullptr;
 }

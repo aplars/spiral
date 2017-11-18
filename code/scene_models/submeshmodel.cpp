@@ -7,6 +7,11 @@ SubMeshModel::SubMeshModel(const std::string& name)
   : m_name(name)
 { }
 
+SubMeshModel::~SubMeshModel() {
+  delete m_skeleton;
+  m_skeleton = nullptr;
+}
+
 std::vector<unsigned int> SubMeshModel::getIndices() const {
   std::vector<unsigned int> indices;
   for(const Face& f : m_faces) {
@@ -58,19 +63,29 @@ void SubMeshModel::addFace(const SubMeshModel::Face &face)
   m_faces.push_back(face);
 }
 
+void SubMeshModel::setBoneDataForVertex(unsigned int vertexIndex, unsigned int boneId, float weight) {
+  for(unsigned int i = 0; i < 4; ++i) {
+    if(m_vertices[vertexIndex].w[i] == 0.0f) {
+      m_vertices[vertexIndex].b[i] = boneId;
+      m_vertices[vertexIndex].w[i] = weight;
+      break;
+    }
+  }
+}
+
 const Skeleton* SubMeshModel::skeleton() const
 {
-    return m_skeleton;
+  return m_skeleton;
 }
 
 Skeleton* SubMeshModel::skeleton()
 {
-    return m_skeleton;
+  return m_skeleton;
 }
 
 void SubMeshModel::setSkeleton(Skeleton* skeleton)
 {
-    m_skeleton = skeleton;
+  m_skeleton = skeleton;
 }
 
 }

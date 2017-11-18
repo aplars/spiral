@@ -79,7 +79,7 @@ public:
 
     vmin = mins;
     vmax = maxs;
-    for(int i = 0; i < planes.size(); ++i) {
+    for(unsigned int i = 0; i < planes.size(); ++i) {
       // X axis
       if(planes[i].normal().x > 0) {
         vmin.x = (mins.x);

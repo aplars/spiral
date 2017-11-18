@@ -22,6 +22,21 @@ public:
   lru(std::size_t capacity)
     : m_capacity(capacity) {}
 
+  lru(const lru& other) {
+    m_capacity = other.m_capacity;
+    for(key_value_type e : other) {
+      insert(e.first, e.second);
+    }
+  }
+
+  const lru& operator=(const lru& other) {
+    m_capacity = other.m_capacity;
+    for(key_value_type e : other) {
+      insert(e.first, e.second);
+    }
+    return *this;
+  }
+
   iterator begin() { return m_history.begin(); }
   const_iterator begin() const { return m_history.begin(); }
 

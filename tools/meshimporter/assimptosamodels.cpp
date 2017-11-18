@@ -16,6 +16,10 @@
 #include <scene_models/animationchannelmodel.h>
 #include <scene_models/animationmodel.h>
 #include <scene_models/visitorgettransformationnode.h>
+
+#include <scene_models/visitorapplytransformations.h>
+#include <scene_models/visitorapplyanimation.h>
+#include <scene_models/visitorgetmeshnodes.h>
 #include <math/mat4ext.h>
 BOOST_CLASS_EXPORT(sa::MeshNodeModel)
 BOOST_CLASS_EXPORT(sa::TransformationNodeModel)
@@ -94,7 +98,7 @@ bool AssimpToSAModels::convertToXML(bool toXML, const QDir& sourceDir, const QDi
     unsigned int numMeshesInSubTree = 0;
     sa::NodeModel* transformationRoot = processTransformationTree(scene->mRootNode, nodeKeys, numMeshesInSubTree);
     std::deque<sa::AnimationModel<boost::uuids::uuid> * > animations = processAnimations(scene, nodeKeys);
-    bool haveBones = processBones(scene, saMeshes, nodeKeys);
+    std::set<sa::Skeleton*> saSkeletons = processBones(scene, saMeshes, nodeKeys);
     //Assimp not needed anymore. Remove it
     delete scene;
     scene = nullptr;
@@ -139,8 +143,8 @@ bool AssimpToSAModels::convertToXML(bool toXML, const QDir& sourceDir, const QDi
 
     //Create a spiral architect scene and add the resources to it.
     sa::MeshModel saModel;
-    saModel.m_header.boundingBox = calculateBoundingBox(haveBones, saMeshes, animations, transformationRoot);
-    saModel.setHaveBones(haveBones);
+    saModel.m_header.boundingBox = calculateBoundingBox(saSkeletons.size() > 0, saMeshes, animations, transformationRoot, *saSkeletons.begin());
+    saModel.setHaveBones(saSkeletons.size() > 0);
     saModel.setMaterials(saMaterials);
     saModel.setMeshes(saMeshes);
     saModel.setTransformationTree(transformationRoot);
@@ -358,12 +362,13 @@ std::deque<sa::AnimationModel<boost::uuids::uuid> * > AssimpToSAModels::processA
   return saAnimations;
 }
 
-bool AssimpToSAModels::processBones(
+std::set<sa::Skeleton*> AssimpToSAModels::processBones(
     const aiScene* const scene,
     std::deque<sa::SubMeshModel*> saMeshes,
     const std::map<std::string, boost::uuids::uuid>& nodeKeys)
 {
-  bool haveBones = false;
+  std::set<sa::Skeleton*> saMeshSkeletons;
+
   for(std::map<std::string, boost::uuids::uuid>::value_type saNodes : nodeKeys) {
     aiNode* node = scene->mRootNode->FindNode(saNodes.first.c_str());
     if(node->mNumMeshes > 0) {
@@ -372,6 +377,7 @@ bool AssimpToSAModels::processBones(
         if(skeletons[i]->Joints.size() <= 0)
           continue;
         sa::SubMeshModel* saSubMesh = saMeshes[node->mMeshes[i]];
+        saMeshSkeletons.insert(skeletons.begin(), skeletons.end());
         saSubMesh->setSkeleton(skeletons[i]);
         sa::Skeleton* saSkeleton = skeletons[i];
 
@@ -383,12 +389,10 @@ bool AssimpToSAModels::processBones(
           }
           ++boneId;
         }
-
-        haveBones = true;
       }
     }
   }
-  return haveBones;
+  return saMeshSkeletons;
 }
 
 std::deque<sa::Skeleton*> AssimpToSAModels::processSkeletonsForMeshNode(const aiScene* scene, aiNode* const meshNode)
@@ -472,11 +476,7 @@ std::map<aiNode* const, const aiBone*> AssimpToSAModels::getBoneNodes(const aiSc
     {
       if(boneNodes.find(boneNode) == boneNodes.end())
       {
-        aiBone* identityBone = new aiBone();
-        identityBone->mName = "SPIRAL_ARCHITECT_IDENTITY_BONE";
-        identityBone->mNumWeights = 0;
-
-        boneNodes[boneNode] = NULL;//identityBone;
+        boneNodes[boneNode] = NULL;
       }
       boneNode = boneNode->mParent;
     }
@@ -539,11 +539,9 @@ void AssimpToSAModels::processSkeletalAnimations(const aiScene* scene, sa::Skele
     ++i;
   }
 }
-#include <scene_models/visitorapplytransformations.h>
-#include <scene_models/visitorapplyanimation.h>
-#include <scene_models/visitorgetmeshnodes.h>
 
-sa::AABBModel AssimpToSAModels::calculateBoundingBox(bool haveBones, std::deque<sa::SubMeshModel*> saMeshes, std::deque<sa::AnimationModel<boost::uuids::uuid>* > animations, sa::NodeModel* saRoot) {
+
+sa::AABBModel AssimpToSAModels::calculateBoundingBox(bool haveBones, std::deque<sa::SubMeshModel*> saMeshes, std::deque<sa::AnimationModel<boost::uuids::uuid>* > animations, sa::NodeModel* saRoot, sa::Skeleton* skeleton) {
   sa::AABBModel totalBBox = calculateBoundingBoxAtSGTransformStep(saMeshes, saRoot);
 
   //Expand the box with node animations if they exist.
@@ -561,7 +559,7 @@ sa::AABBModel AssimpToSAModels::calculateBoundingBox(bool haveBones, std::deque<
 
   //Expand the box with skeletal animations if they exist.
   if(haveBones) {
-    sa::AABBModel bbox = calculateBoundingBoxAtSKAnimationStep(saMeshes, saRoot);
+    sa::AABBModel bbox = calculateBoundingBoxAtSKAnimationStep(saMeshes, saRoot, skeleton);
     //totalBBox.expand(bbox);
     totalBBox=bbox;
   }
@@ -622,7 +620,7 @@ sa::AABBModel AssimpToSAModels::calculateBoundingBoxAtSGAnimationStep(std::deque
   return totalBBox;
 }
 
-sa::AABBModel AssimpToSAModels::calculateBoundingBoxAtSKAnimationStep(std::deque<sa::SubMeshModel*> saMeshes, sa::NodeModel* saRoot) {
+sa::AABBModel AssimpToSAModels::calculateBoundingBoxAtSKAnimationStep(std::deque<sa::SubMeshModel*> saMeshes, sa::NodeModel* saRoot, sa::Skeleton* ) {
 //  std::map<boost::uuids::uuid, sa::SubMeshModel*> saMeshMap;
 //  for(sa::SubMeshModel* saMesh : saMeshes) {
 //    saMeshMap[saMesh->getKey()] = saMesh;
