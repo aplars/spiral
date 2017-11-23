@@ -93,4 +93,5 @@ private:
   float m_heading = 0.0f;
   mutable std::mutex m_mutex;
 };
+typedef std::shared_ptr<Model> ModelPtr;
 }

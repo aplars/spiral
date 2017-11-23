@@ -65,20 +65,20 @@ void GLWidget::initializeGL() {
   bobMesh.reset(new sa::MeshRenderable(config.getParam("DATA_DIR") + "/meshes/", "bob.xml"));
 
 
-//  sa::MeshRenderablePtr motioncaptureMesh;
-//  motioncaptureMesh.reset(new sa::MeshRenderable(config.getParam("DATA_DIR") + "/meshes/", "motioncapture.xml"));
+  sa::MeshRenderablePtr motioncaptureMesh;
+  motioncaptureMesh.reset(new sa::MeshRenderable(config.getParam("DATA_DIR") + "/meshes/", "motioncapture.xml"));
 
   sa::MeshRenderablePtr landscapeMesh;
   landscapeMesh.reset(new sa::MeshRenderable(config.getParam("DATA_DIR") + "/meshes/", "landscape.xml"));
 
-  m_scene->addMeshEntity("landscape", landscapeMesh, false);
+  m_scene->addModel("landscape", landscapeMesh, false);
 
-  m_scene->addMeshEntity("bob0", bobMesh, true);
+  m_scene->addModel("bob0", bobMesh, true);
   m_scene->getMeshEntity("bob0")->playSkeletalAnimation("");
 
-//  m_scene->addMeshEntity("motioncaptureLeft", motioncaptureMesh, true);
-//  m_scene->getMeshEntity("motioncaptureLeft")->playNodeAnimation("");
-//  m_scene->getMeshEntity("motioncaptureLeft")->setPosition(-120,0,40);
+  m_scene->addModel("motioncaptureLeft", motioncaptureMesh, true);
+  m_scene->getMeshEntity("motioncaptureLeft")->playNodeAnimation("");
+  m_scene->getMeshEntity("motioncaptureLeft")->setPosition(-120,0,40);
 
 
 

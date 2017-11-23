@@ -73,7 +73,7 @@ bool ShadowMapping::isAABBVisibleFromSun(FPSCamera &sunCamera, const glm::vec3 &
      frustum = sunCamera.getFrustum(shadowMapProjection);
      std::deque<PlaneT<float>> frustumdeque;
 
-     //We do not use the front plane here. Thats because it may be in fron of
+     //We do not use the front plane here. Thats because it may be in front of
      //objects that contributes to the scene.
      frustumdeque.push_back(frustum.at(sa::Mat4ext::ClipPlane::Left));
      frustumdeque.push_back(frustum.at(sa::Mat4ext::ClipPlane::Right));

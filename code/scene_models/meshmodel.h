@@ -55,7 +55,7 @@ public:
    */
   struct Data {
     typedef std::deque<SubMeshModel* > SubMeshes;
-    typedef std::deque<MaterialModel*> Materials;
+    typedef std::deque<MaterialModel> Materials;
     typedef std::map<std::string, AnimationModel<boost::uuids::uuid >* > Animations;
     ~Data() {
       unload();
@@ -107,11 +107,6 @@ public:
     }
 
     void unload() {
-      for(auto m : m_materials) {
-        delete m;
-        m = nullptr;
-      }
-      m_materials.clear();
       for(auto m : m_subMeshes) {
         delete m;
         m = nullptr;
@@ -138,7 +133,7 @@ public:
   ~MeshModel();
 
   void setHaveBones(bool haveBones) { m_data.m_haveBones = haveBones; }
-  void setMaterials(const std::deque<MaterialModel*>& materials);
+  void setMaterials(const Data::Materials &materials);
   void setMeshes(const std::deque<SubMeshModel*>& meshes);
   void setTransformationTree(NodeModel* root);
   //void setSkeletons(const std::set<Skeleton*>& skeletons);

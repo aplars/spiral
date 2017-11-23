@@ -8,8 +8,6 @@ SubMeshModel::SubMeshModel(const std::string& name)
 { }
 
 SubMeshModel::~SubMeshModel() {
-  delete m_skeleton;
-  m_skeleton = nullptr;
 }
 
 std::vector<unsigned int> SubMeshModel::getIndices() const {
@@ -73,17 +71,17 @@ void SubMeshModel::setBoneDataForVertex(unsigned int vertexIndex, unsigned int b
   }
 }
 
-const Skeleton* SubMeshModel::skeleton() const
+const SkeletonPtr SubMeshModel::skeleton() const
 {
   return m_skeleton;
 }
 
-Skeleton* SubMeshModel::skeleton()
+SkeletonPtr SubMeshModel::skeleton()
 {
   return m_skeleton;
 }
 
-void SubMeshModel::setSkeleton(Skeleton* skeleton)
+void SubMeshModel::setSkeleton(SkeletonPtr skeleton)
 {
   m_skeleton = skeleton;
 }

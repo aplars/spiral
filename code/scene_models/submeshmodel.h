@@ -5,6 +5,7 @@
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/map.hpp>
 #include <boost/serialization/string.hpp>
+#include <boost/serialization/shared_ptr.hpp>
 #include "serialization.h"
 #include <vector>
 #include <map>
@@ -134,9 +135,9 @@ public:
                             unsigned int boneId,
                             float weight);
 
-  const Skeleton* skeleton() const;
-  Skeleton* skeleton();
-  void setSkeleton(Skeleton* skeleton);
+  const SkeletonPtr skeleton() const;
+  SkeletonPtr skeleton();
+  void setSkeleton(SkeletonPtr skeleton);
 
 private:
   friend class boost::serialization::access;
@@ -156,7 +157,7 @@ private:
   std::vector<Face> m_faces;
   std::vector<Vertex> m_vertices;
   unsigned int m_materialKey;
-  Skeleton* m_skeleton = nullptr;
+  SkeletonPtr m_skeleton = nullptr;
   AABBModel m_boundingBox;
 };
 }

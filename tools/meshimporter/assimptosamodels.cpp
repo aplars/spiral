@@ -92,29 +92,29 @@ bool AssimpToSAModels::convertToXML(bool toXML, const QDir& sourceDir, const QDi
       const_cast<aiMatrix4x4&>(scene->mRootNode->mTransformation) = scaling * scene->mRootNode->mTransformation;
     }
 
-    std::deque<sa::MaterialModel*> saMaterials = processMaterials(scene);
+    std::deque<sa::MaterialModel> saMaterials = processMaterials(scene);
     std::deque<sa::SubMeshModel*> saMeshes = processMeshes(scene);
     std::map<std::string, boost::uuids::uuid> nodeKeys;
     unsigned int numMeshesInSubTree = 0;
     sa::NodeModel* transformationRoot = processTransformationTree(scene->mRootNode, nodeKeys, numMeshesInSubTree);
     std::deque<sa::AnimationModel<boost::uuids::uuid> * > animations = processAnimations(scene, nodeKeys);
-    std::set<sa::Skeleton*> saSkeletons = processBones(scene, saMeshes, nodeKeys);
+    std::set<sa::SkeletonPtr> saSkeletons = processBones(scene, saMeshes, nodeKeys);
     //Assimp not needed anymore. Remove it
     delete scene;
     scene = nullptr;
     aiReleasePropertyStore(props);
 
     //Copy the textures to the same directory as the mesh data.
-    for(const sa::MaterialModel* mat : saMaterials) {
+    for(const sa::MaterialModel& mat : saMaterials) {
       QDir srccpy = sourceDir;
       srccpy.cdUp();
-      srccpy=QDir(srccpy.absolutePath() + QDir::separator() + QString(mat->texDirDiffuse().c_str()));
+      srccpy=QDir(srccpy.absolutePath() + QDir::separator() + QString(mat.texDirDiffuse().c_str()));
       QDir dstcpy = destDir;
       dstcpy.cdUp();
 
 
       //create folder if needed.
-      QFileInfo fi =  QFileInfo(dstcpy.absolutePath() + QDir::separator() + QString(mat->texDirDiffuse().c_str()));
+      QFileInfo fi =  QFileInfo(dstcpy.absolutePath() + QDir::separator() + QString(mat.texDirDiffuse().c_str()));
 
 
       QDir mejkdir(fi.absoluteDir());
@@ -123,18 +123,18 @@ bool AssimpToSAModels::convertToXML(bool toXML, const QDir& sourceDir, const QDi
         QDir::home().mkdir(fi.absoluteDir().absolutePath()); //make dir
       }
 
-      dstcpy=QDir(dstcpy.absolutePath() + QDir::separator() + QString(mat->texDirDiffuse().c_str()));
+      dstcpy=QDir(dstcpy.absolutePath() + QDir::separator() + QString(mat.texDirDiffuse().c_str()));
 
 
       qDebug() << "copy " << srccpy.absolutePath() << " -- " << dstcpy.absolutePath();
       if(!QFile::copy(srccpy.absolutePath(), dstcpy.absolutePath())) {
         QDir srccpy = sourceDir;
         srccpy.cdUp();
-        QString difflow = QString(mat->texDirDiffuse().c_str()).toLower();
+        QString difflow = QString(mat.texDirDiffuse().c_str()).toLower();
         srccpy=QDir(srccpy.absolutePath() + QDir::separator() + difflow);
         QDir dstcpy = destDir;
         dstcpy.cdUp();
-        dstcpy=QDir(dstcpy.absolutePath() + QDir::separator() + QString(mat->texDirDiffuse().c_str()));
+        dstcpy=QDir(dstcpy.absolutePath() + QDir::separator() + QString(mat.texDirDiffuse().c_str()));
         QFile::copy(srccpy.absolutePath(), dstcpy.absolutePath());
       }
     }
@@ -198,8 +198,8 @@ bool AssimpToSAModels::convertToXML(bool toXML, const QDir& sourceDir, const QDi
   return isOk;
 }
 
-std::deque<sa::MaterialModel*> AssimpToSAModels::processMaterials(const aiScene* const scene) {
-  std::deque<sa::MaterialModel*> saMaterials;
+std::deque<sa::MaterialModel> AssimpToSAModels::processMaterials(const aiScene* const scene) {
+  std::deque<sa::MaterialModel> saMaterials;
   for(unsigned int materialIt = 0; materialIt < scene->mNumMaterials; ++materialIt) {
     const aiMaterial* material = scene->mMaterials[materialIt];
 
@@ -237,7 +237,7 @@ std::deque<sa::MaterialModel*> AssimpToSAModels::processMaterials(const aiScene*
     float opacity = 1.0f;
     GetMaterialProperty(material, AI_MATKEY_OPACITY, 1.0f, opacity);
 
-    sa::MaterialModel* saMaterial = new sa::MaterialModel(
+    sa::MaterialModel saMaterial(
           static_cast<bool>(twoSided),
           getSaBlendModeFromAi(blendMode),
           texDirAmbient.C_Str(),
@@ -362,24 +362,24 @@ std::deque<sa::AnimationModel<boost::uuids::uuid> * > AssimpToSAModels::processA
   return saAnimations;
 }
 
-std::set<sa::Skeleton*> AssimpToSAModels::processBones(
+std::set<sa::SkeletonPtr> AssimpToSAModels::processBones(
     const aiScene* const scene,
     std::deque<sa::SubMeshModel*> saMeshes,
     const std::map<std::string, boost::uuids::uuid>& nodeKeys)
 {
-  std::set<sa::Skeleton*> saMeshSkeletons;
+  std::set<sa::SkeletonPtr> saMeshSkeletons;
 
   for(std::map<std::string, boost::uuids::uuid>::value_type saNodes : nodeKeys) {
     aiNode* node = scene->mRootNode->FindNode(saNodes.first.c_str());
     if(node->mNumMeshes > 0) {
-      std::deque<sa::Skeleton*> skeletons = processSkeletonsForMeshNode(scene, node);
+      std::deque<sa::SkeletonPtr> skeletons = processSkeletonsForMeshNode(scene, node);
       for(unsigned int i = 0; i < node->mNumMeshes; ++i) {
         if(skeletons[i]->Joints.size() <= 0)
           continue;
         sa::SubMeshModel* saSubMesh = saMeshes[node->mMeshes[i]];
         saMeshSkeletons.insert(skeletons.begin(), skeletons.end());
         saSubMesh->setSkeleton(skeletons[i]);
-        sa::Skeleton* saSkeleton = skeletons[i];
+        sa::SkeletonPtr saSkeleton = skeletons[i];
 
         int boneId = 0;
         for(sa::Skeleton::JointMap::value_type jointEntry : saSkeleton->Joints) {
@@ -395,9 +395,9 @@ std::set<sa::Skeleton*> AssimpToSAModels::processBones(
   return saMeshSkeletons;
 }
 
-std::deque<sa::Skeleton*> AssimpToSAModels::processSkeletonsForMeshNode(const aiScene* scene, aiNode* const meshNode)
+std::deque<sa::SkeletonPtr> AssimpToSAModels::processSkeletonsForMeshNode(const aiScene* scene, aiNode* const meshNode)
 {
-  std::deque<sa::Skeleton*> skeletons;
+  std::deque<sa::SkeletonPtr> skeletons;
   for(unsigned int i = 0; i < meshNode->mNumMeshes; ++i)
   {
     aiMesh* mesh = scene->mMeshes[meshNode->mMeshes[i]];
@@ -407,7 +407,7 @@ std::deque<sa::Skeleton*> AssimpToSAModels::processSkeletonsForMeshNode(const ai
 
     std::map<aiNode*, std::string> NodeToSAJointIndex;
 
-    sa::Skeleton* skeleton = new sa::Skeleton();
+    sa::SkeletonPtr skeleton = std::make_shared<sa::Skeleton>();
     for(map_value_type b : boneNodes)
     {
 
@@ -484,7 +484,7 @@ std::map<aiNode* const, const aiBone*> AssimpToSAModels::getBoneNodes(const aiSc
   return boneNodes;
 }
 
-void AssimpToSAModels::processSkeletalAnimations(const aiScene* scene, sa::Skeleton* skeleton)
+void AssimpToSAModels::processSkeletalAnimations(const aiScene* scene, sa::SkeletonPtr skeleton)
 {
   std::map<std::string, std::string> SAJoints;
   //Create animations for the skeleton pose.
@@ -541,7 +541,7 @@ void AssimpToSAModels::processSkeletalAnimations(const aiScene* scene, sa::Skele
 }
 
 
-sa::AABBModel AssimpToSAModels::calculateBoundingBox(bool haveBones, std::deque<sa::SubMeshModel*> saMeshes, std::deque<sa::AnimationModel<boost::uuids::uuid>* > animations, sa::NodeModel* saRoot, sa::Skeleton* skeleton) {
+sa::AABBModel AssimpToSAModels::calculateBoundingBox(bool haveBones, std::deque<sa::SubMeshModel*> saMeshes, std::deque<sa::AnimationModel<boost::uuids::uuid>* > animations, sa::NodeModel* saRoot, sa::SkeletonPtr skeleton) {
   sa::AABBModel totalBBox = calculateBoundingBoxAtSGTransformStep(saMeshes, saRoot);
 
   //Expand the box with node animations if they exist.
@@ -559,7 +559,7 @@ sa::AABBModel AssimpToSAModels::calculateBoundingBox(bool haveBones, std::deque<
 
   //Expand the box with skeletal animations if they exist.
   if(haveBones) {
-    sa::AABBModel bbox = calculateBoundingBoxAtSKAnimationStep(saMeshes, saRoot, skeleton);
+    sa::AABBModel bbox = calculateBoundingBoxAtSKAnimationStep(saMeshes, saRoot);
     //totalBBox.expand(bbox);
     totalBBox=bbox;
   }
@@ -620,7 +620,7 @@ sa::AABBModel AssimpToSAModels::calculateBoundingBoxAtSGAnimationStep(std::deque
   return totalBBox;
 }
 
-sa::AABBModel AssimpToSAModels::calculateBoundingBoxAtSKAnimationStep(std::deque<sa::SubMeshModel*> saMeshes, sa::NodeModel* saRoot, sa::Skeleton* ) {
+sa::AABBModel AssimpToSAModels::calculateBoundingBoxAtSKAnimationStep(std::deque<sa::SubMeshModel*> saMeshes, sa::NodeModel* saRoot ) {
 //  std::map<boost::uuids::uuid, sa::SubMeshModel*> saMeshMap;
 //  for(sa::SubMeshModel* saMesh : saMeshes) {
 //    saMeshMap[saMesh->getKey()] = saMesh;
@@ -638,7 +638,7 @@ sa::AABBModel AssimpToSAModels::calculateBoundingBoxAtSKAnimationStep(std::deque
   bool firstTime = true;
   for(sa::MeshNodeModel* meshNode : getVisitor.m_meshes) {
     sa::SubMeshModel* subMesh = saMeshes[meshNode->mesh()];
-    sa::Skeleton* skeleton = subMesh->skeleton();
+    sa::SkeletonPtr skeleton = subMesh->skeleton();
     for(unsigned int animation = 0; animation < skeleton->getAnimationNames().size(); ++animation) {
       float time = 0.0f;
       while(time < skeleton->Animations[skeleton->getAnimationNames()[animation]].Duration)

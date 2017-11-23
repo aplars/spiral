@@ -55,27 +55,27 @@ void MeshRenderable::toCPU(ImageCache& imageCache, const std::string& texturePat
 
   unsigned int materialKey = 0;
   for(MeshModel::Data::Materials::value_type material : m_meshModel.m_data.m_materials) {
-    if(!material->texDirAmbient().empty()) {
+    if(!material.texDirAmbient().empty()) {
       Image img;
-      if(!imageCache.try_get(m_resourcePath + material->texDirAmbient(), img)) {
-        img = Image(m_resourcePath + material->texDirAmbient());
-        imageCache.insert(m_resourcePath + material->texDirAmbient(), img);
+      if(!imageCache.try_get(m_resourcePath + material.texDirAmbient(), img)) {
+        img = Image(m_resourcePath + material.texDirAmbient());
+        imageCache.insert(m_resourcePath + material.texDirAmbient(), img);
       }
       m_ambientImage[materialKey] = img;
     }
-    if(!material->texDirDiffuse().empty()) {
+    if(!material.texDirDiffuse().empty()) {
       Image img;
-      if(!imageCache.try_get(m_resourcePath + material->texDirDiffuse(), img)) {
-        img = Image(m_resourcePath + material->texDirDiffuse());
-        imageCache.insert(m_resourcePath + material->texDirDiffuse(), img);
+      if(!imageCache.try_get(m_resourcePath + material.texDirDiffuse(), img)) {
+        img = Image(m_resourcePath + material.texDirDiffuse());
+        imageCache.insert(m_resourcePath + material.texDirDiffuse(), img);
       }
       m_diffuseImage[materialKey] = img;
     }
-    if(!material->texDirSpecular().empty()) {
+    if(!material.texDirSpecular().empty()) {
       Image img;
-      if(!imageCache.try_get(m_resourcePath + material->texDirSpecular(), img)) {
-        img = Image(m_resourcePath + material->texDirSpecular());
-        imageCache.insert(m_resourcePath + material->texDirSpecular(), img);
+      if(!imageCache.try_get(m_resourcePath + material.texDirSpecular(), img)) {
+        img = Image(m_resourcePath + material.texDirSpecular());
+        imageCache.insert(m_resourcePath + material.texDirSpecular(), img);
       }
       m_specularImage[materialKey] = img;
     }
@@ -110,13 +110,13 @@ std::set<std::string> getShaderDefinesFromMesh(const MeshModel& mesh) {
 std::set<std::string> getShaderDefinesFromSubMesh(const SubMeshModel& subMesh, const MeshModel::Data::Materials& materials) {
   std::set<std::string> defines;
   auto material = materials[subMesh.getMaterialKey()];
-  if(!material->texDirAmbient().empty()) {
+  if(!material.texDirAmbient().empty()) {
     defines.insert("AMBIENT_TEXTURE");
   }
-  if(!material->texDirDiffuse().empty()) {
+  if(!material.texDirDiffuse().empty()) {
     defines.insert("DIFFUSE_TEXTURE");
   }
-  if(!material->texDirSpecular().empty()) {
+  if(!material.texDirSpecular().empty()) {
     defines.insert("SPECULAR_TEXTURE");
   }
   return defines;
@@ -238,33 +238,33 @@ void MeshRenderable::toGPU(const Config& /*config*/, unsigned int numberOfShadow
 
 
     DrawData subMeshDrawData;
-    const MaterialModel* material = m_meshModel.m_data.m_materials[sm->getMaterialKey()];
+    const MaterialModel& material = m_meshModel.m_data.m_materials[sm->getMaterialKey()];
 
     sa::TexturePtr ambientTex;
     sa::TexturePtr diffuseTex;
     sa::TexturePtr speculaTex;
-    textureCache.try_get(material->texDirAmbient(), ambientTex);
-    textureCache.try_get(material->texDirDiffuse(), diffuseTex);
-    textureCache.try_get(material->texDirSpecular(), speculaTex);
+    textureCache.try_get(material.texDirAmbient(), ambientTex);
+    textureCache.try_get(material.texDirDiffuse(), diffuseTex);
+    textureCache.try_get(material.texDirSpecular(), speculaTex);
 
 
     bool isTransparent = false;
 
     if(!ambientTex)
     {
-      ambientTex =  device->createTextureFromImage(m_ambientImage[sm->getMaterialKey()], Converters::convertWrapMode(material->mappingModeAmbient()));
-      textureCache.insert(material->texDirAmbient(), ambientTex);
+      ambientTex =  device->createTextureFromImage(m_ambientImage[sm->getMaterialKey()], Converters::convertWrapMode(material.mappingModeAmbient()));
+      textureCache.insert(material.texDirAmbient(), ambientTex);
     }
     if(!diffuseTex)
     {
-      diffuseTex =  device->createTextureFromImage(m_diffuseImage[sm->getMaterialKey()], Converters::convertWrapMode(material->mappingModeDiffuse()));
-      textureCache.insert(material->texDirDiffuse(), diffuseTex);
+      diffuseTex =  device->createTextureFromImage(m_diffuseImage[sm->getMaterialKey()], Converters::convertWrapMode(material.mappingModeDiffuse()));
+      textureCache.insert(material.texDirDiffuse(), diffuseTex);
       isTransparent = m_diffuseImage[sm->getMaterialKey()].containTransparentPixels();
     }
     if(!speculaTex)
     {
-      speculaTex =  device->createTextureFromImage(m_specularImage[sm->getMaterialKey()], Converters::convertWrapMode(material->mappingModeSpecular()));
-      textureCache.insert(material->texDirDiffuse(), speculaTex);
+      speculaTex =  device->createTextureFromImage(m_specularImage[sm->getMaterialKey()], Converters::convertWrapMode(material.mappingModeSpecular()));
+      textureCache.insert(material.texDirDiffuse(), speculaTex);
     }
 
 
@@ -272,7 +272,7 @@ void MeshRenderable::toGPU(const Config& /*config*/, unsigned int numberOfShadow
     sa::VertexArrayPtr vao = context->createVertexArray(vertexDesc, vb);
     sa::IndexBufferPtr ib = device->createIndexBuffer(sm->getIndices());
 
-    switch(material->blendMode()) {
+    switch(material.blendMode()) {
     case MaterialModel::BlendMode::Default:
       subMeshDrawData.BlendingFunction = Blending::Normal;
       break;
@@ -285,7 +285,7 @@ void MeshRenderable::toGPU(const Config& /*config*/, unsigned int numberOfShadow
 
     }
     subMeshDrawData.PolygonDrawMode = PolygonMode::Fill;
-    subMeshDrawData.IsTwoSided = material->isTwoSided();
+    subMeshDrawData.IsTwoSided = material.isTwoSided();
     subMeshDrawData.VAO = vao;
     subMeshDrawData.IB = ib;
     subMeshDrawData.Uber_SP = uberSp;
@@ -296,8 +296,8 @@ void MeshRenderable::toGPU(const Config& /*config*/, unsigned int numberOfShadow
     subMeshDrawData.TEX[2] = speculaTex;
     subMeshDrawData.TEX[3] = device->createTextureFromImage(m_atmosphereFogImg, Texture::ClampToEdge);
 
-    subMeshDrawData.Uniforms.IntUniforms["u_isTwoSided"] = static_cast<int>(material->isTwoSided());
-    //subMeshDrawData.Uniforms.IntUniforms["u_flipNormals"] = static_cast<int>(material->isTwoSided());
+    subMeshDrawData.Uniforms.IntUniforms["u_isTwoSided"] = static_cast<int>(material.isTwoSided());
+    //subMeshDrawData.Uniforms.IntUniforms["u_flipNormals"] = static_cast<int>(material.isTwoSided());
     if(ambientTex) {
       subMeshDrawData.Uniforms.Sampler2DUniforms["u_ambientTexture"] = 0;
     }
@@ -305,18 +305,18 @@ void MeshRenderable::toGPU(const Config& /*config*/, unsigned int numberOfShadow
       subMeshDrawData.Uniforms.Sampler2DUniforms["u_diffuseTexture"] = 1;
     }
     //else {
-      subMeshDrawData.Uniforms.Vec4Uniforms["u_diffuseMaterial"] = material->diffuse();
+      subMeshDrawData.Uniforms.Vec4Uniforms["u_diffuseMaterial"] = material.diffuse();
     //}
     if(speculaTex) {
       subMeshDrawData.Uniforms.Sampler2DUniforms["u_specularTexture"] = 2;
     }
     else {
-      subMeshDrawData.Uniforms.Vec4Uniforms["u_specularMaterial"] = material->specular();
+      subMeshDrawData.Uniforms.Vec4Uniforms["u_specularMaterial"] = material.specular();
     }
     subMeshDrawData.Uniforms.Sampler2DUniforms["u_aeralPerspectiveFogColorTexture"] = 3;
 
-    subMeshDrawData.Uniforms.FloatUniforms["u_shininess"] = material->shininess();
-    subMeshDrawData.Uniforms.FloatUniforms["u_shininessStrength"] = material->shininessStrength();
+    subMeshDrawData.Uniforms.FloatUniforms["u_shininess"] = material.shininess();
+    subMeshDrawData.Uniforms.FloatUniforms["u_shininessStrength"] = material.shininessStrength();
 
     subMeshDrawData.Uniforms.Matrix4Uniforms["u_modelMatrix"] = glm::mat4(1.0f);
     m_drawData[meshIndex] = subMeshDrawData;
@@ -441,7 +441,7 @@ void MeshRenderable::applyTransformations() {
     //////////////////////////////////////////////////
     unsigned int subMeshIndex = 0;
     for(sa::MeshModel::Data::SubMeshes::value_type subMesh : m_meshModel.m_data.m_subMeshes) {
-      Skeleton* skeleton = subMesh->skeleton();
+      SkeletonPtr skeleton = subMesh->skeleton();
       skeleton->applyTransformations();
       unsigned int i = 0;
       for(Skeleton::JointMap::value_type j : skeleton->Joints) {

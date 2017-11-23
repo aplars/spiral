@@ -30,7 +30,7 @@ class AssimpToSAModels
 public:
   static bool convertToXML(bool toXML, const QDir& sourceDir, const QDir& destDir, bool isStatic, float scaleFactor);
 
-  static std::deque<sa::MaterialModel*> processMaterials(const aiScene* const scene);
+  static std::deque<sa::MaterialModel> processMaterials(const aiScene* const scene);
 
   static std::deque<sa::SubMeshModel*> processMeshes(const aiScene* const scene);
 
@@ -41,21 +41,21 @@ public:
                                                             const std::map<std::string,
                                                             boost::uuids::uuid>& nodeKeys);
 
-  static std::set<sa::Skeleton*> processBones(const aiScene* const scene,
+  static std::set<sa::SkeletonPtr> processBones(const aiScene* const scene,
                            std::deque<sa::SubMeshModel*> saMeshes,
                            const std::map<std::string, boost::uuids::uuid>& nodeKeys);
 
-  static std::deque<sa::Skeleton*> processSkeletonsForMeshNode(const aiScene* scene, aiNode* const meshNode);
+  static std::deque<sa::SkeletonPtr> processSkeletonsForMeshNode(const aiScene* scene, aiNode* const meshNode);
 
-  static void processSkeletalAnimations(const aiScene* scene, sa::Skeleton* skeleton);
+  static void processSkeletalAnimations(const aiScene* scene, sa::SkeletonPtr skeleton);
 
-  static sa::AABBModel calculateBoundingBox(bool haveBones, std::deque<sa::SubMeshModel*> saMeshes, std::deque<sa::AnimationModel<boost::uuids::uuid>* > animations, sa::NodeModel* saRoot, sa::Skeleton *skeleton);
+  static sa::AABBModel calculateBoundingBox(bool haveBones, std::deque<sa::SubMeshModel*> saMeshes, std::deque<sa::AnimationModel<boost::uuids::uuid>* > animations, sa::NodeModel* saRoot, sa::SkeletonPtr skeleton);
 
   static sa::AABBModel calculateBoundingBoxAtSGTransformStep(std::deque<sa::SubMeshModel*> saMeshes, sa::NodeModel* saRoot);
 
   static sa::AABBModel calculateBoundingBoxAtSGAnimationStep(std::deque<sa::SubMeshModel*> saMeshes, const sa::AnimationModel<boost::uuids::uuid>* animation, sa::NodeModel* saRoot, float time);
 
-  static sa::AABBModel calculateBoundingBoxAtSKAnimationStep(std::deque<sa::SubMeshModel*> saMeshes, sa::NodeModel* saRoot, sa::Skeleton *);
+  static sa::AABBModel calculateBoundingBoxAtSKAnimationStep(std::deque<sa::SubMeshModel*> saMeshes, sa::NodeModel* saRoot);
 
 private:
   template <typename T>

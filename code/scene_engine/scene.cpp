@@ -12,11 +12,6 @@ namespace sa {
 
 Scene::~Scene()
 {
-  for(Models::value_type e : m_meshes) {
-    Model* entity = e.second;
-    delete entity;
-    entity = nullptr;
-  }
 }
 
 Scene::Scene(unsigned int width, unsigned int height, Config config)
@@ -144,12 +139,12 @@ void Scene::setSunPosition(float phi, float theta) {
   m_sun.setDirection(glm::vec3() - glm::vec3(x, y, z));
 }
 
-void Scene::addMeshEntity(const std::string& name, MeshRenderablePtr mesh, bool castShadow) {
-  Model* streamedEntity = new Model(mesh, castShadow);
+void Scene::addModel(const std::string& name, MeshRenderablePtr mesh, bool castShadow) {
+  ModelPtr model = std::make_shared<Model>(mesh, castShadow);
 //  AABBModel aabbmodel = streamedEntity->getBoundingBox();
 //  addDebugBox(name+"db", aabbmodel.getCenter()[0], aabbmodel.getCenter()[1], aabbmodel.getCenter()[2],
 //      aabbmodel.getHalfSize()[0], aabbmodel.getHalfSize()[1], aabbmodel.getHalfSize()[2]);
-  m_meshes[name] = streamedEntity;
+  models[name] = model;
 
  // streamedEntity->addPropertyChangedListener([&name, this](const StreamedMeshEntity::PropertyChangedEvent& /*evt*/) {
     //DebugEntityBox* box = getDebugBoxEntety(name+"db");
@@ -157,17 +152,22 @@ void Scene::addMeshEntity(const std::string& name, MeshRenderablePtr mesh, bool 
  // });
 }
 
-void Scene::addGroundMeshEntity(const std::string& name, MeshRenderablePtr mesh, bool castShadow) {
-  Model* streamedEntity = new Model(mesh, castShadow);
-  m_meshes[name] = streamedEntity;
-  m_groundMeshes[name] = streamedEntity;
+void Scene::addGroundModel(const std::string& name, MeshRenderablePtr mesh, bool castShadow) {
+  ModelPtr model = std::make_shared<Model>(mesh, castShadow);
+  models[name] = model;
+  m_groundModels[name] = model;
 }
 
-void Scene::removeMeshEntity(const std::string& name) {
+void Scene::removeModel(const std::string& name) {
   //Add the mesh to the remove list.
   //The mesh will be deleted safely during update.
   //We need to do this to make sure to avoid thread collisions.
-  m_meshesToDelete.push_back(name);
+  m_modelsToDelete.push_back(name);
+}
+
+ModelPtr Scene::getMeshEntity(const std::string &name)
+{
+  return models[name];
 }
 
 void Scene::addDebugBox(const std::string& name, float posx, float posy, float posz, float hw, float hh, float hd) {
@@ -177,7 +177,7 @@ void Scene::addDebugBox(const std::string& name, float posx, float posy, float p
 void Scene::toCPU() {
   std::array<PlaneT<float>, 6> frustum = m_camera.getFrustum(m_projection);
 
-  for(Models::value_type e : m_meshes) {
+  for(Models::value_type e : models) {
     AABBModel bbox = e.second->getBoundingBox();
     IntersectionTests::Side side = IntersectionTests::FrustumAABBIntersect(frustum, bbox.getMin(), bbox.getMax());
     bool isInFrustums = (side == IntersectionTests::Inside || side == IntersectionTests::Intersect) | m_shadowMapping.isAABBVisibleFromSun(m_sunCamera, bbox.getMin(), bbox.getMax());
@@ -239,7 +239,7 @@ void Scene::toGPU(RenderDevice* device, RenderContext* context) {
     }
   }
 
-  for(Models::value_type e : m_meshes) {
+  for(Models::value_type e : models) {
     if(e.second->currentDataStorage() == DataStorage::CPU)
     {
       e.second->toGPU(m_config, m_shadowMapping.getNumberOfPasses(), m_textureCache, m_shaderCache, device, context);
@@ -253,17 +253,17 @@ void Scene::toGPU(RenderDevice* device, RenderContext* context) {
 
 void Scene::deleteMeshes(Models meshes, Models groundMeshes)
 {
-  for(std::deque<std::string>::iterator toDeleteIt = m_meshesToDelete.begin(); toDeleteIt != m_meshesToDelete.end(); ) {
+  for(std::deque<std::string>::iterator toDeleteIt = m_modelsToDelete.begin(); toDeleteIt != m_modelsToDelete.end(); ) {
     Models::const_iterator findIt = meshes.find(*toDeleteIt);
     Models::const_iterator gmFindIt = groundMeshes.find(*toDeleteIt);
     if(findIt != meshes.end())
     {
-      Model* entity = findIt->second;
+      ModelPtr entity = findIt->second;
       if(entity->currentDataStorage() != DataStorage::Pending)
       {
-        delete entity;
+        //delete entity;
         entity = nullptr;
-        toDeleteIt = m_meshesToDelete.erase(toDeleteIt);
+        toDeleteIt = m_modelsToDelete.erase(toDeleteIt);
         meshes.erase(findIt);
         if(gmFindIt != groundMeshes.end())
           groundMeshes.erase(gmFindIt);
@@ -274,25 +274,25 @@ void Scene::deleteMeshes(Models meshes, Models groundMeshes)
     }
     else {
       //The mesh does not exist. Remove it from the delete list.
-      toDeleteIt = m_meshesToDelete.erase(toDeleteIt);
+      toDeleteIt = m_modelsToDelete.erase(toDeleteIt);
     }
   }
 }
 
 void Scene::update(float dt) {
   //Delete meshes that are not pending (loading)
-  deleteMeshes(m_meshes, m_groundMeshes);
+  deleteMeshes(models, m_groundModels);
 
 
-  std::deque<Model*> entetiesDeq;
-  for(Models::value_type e : m_meshes) {
+  std::deque<ModelPtr> entetiesDeq;
+  for(Models::value_type e : models) {
     entetiesDeq.push_back(e.second);
   }
 
 
 #pragma omp parallel for
   for(unsigned int i = 0; i < entetiesDeq.size(); ++i) {
-    Model* e = entetiesDeq[i];
+    ModelPtr e = entetiesDeq[i];
     e->applyAnimations(dt);
   }
 
@@ -320,7 +320,7 @@ void Scene::drawShadowPass(RenderContext* context) {
 
   DrawDataList allToDraw;
 
-  for(Models::value_type e : m_meshes) {
+  for(Models::value_type e : models) {
     DrawDataList dds = e.second->getDrawData(RenderPass::Shadow);
     allToDraw.insert(allToDraw.end(), dds.begin(), dds.end());
   }
@@ -361,7 +361,7 @@ void Scene::drawUberPass(RenderContext* context)
   }
   allToDraw.push_back(m_sky.getDrawData(RenderPass::Uber));
 
-  for(Models::value_type e : m_meshes) {
+  for(Models::value_type e : models) {
     DrawDataList dds = e.second->getDrawData(RenderPass::Uber);
     allToDraw.insert(allToDraw.end(), dds.begin(), dds.end());
   }
@@ -409,7 +409,7 @@ void Scene::createLightShaftsPass(RenderContext *context)
   context->clear();
   DrawDataList allToDraw;
 
-  for(Models::value_type e : m_meshes) {
+  for(Models::value_type e : models) {
     DrawDataList dds = e.second->getDrawData(RenderPass::SunLightShafts);
     allToDraw.insert(allToDraw.end(), dds.begin(), dds.end());
   }

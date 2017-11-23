@@ -55,13 +55,10 @@ public:
   void setAtmosDensity(float density);
   void setAtmosWeight(float weight);
   FPSCamera& camera() { return m_camera; }
-  void addMeshEntity(const std::string& name, MeshRenderablePtr mesh, bool castShadow);
-  void addGroundMeshEntity(const std::string& name, MeshRenderablePtr mesh, bool castShadow);
-  void removeMeshEntity(const std::string& name);
-  Model* getMeshEntity(const std::string& name)
-  {
-    return m_meshes[name];
-  }
+  void addModel(const std::string& name, MeshRenderablePtr mesh, bool castShadow);
+  void addGroundModel(const std::string& name, MeshRenderablePtr mesh, bool castShadow);
+  void removeModel(const std::string& name);
+  ModelPtr getMeshEntity(const std::string& name);
   DebugEntityBox* getDebugBoxEntety(const std::string& name) {
     DebugBoxEntities::const_iterator it = m_debugBoxes.find(name);
     if(it == m_debugBoxes.end())
@@ -89,7 +86,7 @@ private:
   //void createShadowBufferRectangle(RenderDevice* device, RenderContext* context, float posx, float posy, float sw, float sh);
 
 
-  typedef std::map<std::string, Model*> Models;
+  typedef std::map<std::string, std::shared_ptr<Model>> Models;
   typedef std::map<std::string, DebugEntityBox*> DebugBoxEntities;
 
   unsigned int m_screenWidth, m_screenHeight;
@@ -106,9 +103,9 @@ private:
   FPSCamera m_sunCamera;
   DirectionalLight m_sun;
   glm::vec4 m_ambientColor = {0.5, 0.5, 0.5, 1.0};
-  Models m_meshes;
-  Models m_groundMeshes;
-  std::deque<std::string> m_meshesToDelete;
+  Models models;
+  Models m_groundModels;
+  std::deque<std::string> m_modelsToDelete;
   DebugBoxEntities m_debugBoxes;
   sky::Sky m_sky;
   Weather m_weather;

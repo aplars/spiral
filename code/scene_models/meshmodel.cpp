@@ -7,7 +7,7 @@
 namespace sa {
 
 MeshModel MeshModel::createGroundPlane(int width, int depth) {
-  MaterialModel* material = new MaterialModel(
+  MaterialModel material(
         false,
         MaterialModel::BlendMode::None,
         "",
@@ -54,7 +54,7 @@ MeshModel::~MeshModel()
 
 }
 
-void MeshModel::setMaterials(const std::deque<MaterialModel*>& materials) {
+void MeshModel::setMaterials(const MeshModel::Data::Materials& materials) {
   m_data.m_materials = materials;
 }
 

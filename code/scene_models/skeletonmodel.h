@@ -44,4 +44,5 @@ namespace sa
       ar & BOOST_SERIALIZATION_NVP(Animations);
     }
   };
+  typedef std::shared_ptr<Skeleton> SkeletonPtr;
 }
